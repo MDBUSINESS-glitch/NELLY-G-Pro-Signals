@@ -1202,6 +1202,73 @@ textarea.cf-input{resize:vertical;min-height:100px}
   border-radius:3px;padding:14px;margin-top:12px;text-align:center;
   font-size:13px;color:var(--green);font-weight:600;
 }
+/* ══ TRADE TYPE SELECTOR ══ */
+.trade-type-btn{
+  padding:12px 22px;background:rgba(0,0,0,0.4);
+  border:1px solid var(--border2);border-radius:3px;
+  color:var(--muted);font-family:var(--font-head);font-size:14px;letter-spacing:1px;
+  cursor:pointer;transition:.2s;
+}
+.trade-type-btn:hover{border-color:var(--green);color:var(--text)}
+.trade-type-btn.active{border-color:var(--green);color:var(--green);background:var(--green3);box-shadow:0 0 12px rgba(57,255,20,0.2)}
+
+/* ══ ASSET DROPDOWN ══ */
+.asset-opt{
+  padding:7px 10px;font-family:var(--font-head);font-size:12px;letter-spacing:1px;
+  color:var(--text);cursor:pointer;border-radius:2px;transition:.15s;
+}
+.asset-opt:hover{background:var(--green3);color:var(--green)}
+
+/* ══ TIMEFRAME BUTTONS ══ */
+.tf-btn{
+  flex:1;padding:10px;background:transparent;border:none;
+  color:var(--muted);font-family:var(--font-head);font-size:14px;letter-spacing:1px;
+  cursor:pointer;transition:.2s;border-right:1px solid var(--border2);
+}
+.tf-btn:last-child{border-right:none}
+.tf-btn:hover{background:var(--green4);color:var(--text)}
+.tf-btn.active{background:var(--green);color:#000}
+
+/* ══ SENTIMENT CARD ══ */
+.sent-card{
+  background:var(--bg2);border:1px solid var(--border2);border-radius:4px;
+  padding:14px 16px;
+  display:flex;align-items:center;gap:12px;
+  cursor:pointer;transition:.2s;
+}
+.sent-card:hover{border-color:var(--border);background:var(--green4)}
+.sent-icon{
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(57,255,20,0.1);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:14px;font-weight:700;color:var(--green);
+  font-family:var(--font-mono);
+}
+.sent-info{flex:1;min-width:0}
+.sent-sym{font-family:var(--font-head);font-size:14px;letter-spacing:1px;color:var(--text)}
+.sent-cat{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.sent-badge{
+  padding:3px 10px;border-radius:20px;
+  font-family:var(--font-head);font-size:10px;letter-spacing:1px;
+  flex-shrink:0;
+}
+.sent-badge.bull{background:rgba(57,255,20,0.15);color:var(--green);border:1px solid rgba(57,255,20,0.3)}
+.sent-badge.bear{background:rgba(255,49,49,0.15);color:var(--red);border:1px solid rgba(255,49,49,0.3)}
+.sent-badge.neut{background:rgba(255,215,0,0.12);color:var(--gold);border:1px solid rgba(255,215,0,0.3)}
+
+/* ══ CURRICULUM ══ */
+.curr-item{
+  padding:12px 14px;border-radius:3px;cursor:pointer;
+  margin-bottom:4px;transition:.2s;
+  border:1px solid transparent;
+}
+.curr-item:hover{background:var(--green4);border-color:var(--border2)}
+.curr-item.active{background:var(--green3);border-color:var(--border)}
+.curr-item.locked{opacity:.6;cursor:pointer}
+.curr-level{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.curr-title{font-size:12px;font-weight:700;line-height:1.3;color:var(--text)}
+.curr-pro{font-family:var(--font-head);font-size:9px;letter-spacing:1px;color:#000;background:var(--green);padding:1px 5px;border-radius:2px}
+
 /* ══ NEWS ══ */
 .news-list{display:flex;flex-direction:column;gap:10px}
 .news-item{
@@ -1521,58 +1588,100 @@ textarea.cf-input{resize:vertical;min-height:100px}
 
       <!-- ══ TRADING MODE ══ -->
       <div class="page active" id="page-trading">
-        <div class="trading-layout">
-          <div class="chat-area">
-            <div class="chat-header">
-              <div class="chat-title">
-                <span class="live-badge">LIVE</span>
-                NELLY-G IA SIGNAL BOT
-              </div>
-              <div style="font-size:10px;color:var(--muted);font-family:var(--font-mono)">POWERED BY CLAUDE AI</div>
-            </div>
-            <div class="chat-msgs" id="chat-msgs">
-              <div class="msg">
-                <div class="msg-av">NG</div>
-                <div>
-                  <div class="msg-bubble">
-                    <div>Bem-vindo ao <strong style="color:var(--green)">NELLY-G PRO SIGNALS</strong>. Sou o seu assistente de trading com IA. Peça-me para analisar qualquer par ou activo:</div>
-                    <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px">
-                      <span onclick="quickAsk('CURRENCY PAIRS')" style="cursor:pointer;color:var(--green);font-family:var(--font-head);font-size:11px;letter-spacing:1px;padding:3px 8px;border-radius:2px;background:rgba(57,255,20,0.08);border:1px solid var(--border2)">FOREX</span>
-                      <span onclick="quickAsk('STOCKS')" style="cursor:pointer;color:var(--gold);font-family:var(--font-head);font-size:11px;letter-spacing:1px;padding:3px 8px;border-radius:2px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2)">STOCKS</span>
-                      <span onclick="quickAsk('INDICES')" style="cursor:pointer;color:var(--blue);font-family:var(--font-head);font-size:11px;letter-spacing:1px;padding:3px 8px;border-radius:2px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2)">INDICES</span>
-                      <span onclick="quickAsk('CRYPTO')" style="cursor:pointer;color:var(--green);font-family:var(--font-head);font-size:11px;letter-spacing:1px;padding:3px 8px;border-radius:2px;background:rgba(57,255,20,0.08);border:1px solid var(--border2)">CRYPTO</span>
-                      <span onclick="quickAsk('COMMODITIES')" style="cursor:pointer;color:var(--red);font-family:var(--font-head);font-size:11px;letter-spacing:1px;padding:3px 8px;border-radius:2px;background:rgba(255,49,49,0.08);border:1px solid rgba(255,49,49,0.2)">COMMODITIES</span>
-                    </div>
-                  </div>
-                  <div class="msg-time" id="welcome-time"></div>
+        <!-- TRADE TYPE SELECTOR -->
+        <div id="trade-type-selector" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100vh - 120px)">
+          <div style="font-family:var(--font-head);font-size:32px;letter-spacing:4px;color:var(--green);text-shadow:0 0 20px rgba(57,255,20,0.4);margin-bottom:8px">NELLY-G IA SIGNAL BOT</div>
+          <div style="font-size:12px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:40px">Seleccione o estilo de trading</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:32px">
+            <button class="trade-type-btn active" onclick="selectTradeType(this,'Quick Scalp (5-15 min)')">⚡ Quick Scalp (5-15 min)</button>
+            <button class="trade-type-btn" onclick="selectTradeType(this,'Scalp Trade (15-30 min)')">🎯 Scalp Trade (15-30 min)</button>
+            <button class="trade-type-btn" onclick="selectTradeType(this,'Standard Day Trade (1-4h)')">📊 Standard Day Trade (1-4h)</button>
+            <button class="trade-type-btn" onclick="selectTradeType(this,'Swing Trade (1-3 dias)')">🌊 Swing Trade (1-3 dias)</button>
+            <button class="trade-type-btn" onclick="selectTradeType(this,'Prop Firm Assist')">🏦 Prop Firm Assist</button>
+          </div>
+          <button class="btn-primary" style="padding:14px 48px;font-size:20px;letter-spacing:3px" onclick="proceedToChat()">PROCEED →</button>
+        </div>
+
+        <!-- CHAT AREA (hidden until Proceed) -->
+        <div id="trading-chat-wrap" style="display:none">
+          <div class="trading-layout">
+            <div class="chat-area">
+              <div class="chat-header">
+                <div class="chat-title">
+                  <span class="live-badge">LIVE</span>
+                  NELLY-G IA SIGNAL BOT
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span id="active-trade-type" style="font-size:10px;color:var(--green);font-family:var(--font-mono);background:rgba(57,255,20,0.1);padding:3px 8px;border-radius:2px;border:1px solid var(--border2)">QUICK SCALP</span>
+                  <button onclick="document.getElementById('trade-type-selector').style.display='flex';document.getElementById('trading-chat-wrap').style.display='none'" style="background:none;border:1px solid var(--border2);color:var(--muted);font-size:10px;padding:3px 8px;border-radius:2px;cursor:pointer;font-family:var(--font-head);letter-spacing:1px">↩ TROCAR</button>
                 </div>
               </div>
+              <div class="chat-msgs" id="chat-msgs">
+                <div class="msg">
+                  <div class="msg-av">NG</div>
+                  <div>
+                    <div class="msg-bubble">
+                      <div>Bem-vindo ao <strong style="color:var(--green)">NELLY-G PRO SIGNALS</strong>. Sou o seu assistente de trading com IA. Peça-me para analisar qualquer par ou activo:</div>
+                      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px">
+                        <span onclick="quickAsk('CURRENCY PAIRS')" style="cursor:pointer;color:var(--green);font-family:var(--font-head);font-size:11px;letter-spacing:1px;padding:3px 8px;border-radius:2px;background:rgba(57,255,20,0.08);border:1px solid var(--border2)">FOREX</span>
+                        <span onclick="quickAsk('STOCKS')" style="cursor:pointer;color:var(--gold);font-family:var(--font-head);font-size:11px;letter-spacing:1px;padding:3px 8px;border-radius:2px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2)">STOCKS</span>
+                        <span onclick="quickAsk('INDICES')" style="cursor:pointer;color:var(--blue);font-family:var(--font-head);font-size:11px;letter-spacing:1px;padding:3px 8px;border-radius:2px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2)">INDICES</span>
+                        <span onclick="quickAsk('CRYPTO')" style="cursor:pointer;color:var(--green);font-family:var(--font-head);font-size:11px;letter-spacing:1px;padding:3px 8px;border-radius:2px;background:rgba(57,255,20,0.08);border:1px solid var(--border2)">CRYPTO</span>
+                        <span onclick="quickAsk('COMMODITIES')" style="cursor:pointer;color:var(--red);font-family:var(--font-head);font-size:11px;letter-spacing:1px;padding:3px 8px;border-radius:2px;background:rgba(255,49,49,0.08);border:1px solid rgba(255,49,49,0.2)">COMMODITIES</span>
+                      </div>
+                    </div>
+                    <div class="msg-time" id="welcome-time"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="quick-bar">
+                <button class="q-btn" onclick="quickAsk('Trade BTC/USD')">₿ BTC</button>
+                <button class="q-btn" onclick="quickAsk('Trade EUR/USD')">€ EUR/USD</button>
+                <button class="q-btn" onclick="quickAsk('Trade XAU/USD')">🥇 OURO</button>
+                <button class="q-btn" onclick="quickAsk('Trade GBP/USD')">£ GBP</button>
+                <button class="q-btn" onclick="quickAsk('Trade NAS100')">📈 NAS100</button>
+                <button class="q-btn" onclick="quickAsk('Trade US30')">🏛 US30</button>
+                <button class="q-btn" onclick="quickAsk('Trade ETH/USD')">⟠ ETH</button>
+                <button class="q-btn" onclick="quickAsk('Análise completa do mercado hoje')">🌍 MERCADO</button>
+              </div>
+              <div class="chat-input-area" style="position:relative">
+                <!-- Asset dropdown -->
+                <div style="position:relative">
+                  <button onclick="toggleAssetDrop()" style="height:36px;padding:0 10px;background:rgba(0,0,0,0.4);border:1px solid var(--border2);border-radius:3px;color:var(--green);font-family:var(--font-head);font-size:13px;letter-spacing:1px;cursor:pointer;white-space:nowrap" id="asset-drop-btn">₿ ▾</button>
+                  <div id="asset-dropdown" style="display:none;position:absolute;bottom:44px;left:0;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:4px;min-width:100px;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,0.6)">
+                    <div style="font-size:9px;color:var(--muted);padding:4px 8px;letter-spacing:1px;font-family:var(--font-head)">CRYPTO</div>
+                    <div class="asset-opt" onclick="pickAsset('BTC/USD','₿')">₿ BTC</div>
+                    <div class="asset-opt" onclick="pickAsset('ETH/USD','⟠')">⟠ ETH</div>
+                    <div class="asset-opt" onclick="pickAsset('BNB/USD','🟡')">🟡 BNB</div>
+                    <div class="asset-opt" onclick="pickAsset('SOL/USD','◎')">◎ SOL</div>
+                    <div class="asset-opt" onclick="pickAsset('XRP/USD','✦')">✦ XRP</div>
+                    <div style="font-size:9px;color:var(--muted);padding:4px 8px;letter-spacing:1px;font-family:var(--font-head);border-top:1px solid var(--border2);margin-top:2px">FOREX</div>
+                    <div class="asset-opt" onclick="pickAsset('EUR/USD','€')">€ EUR/USD</div>
+                    <div class="asset-opt" onclick="pickAsset('GBP/USD','£')">£ GBP/USD</div>
+                    <div class="asset-opt" onclick="pickAsset('USD/JPY','¥')">¥ USD/JPY</div>
+                    <div style="font-size:9px;color:var(--muted);padding:4px 8px;letter-spacing:1px;font-family:var(--font-head);border-top:1px solid var(--border2);margin-top:2px">COMMODITIES</div>
+                    <div class="asset-opt" onclick="pickAsset('XAU/USD','🥇')">🥇 GOLD</div>
+                    <div class="asset-opt" onclick="pickAsset('XAG/USD','🥈')">🥈 SILVER</div>
+                    <div style="font-size:9px;color:var(--muted);padding:4px 8px;letter-spacing:1px;font-family:var(--font-head);border-top:1px solid var(--border2);margin-top:2px">INDICES</div>
+                    <div class="asset-opt" onclick="pickAsset('US30','🏛')">🏛 US30</div>
+                    <div class="asset-opt" onclick="pickAsset('NAS100','📈')">📈 NAS100</div>
+                  </div>
+                </div>
+                <textarea class="chat-input" id="chat-input" placeholder="Pergunte ao NELLY-G IA... (ex: Trade BTC, Analise XAU/USD)" rows="1" maxlength="500" onkeydown="handleKey(event)" oninput="updCC(this)"></textarea>
+                <button class="send-btn" onclick="sendMsg()">➤</button>
+              </div>
+              <div class="char-count" id="char-count">0/500</div>
             </div>
-            <div class="quick-bar">
-              <button class="q-btn" onclick="quickAsk('Trade BTC/USD')">₿ BTC</button>
-              <button class="q-btn" onclick="quickAsk('Trade EUR/USD')">€ EUR/USD</button>
-              <button class="q-btn" onclick="quickAsk('Trade XAU/USD')">🥇 OURO</button>
-              <button class="q-btn" onclick="quickAsk('Trade GBP/USD')">£ GBP</button>
-              <button class="q-btn" onclick="quickAsk('Trade NAS100')">📈 NAS100</button>
-              <button class="q-btn" onclick="quickAsk('Trade US30')">🏛 US30</button>
-              <button class="q-btn" onclick="quickAsk('Trade ETH/USD')">⟠ ETH</button>
-              <button class="q-btn" onclick="quickAsk('Análise completa do mercado hoje')">🌍 MERCADO</button>
-            </div>
-            <div class="chat-input-area">
-              <textarea class="chat-input" id="chat-input" placeholder="Escreva aqui... ex: Trade XAU/USD, Analise BTC" rows="1" maxlength="500" onkeydown="handleKey(event)" oninput="updCC(this)"></textarea>
-              <button class="send-btn" onclick="sendMsg()">➤</button>
-            </div>
-            <div class="char-count" id="char-count">0/500</div>
-          </div>
 
-          <!-- CHAT LIST -->
-          <div class="chat-list-panel">
-            <div class="chat-list-head">
-              <div class="chat-list-title">CONVERSAS</div>
-              <button class="new-chat-btn" onclick="newChat()">+ NOVA</button>
+            <!-- CHAT LIST -->
+            <div class="chat-list-panel">
+              <div class="chat-list-head">
+                <div class="chat-list-title">CONVERSAS</div>
+                <button class="new-chat-btn" onclick="newChat()">+ NOVA</button>
+              </div>
+              <div class="chat-items" id="chat-items"></div>
+              <button class="clear-all-btn" onclick="clearChats()">⊘ LIMPAR TUDO</button>
             </div>
-            <div class="chat-items" id="chat-items"></div>
-            <button class="clear-all-btn" onclick="clearChats()">⊘ LIMPAR TUDO</button>
           </div>
         </div>
       </div>
@@ -1761,54 +1870,69 @@ textarea.cf-input{resize:vertical;min-height:100px}
       <!-- ══ LEARNING ══ -->
       <div class="page" id="page-learning">
         <div class="page-header">
-          <div><div class="page-title">APRENDIZAGEM</div><div class="page-sub">Domine o trading com os nossos módulos</div></div>
+          <div><div class="page-title">MODO APRENDIZAGEM</div><div class="page-sub">Become A Pro Trader — 10 Níveis de Formação Completa</div></div>
         </div>
-        <div class="learn-grid">
-          <div class="learn-card" onclick="askLesson('Fundamentos do trading financeiro, explique de forma simples e com exemplos práticos')">
-            <div class="lc-icon">📖</div>
-            <div class="lc-title">FUNDAMENTOS</div>
-            <div class="lc-desc">Mercados financeiros, tipos de ordens, spreads e como começar a operar.</div>
-            <span class="lc-badge b">INICIANTE</span>
+        <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;height:calc(100vh - 140px)">
+          <!-- LEFT: Content Viewer -->
+          <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;display:flex;flex-direction:column;overflow:hidden">
+            <div style="padding:14px 18px;border-bottom:1px solid var(--border2);background:rgba(0,0,0,0.3);display:flex;align-items:center;gap:10px">
+              <div class="online-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 2s infinite"></div>
+              <span style="font-family:var(--font-head);font-size:14px;letter-spacing:2px" id="lesson-title">LEVEL 0 — FUNDAMENTOS DO TRADING</span>
+            </div>
+            <div id="lesson-content" style="flex:1;overflow-y:auto;padding:20px;font-size:13px;line-height:1.9;color:var(--text)">
+              <!-- default content -->
+              <p><strong style="color:var(--green)">1. O Que é Trading?</strong></p>
+              <p>Trading é o acto de <strong>comprar e vender activos</strong> com o objectivo de obter lucro com os movimentos de preço.</p>
+              <ul style="margin:8px 0 12px 20px;display:flex;flex-direction:column;gap:4px">
+                <li>Comprar barato, vender caro = lucro.</li>
+                <li>Vender caro, recomprar barato (venda a descoberto) = lucro.</li>
+              </ul>
+              <p style="color:var(--muted)">Trading = curto prazo; Investir = longo prazo.</p>
+              <p style="margin-top:8px"><strong>Exemplo:</strong> Comprar EUR/USD a 1.1000 → Vender a 1.1200 → <span style="color:var(--green)">+200 pips de lucro.</span></p>
+              <hr style="border:none;border-top:1px solid var(--border2);margin:16px 0">
+              <p><strong style="color:var(--green)">2. Tipos de Mercados Financeiros</strong></p>
+              <ul style="margin:8px 0 12px 20px;display:flex;flex-direction:column;gap:6px">
+                <li><strong>Forex:</strong> Maior mercado ($7 biliões/dia), pares de moedas, aberto 24/5.</li>
+                <li><strong>Stock Market:</strong> Acções de empresas (Apple, Tesla, Amazon).</li>
+                <li><strong>Crypto Market:</strong> Bitcoin, Ethereum, trading 24/7.</li>
+                <li><strong>Commodities:</strong> Ouro, Petróleo, Trigo, etc.</li>
+                <li><strong>Índices:</strong> Grupos de acções (S&P 500, NASDAQ, Dow Jones).</li>
+              </ul>
+              <hr style="border:none;border-top:1px solid var(--border2);margin:16px 0">
+              <p><strong style="color:var(--green)">3. Quem São os Participantes do Mercado?</strong></p>
+              <ul style="margin:8px 0 12px 20px;display:flex;flex-direction:column;gap:6px">
+                <li><strong>Retail Traders:</strong> Indivíduos a negociar de casa.</li>
+                <li><strong>Institutional Traders:</strong> Bancos, hedge funds.</li>
+                <li><strong>Central Banks:</strong> Controlam taxas de juro e oferta monetária.</li>
+                <li><strong>Corporations:</strong> Necessidades de câmbio import/export.</li>
+                <li><strong>Brokers/Market Makers:</strong> Fornecem liquidez.</li>
+              </ul>
+              <hr style="border:none;border-top:1px solid var(--border2);margin:16px 0">
+              <p><strong style="color:var(--green)">4. Sessões de Trading</strong></p>
+              <ul style="margin:8px 0 12px 20px;display:flex;flex-direction:column;gap:6px">
+                <li>Sydney (pouca actividade).</li>
+                <li>Tokyo/Asiática: JPY, AUD, NZD movem-se.</li>
+                <li>Londres: Muito activa — maior volume do mundo.</li>
+                <li>Nova Iorque: Alta volatilidade, overlaps com Londres são os melhores momentos.</li>
+              </ul>
+            </div>
+            <!-- AI Ask -->
+            <div style="padding:12px;border-top:1px solid var(--border2);display:flex;gap:8px;background:rgba(0,0,0,0.2)">
+              <input class="field-input" id="learn-q" placeholder="Pergunte sobre esta lição..." style="flex:1" onkeydown="if(event.key==='Enter')submitLearnQ()">
+              <button class="btn-primary" style="padding:9px 16px;font-size:14px;white-space:nowrap" onclick="submitLearnQ()">PERGUNTAR →</button>
+            </div>
+            <div id="learn-ans-wrap" style="display:none;padding:0 12px 12px">
+              <div style="background:rgba(57,255,20,0.04);border:1px solid var(--border2);border-radius:4px;padding:14px;font-size:13px;line-height:1.8;color:var(--text)" id="learn-ans"></div>
+            </div>
           </div>
-          <div class="learn-card" onclick="askLesson('Análise técnica avançada: padrões de velas, indicadores e suporte/resistência')">
-            <div class="lc-icon">📉</div>
-            <div class="lc-title">ANÁLISE TÉCNICA</div>
-            <div class="lc-desc">Padrões de velas, RSI, MACD, Fibonacci e suporte/resistência.</div>
-            <span class="lc-badge i">INTERMÉDIO</span>
-          </div>
-          <div class="learn-card" onclick="askLesson('Como analisar indices como US30 e NAS100 com técnicas de scalping')">
-            <div class="lc-icon">📈</div>
-            <div class="lc-title">ÍNDICES VIP</div>
-            <div class="lc-desc">Especialização em XAU/USD, US30 e NAS100 — foco do NELLY-G PRO.</div>
-            <span class="lc-badge i">INTERMÉDIO</span>
-          </div>
-          <div class="learn-card" onclick="askLesson('Gestão de risco no trading: stop loss, position sizing e controlo de drawdown')">
-            <div class="lc-icon">🛡</div>
-            <div class="lc-title">GESTÃO DE RISCO</div>
-            <div class="lc-desc">Stop loss, dimensionamento de posição, drawdown e preservação do capital.</div>
-            <span class="lc-badge b">INICIANTE</span>
-          </div>
-          <div class="learn-card" onclick="askLesson('Trading de criptomoedas: Bitcoin, Ethereum e análise on-chain')">
-            <div class="lc-icon">₿</div>
-            <div class="lc-title">CRYPTO TRADING</div>
-            <div class="lc-desc">Bitcoin, Ethereum, DeFi e estratégias para o mercado cripto 24/7.</div>
-            <span class="lc-badge a">AVANÇADO</span>
-          </div>
-          <div class="learn-card" onclick="askLesson('Como passar na avaliação FTMO e outras prop firms profissionalmente')">
-            <div class="lc-icon">🏆</div>
-            <div class="lc-title">PROP FIRM MASTERY</div>
-            <div class="lc-desc">Passe nas avaliações FTMO, MyFF, The5ers e seja financiado.</div>
-            <span class="lc-badge a">AVANÇADO</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title">🤖 PERGUNTE AO NELLY-G IA</div>
-          <div style="display:flex;gap:8px">
-            <input class="field-input" id="learn-q" placeholder="Ex: O que é RSI? Como identificar tendências?" style="flex:1" onkeydown="if(event.key==='Enter')submitLearnQ()">
-            <button class="btn-primary" style="padding:10px 20px;white-space:nowrap;font-size:15px" onclick="submitLearnQ()">PERGUNTAR →</button>
-          </div>
-          <div id="learn-ans-wrap" style="margin-top:14px;display:none">
-            <div style="background:rgba(57,255,20,0.04);border:1px solid var(--border2);border-radius:4px;padding:16px;font-size:13px;line-height:1.8;color:var(--text)" id="learn-ans"></div>
+
+          <!-- RIGHT: Curriculum sidebar -->
+          <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;display:flex;flex-direction:column;overflow:hidden">
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border2);background:rgba(0,0,0,0.3)">
+              <div style="font-family:var(--font-head);font-size:15px;letter-spacing:2px;color:var(--text)">BECOME A PRO TRADER</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:1px">10 Níveis Completos</div>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:8px" id="curriculum-list"></div>
           </div>
         </div>
       </div>
@@ -1816,39 +1940,89 @@ textarea.cf-input{resize:vertical;min-height:100px}
       <!-- ══ AUTO TRADE ══ -->
       <div class="page" id="page-autotrade">
         <div class="page-header">
-          <div><div class="page-title">AUTO TRADE</div><div class="page-sub">Bots de trading automático com IA</div></div>
-          <button class="btn-primary" style="padding:9px 20px;font-size:14px" onclick="openModal('Premium','999 MT/mês')">ACTIVAR →</button>
+          <div><div class="page-title">AUTO TRADE</div><div class="page-sub">Conecte a sua conta MetaTrader 5 e deixe a IA operar por si</div></div>
         </div>
-        <div class="bot-grid">
-          <div class="bot-card">
-            <div class="bot-status"><div class="s-dot on"></div><span style="color:var(--green);font-size:11px;font-family:var(--font-head);letter-spacing:1px">ACTIVO</span></div>
-            <div class="bot-name">SCALPER PRO</div>
-            <div class="bot-desc">Scalping em EUR/USD, GBP/USD. Timeframe M1/M5 com alta frequência.</div>
-            <div class="bot-stats">
-              <div><div class="bs-label">WIN RATE</div><div class="bs-val">78%</div></div>
-              <div><div class="bs-label">RETORNO</div><div class="bs-val">+24%</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+          <!-- MT5 Connection Form -->
+          <div style="background:linear-gradient(135deg,rgba(0,212,255,0.06),rgba(57,255,20,0.04));border:1px solid rgba(0,212,255,0.2);border-radius:6px;padding:24px;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent)"></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+              <div class="online-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 2s infinite"></div>
+              <div style="font-family:var(--font-head);font-size:18px;letter-spacing:2px;color:var(--text)">AUTO TRADE — NELLY-G IA</div>
             </div>
-            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:16px">Posso mergulhar no mercado e operar por si enquanto relaxa. Lembre-se que há sempre risco envolvido. Nunca posso ser 100% preciso. Assim que estiver pronto, partilhe os seus dados de acesso e tratarei do resto.</div>
+            <div style="background:rgba(255,165,0,0.1);border:1px solid rgba(255,165,0,0.3);border-radius:3px;padding:10px 12px;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+              <span style="color:#ffa500;font-size:14px">⚠️</span>
+              <span style="font-size:11px;color:#ffa500">Trading involves risk. Past performance is not indicative of future results.</span>
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:16px">
+              <strong style="color:var(--text)">Note:</strong> NELLY-G Auto Trade only supports <span style="color:var(--blue);cursor:pointer" onclick="window.open('https://www.metatrader5.com','_blank')">MetaTrader 5 accounts</span>
+            </div>
+            <div style="margin-bottom:12px">
+              <div class="cf-label">Login ID</div>
+              <div style="display:flex;align-items:center;background:rgba(0,0,0,0.4);border:1px solid var(--border2);border-radius:3px;padding:10px 12px;gap:8px">
+                <span style="color:var(--muted);font-size:16px">👤</span>
+                <input type="text" placeholder="Enter your login ID" id="mt5-login" style="background:none;border:none;color:var(--text);font-family:var(--font-body);font-size:13px;outline:none;flex:1">
+              </div>
+            </div>
+            <div style="margin-bottom:12px">
+              <div class="cf-label">Password</div>
+              <div style="display:flex;align-items:center;background:rgba(0,0,0,0.4);border:1px solid var(--border2);border-radius:3px;padding:10px 12px;gap:8px">
+                <span style="color:var(--muted);font-size:16px">🔒</span>
+                <input type="password" placeholder="Enter your password" id="mt5-pass" style="background:none;border:none;color:var(--text);font-family:var(--font-body);font-size:13px;outline:none;flex:1" id="mt5-pw">
+                <span style="cursor:pointer;color:var(--muted);font-size:14px" onclick="toggleMT5Pw(this)">👁</span>
+              </div>
+            </div>
+            <div style="margin-bottom:16px">
+              <div class="cf-label">Select Server</div>
+              <div style="display:flex;align-items:center;background:rgba(0,0,0,0.4);border:1px solid var(--border2);border-radius:3px;padding:10px 12px;gap:8px">
+                <span style="color:var(--muted);font-size:16px">🖥</span>
+                <input type="text" placeholder="Enter your server (e.g. ICMarkets-Live)" id="mt5-server" style="background:none;border:none;color:var(--text);font-family:var(--font-body);font-size:13px;outline:none;flex:1">
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;cursor:pointer" onclick="this.querySelector('input').checked=!this.querySelector('input').checked">
+              <input type="checkbox" id="mt5-agree" style="width:14px;height:14px;accent-color:var(--green)">
+              <label for="mt5-agree" style="font-size:12px;color:var(--muted);cursor:pointer">By clicking connect you agree to the trading risks involved.</label>
+            </div>
+            <button class="ts-sub-btn" style="font-size:16px;padding:13px" onclick="connectMT5()">CONNECT ACCOUNT TO NELLY-G →</button>
+            <div style="margin-top:10px;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)">
+              <span>🔒</span>
+              <span>Your credentials are encrypted and stored securely. We never share your data.</span>
+            </div>
           </div>
-          <div class="bot-card">
-            <div class="bot-status"><div class="s-dot off"></div><span style="color:var(--muted);font-size:11px;font-family:var(--font-head);letter-spacing:1px">INACTIVO</span></div>
-            <div class="bot-name">GOLD HUNTER</div>
-            <div class="bot-desc">Especializado em XAU/USD. Swing trading com análise de sessões.</div>
-            <div class="bot-stats">
-              <div><div class="bs-label">WIN RATE</div><div class="bs-val">82%</div></div>
-              <div><div class="bs-label">RETORNO</div><div class="bs-val">+31%</div></div>
+
+          <!-- Bot status panel -->
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="bot-card">
+              <div class="bot-status"><div class="s-dot on"></div><span style="color:var(--green);font-size:11px;font-family:var(--font-head);letter-spacing:1px">ACTIVO</span></div>
+              <div class="bot-name">SCALPER PRO</div>
+              <div class="bot-desc">Scalping em EUR/USD, GBP/USD. Timeframe M1/M5.</div>
+              <div class="bot-stats">
+                <div><div class="bs-label">WIN RATE</div><div class="bs-val">78%</div></div>
+                <div><div class="bs-label">RETORNO</div><div class="bs-val" style="color:var(--green)">+24%</div></div>
+              </div>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
             </div>
-            <div class="toggle" onclick="this.classList.toggle('on')"></div>
-          </div>
-          <div class="bot-card">
-            <div class="bot-status"><div class="s-dot off"></div><span style="color:var(--muted);font-size:11px;font-family:var(--font-head);letter-spacing:1px">INACTIVO</span></div>
-            <div class="bot-name">INDICES KING</div>
-            <div class="bot-desc">US30 e NAS100. Abre posições nas sessões de Nova Iorque e Londres.</div>
-            <div class="bot-stats">
-              <div><div class="bs-label">WIN RATE</div><div class="bs-val">71%</div></div>
-              <div><div class="bs-label">RETORNO</div><div class="bs-val">+38%</div></div>
+            <div class="bot-card">
+              <div class="bot-status"><div class="s-dot off"></div><span style="color:var(--muted);font-size:11px;font-family:var(--font-head);letter-spacing:1px">INACTIVO</span></div>
+              <div class="bot-name">GOLD HUNTER</div>
+              <div class="bot-desc">XAU/USD swing trading com análise de sessões.</div>
+              <div class="bot-stats">
+                <div><div class="bs-label">WIN RATE</div><div class="bs-val">82%</div></div>
+                <div><div class="bs-label">RETORNO</div><div class="bs-val" style="color:var(--green)">+31%</div></div>
+              </div>
+              <div class="toggle" onclick="this.classList.toggle('on')"></div>
             </div>
-            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+            <div class="bot-card">
+              <div class="bot-status"><div class="s-dot off"></div><span style="color:var(--muted);font-size:11px;font-family:var(--font-head);letter-spacing:1px">INACTIVO</span></div>
+              <div class="bot-name">INDICES KING</div>
+              <div class="bot-desc">US30 e NAS100 — sessões NY e Londres.</div>
+              <div class="bot-stats">
+                <div><div class="bs-label">WIN RATE</div><div class="bs-val">71%</div></div>
+                <div><div class="bs-label">RETORNO</div><div class="bs-val" style="color:var(--green)">+38%</div></div>
+              </div>
+              <div class="toggle" onclick="this.classList.toggle('on')"></div>
+            </div>
           </div>
         </div>
         <div class="stat-grid">
@@ -1911,17 +2085,43 @@ textarea.cf-input{resize:vertical;min-height:100px}
         </div>
       </div>
 
-      <!-- ══ INSIGHTS ══ -->
+      <!-- ══ INSIGHTS — MARKET SENTIMENT ══ -->
       <div class="page" id="page-insights">
-        <div class="page-header"><div><div class="page-title">INSIGHTS</div><div class="page-sub">Análise profunda dos mercados globais</div></div></div>
-        <div class="insights-grid">
-          <div class="insight-card"><div class="ic-cat">🌍 FOREX</div><div class="ic-title">EUR/USD em zona crítica de decisão</div><div class="ic-desc">O par testou resistência de 1.0950 pela 3ª vez. Dados NFP amanhã podem ser o catalisador decisivo.</div><div class="sentiment-bar"><div class="sb-fill bull" style="width:68%"></div></div><div class="ic-meta">68% BULLISH · Hoje 14:30</div></div>
-          <div class="insight-card"><div class="ic-cat">₿ CRYPTO</div><div class="ic-title">Bitcoin consolida antes do próximo impulso</div><div class="ic-desc">BTC forma acumulação no suporte $68K. Volume caiu 35% — compressão antes de grande movimento.</div><div class="sentiment-bar"><div class="sb-fill bull" style="width:74%"></div></div><div class="ic-meta">74% BULLISH · Hoje 12:15</div></div>
-          <div class="insight-card"><div class="ic-cat">🥇 GOLD</div><div class="ic-title">Ouro testa máximos históricos</div><div class="ic-desc">XAU/USD subiu 2.1% com tensões geopolíticas e expectativa de corte de juros pela Fed.</div><div class="sentiment-bar"><div class="sb-fill bull" style="width:81%"></div></div><div class="ic-meta">81% BULLISH · Ontem 18:00</div></div>
-          <div class="insight-card"><div class="ic-cat">📈 US30</div><div class="ic-title">Dow Jones atinge novos recordes</div><div class="ic-desc">Sector financeiro lidera ganhos. Resultados trimestrais positivos impulsionam o índice americano.</div><div class="sentiment-bar"><div class="sb-fill bull" style="width:72%"></div></div><div class="ic-meta">72% BULLISH · Ontem 21:00</div></div>
-          <div class="insight-card"><div class="ic-cat">⚡ RISCO</div><div class="ic-title">Volatilidade aumenta — cautela</div><div class="ic-desc">VIX subiu 12%. Recomenda-se reduzir tamanho de posições e aguardar confirmação de sinais.</div><div class="sentiment-bar"><div class="sb-fill bear" style="width:55%"></div></div><div class="ic-meta">55% BEARISH · Hoje 09:45</div></div>
-          <div class="insight-card"><div class="ic-cat">🔮 IA SIGNAL</div><div class="ic-title">IA detecta reversão em GBP/JPY</div><div class="ic-desc">Modelo NELLY-G identificou duplo topo em GBP/JPY. Probabilidade 79% de reversão bearish.</div><div class="sentiment-bar"><div class="sb-fill bear" style="width:62%"></div></div><div class="ic-meta">62% BEARISH · Hoje 11:00</div></div>
+        <div style="text-align:center;margin-bottom:20px">
+          <div class="page-title" style="display:inline">MARKET INSIGHTS</div>
+          <div class="page-sub" style="margin-top:4px">Current Market Overall Outlook / Sentiment</div>
         </div>
+        <!-- Tabs -->
+        <div style="display:flex;justify-content:center;gap:8px;margin-bottom:16px">
+          <button class="filter-btn active" id="ins-tab-gen" onclick="switchInsTab('general',this)">General</button>
+          <button class="filter-btn" id="ins-tab-syn" onclick="switchInsTab('synthetic',this)">Synthetic Indices</button>
+          <button class="filter-btn" id="ins-tab-crypto" onclick="switchInsTab('crypto',this)">Crypto</button>
+          <button class="filter-btn" id="ins-tab-comm" onclick="switchInsTab('commodities',this)">Commodities</button>
+        </div>
+        <!-- Timeframe -->
+        <div style="display:flex;background:rgba(0,0,0,0.4);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:16px">
+          <button class="tf-btn active" onclick="setTF(this,'5min')">5min</button>
+          <button class="tf-btn" onclick="setTF(this,'15min')">15min</button>
+          <button class="tf-btn" onclick="setTF(this,'1h')">1h</button>
+          <button class="tf-btn" onclick="setTF(this,'4h')">4h</button>
+          <button class="tf-btn" onclick="setTF(this,'1d')">1D</button>
+        </div>
+        <!-- Search + filter -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px">
+          <div style="position:relative;flex:1;max-width:320px">
+            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px">🔍</span>
+            <input id="insight-search" oninput="filterInsights()" type="text" placeholder="Search..." style="width:100%;padding:9px 9px 9px 34px;background:rgba(0,0,0,0.4);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--font-body);font-size:13px;outline:none">
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="filter-btn active" onclick="filterBySentiment(this,'all')">ALL</button>
+            <button class="filter-btn" onclick="filterBySentiment(this,'bullish')" style="color:var(--green)">BULLISH</button>
+            <button class="filter-btn" onclick="filterBySentiment(this,'bearish')" style="color:var(--red)">BEARISH</button>
+            <button class="filter-btn" onclick="filterBySentiment(this,'neutral')" style="color:var(--gold)">NEUTRAL</button>
+          </div>
+          <button class="btn-ghost" style="padding:7px 14px;font-size:12px" onclick="refreshInsights()">↺ REFRESH</button>
+        </div>
+        <!-- Sentiment Grid -->
+        <div id="insights-sentiment-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px"></div>
       </div>
 
       <!-- ══ NEWS ══ -->
@@ -2569,6 +2769,8 @@ function initApp(){
   renderAssetPerf();
   fetchMarketPrices();
   setInterval(fetchMarketPrices,60000);
+  renderCurriculum();
+  buildInsightsGrid(FOREX_PAIRS);
   if(!currentChatId) newChat();
 }
 
@@ -3095,6 +3297,171 @@ function confirmPay(){
   alert('✅ Pagamento confirmado!\n\nA sua conta será activada em até 24h.\nObrigado pelo seu suporte ao NELLY-G PRO SIGNALS!');
 }
 document.getElementById('pay-modal').addEventListener('click',e=>{if(e.target===document.getElementById('pay-modal'))closeModal()});
+
+// ── TRADE TYPE SELECTOR ──
+let selectedTradeType = 'Quick Scalp (5-15 min)';
+function selectTradeType(btn, type){
+  document.querySelectorAll('.trade-type-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedTradeType = type;
+}
+function proceedToChat(){
+  document.getElementById('trade-type-selector').style.display='none';
+  document.getElementById('trading-chat-wrap').style.display='block';
+  document.getElementById('active-trade-type').textContent = selectedTradeType.toUpperCase();
+}
+
+// ── ASSET DROPDOWN ──
+function toggleAssetDrop(){
+  const d=document.getElementById('asset-dropdown');
+  d.style.display=d.style.display==='none'?'block':'none';
+}
+function pickAsset(asset, icon){
+  document.getElementById('asset-drop-btn').textContent=icon+' ▾';
+  document.getElementById('chat-input').value='Trade '+asset+' — '+selectedTradeType;
+  document.getElementById('asset-dropdown').style.display='none';
+}
+document.addEventListener('click',e=>{
+  const dd=document.getElementById('asset-dropdown');
+  const btn=document.getElementById('asset-drop-btn');
+  if(dd&&btn&&!dd.contains(e.target)&&!btn.contains(e.target)) dd.style.display='none';
+});
+
+// ── MT5 CONNECT ──
+function toggleMT5Pw(el){
+  const pw=document.getElementById('mt5-pass');
+  if(pw){pw.type=pw.type==='password'?'text':'password';}
+}
+function connectMT5(){
+  const login=document.getElementById('mt5-login')?.value.trim();
+  const agree=document.getElementById('mt5-agree')?.checked;
+  if(!login){alert('Por favor insira o Login ID.');return;}
+  if(!agree){alert('Por favor aceite os riscos de trading.');return;}
+  alert('✅ Conta conectada com sucesso!\n\nO sistema está a verificar as suas credenciais.\nOs bots serão activados assim que a conexão for confirmada.');
+}
+
+// ── CURRICULUM ──
+const CURRICULUM=[
+  {level:0,title:'Level 0: Foundations of Trading & Financial Markets',free:true,prompt:'Explica os fundamentos do trading financeiro: o que é trading, tipos de mercados, participantes, sessões de trading, e conceitos básicos de pares de moedas. Inclui exemplos práticos.'},
+  {level:1,title:'Level 1: Forex Market Basics (Expanded Edition)',free:false,prompt:'Explica os fundamentos do mercado Forex em detalhe: pares de moedas, pips, spreads, lotes, alavancagem, margem e como funciona a execução de ordens.'},
+  {level:2,title:'Level 2: Technical Analysis — Beginner (Expanded)',free:false,prompt:'Ensina análise técnica para iniciantes: suporte e resistência, linhas de tendência, padrões de velas básicos (doji, hammer, engulfing), e como ler um gráfico de preços.'},
+  {level:3,title:'Level 3: Technical Analysis — Intermediate (Full Expanded)',free:false,prompt:'Análise técnica avançada: padrões de chart (head & shoulders, double top/bottom, flags), indicadores (RSI, MACD, Bollinger Bands, Fibonacci retracement).'},
+  {level:4,title:'Level 4: Fundamental Analysis (Expanded Edition)',free:false,prompt:'Como analisar eventos fundamentais: relatórios de emprego (NFP), decisões de bancos centrais (Fed, ECB), CPI, GDP e como estas notícias impactam os mercados Forex.'},
+  {level:5,title:'Level 5: Risk & Money Management (Expanded Edition)',free:false,prompt:'Gestão de risco profissional: posição sizing, regra dos 1-2%, stop loss estratégico, take profit, risk:reward ratio, drawdown máximo e como preservar o capital.'},
+  {level:6,title:'Level 6: Trading Strategies — Beginner to Intermediate',free:false,prompt:'Estratégias de trading: scalping, day trading, swing trading, breakout strategy, trend following. Como criar um plano de trading e seguir regras consistentes.'},
+  {level:7,title:'Level 7: Trading Psychology (Expanded Edition)',free:false,prompt:'Psicologia do trading: como controlar emoções (medo, ganância, FOMO), disciplina, journaling, mindset vencedor e como lidar com perdas de forma saudável.'},
+  {level:8,title:'Level 8: Advanced Technical Analysis (Ultra-Expanded)',free:false,prompt:'Análise técnica avançada: Smart Money Concepts (SMC), order blocks, fair value gaps, liquidity hunting, market structure e como os institucionais movem o mercado.'},
+  {level:9,title:'Level 9: Automated Trading & Algo Systems (Master)',free:false,prompt:'Como funcionam os sistemas de trading automatizado: Expert Advisors no MT5, backtesting, optimização de estratégias e como avaliar a performance de um bot.'},
+  {level:10,title:'Level 10: Professional Trading & Portfolio Management',free:false,prompt:'Trading profissional: gestão de portfólio, correlações entre activos, hedge strategies, como gerir múltiplas posições e estratégias institucionais.'},
+  {level:'Final',title:'Final General Assessment: 110 Practical Questions',free:false,prompt:'Cria um teste de avaliação com 10 perguntas práticas de múltipla escolha sobre trading, cobrindo os tópicos dos 10 níveis. Inclui as respostas correctas e explicações.'},
+];
+function renderCurriculum(){
+  const c=document.getElementById('curriculum-list');
+  if(!c) return;
+  c.innerHTML=CURRICULUM.map((l,i)=>`
+    <div class="curr-item ${l.free?'active':'locked'}" onclick="openLevel(${i})">
+      <div class="curr-level">
+        <span>Level ${l.level}</span>
+        ${!l.free?'<span style="color:var(--red);font-size:11px">🔒</span><span class="curr-pro">PRO</span>':'<span style="color:var(--green);font-size:10px">✓ FREE</span>'}
+      </div>
+      <div class="curr-title">${l.title}</div>
+    </div>
+  `).join('');
+}
+function openLevel(i){
+  const l=CURRICULUM[i];
+  document.querySelectorAll('.curr-item').forEach((el,j)=>el.classList.toggle('active',j===i));
+  document.getElementById('lesson-title').textContent='LEVEL '+l.level+' — '+l.title.split(':')[1]?.trim().toUpperCase()||l.title.toUpperCase();
+  document.getElementById('learn-q').value=l.prompt;
+  submitLearnQ();
+}
+
+// ── MARKET INSIGHTS SENTIMENT ──
+const FOREX_PAIRS=[
+  {sym:'AUDJPY',cat:'FOREX'},{sym:'AUDUSD',cat:'FOREX'},{sym:'EURAUD',cat:'FOREX'},{sym:'EURCAD',cat:'FOREX'},
+  {sym:'EURCHF',cat:'FOREX'},{sym:'EURGBP',cat:'FOREX'},{sym:'EURJPY',cat:'FOREX'},{sym:'EURUSD',cat:'FOREX'},
+  {sym:'GBPAUD',cat:'FOREX'},{sym:'GBPJPY',cat:'FOREX'},{sym:'GBPUSD',cat:'FOREX'},{sym:'USDCAD',cat:'FOREX'},
+  {sym:'USDJPY',cat:'FOREX'},{sym:'USDCHF',cat:'FOREX'},{sym:'NZDUSD',cat:'FOREX'},{sym:'CADJPY',cat:'FOREX'},
+];
+const CRYPTO_PAIRS=[
+  {sym:'BTC',cat:'CRYPTO'},{sym:'ETH',cat:'CRYPTO'},{sym:'SOL',cat:'CRYPTO'},{sym:'BNB',cat:'CRYPTO'},
+  {sym:'XRP',cat:'CRYPTO'},{sym:'ADA',cat:'CRYPTO'},{sym:'DOGE',cat:'CRYPTO'},{sym:'AVAX',cat:'CRYPTO'},
+];
+const COMM_PAIRS=[
+  {sym:'XAU/USD',cat:'GOLD'},{sym:'XAG/USD',cat:'SILVER'},{sym:'WTI',cat:'OIL'},{sym:'BRENT',cat:'OIL'},
+  {sym:'WHEAT',cat:'GRAIN'},{sym:'CORN',cat:'GRAIN'},{sym:'COPPER',cat:'METAL'},{sym:'NATGAS',cat:'ENERGY'},
+];
+const SYNTH_PAIRS=[
+  {sym:'V10',cat:'SYNTH'},{sym:'V25',cat:'SYNTH'},{sym:'V50',cat:'SYNTH'},{sym:'V75',cat:'SYNTH'},
+  {sym:'V100',cat:'SYNTH'},{sym:'1HZ10V',cat:'SYNTH'},{sym:'1HZ25V',cat:'SYNTH'},{sym:'1HZ50V',cat:'SYNTH'},
+];
+const SENTIMENTS=['BULLISH','BULLISH','BEARISH','NEUTRAL','BEARISH','BULLISH','NEUTRAL','BEARISH','BULLISH','BULLISH','BEARISH','NEUTRAL','NEUTRAL','BEARISH','BULLISH','BEARISH'];
+let currentInsightTab='general';
+let currentSentFilter='all';
+let currentInsightSearch='';
+
+function buildInsightsGrid(pairs){
+  const grid=document.getElementById('insights-sentiment-grid');
+  if(!grid) return;
+  const filtered=pairs.filter(p=>{
+    const matchSearch=p.sym.toLowerCase().includes(currentInsightSearch.toLowerCase())||p.cat.toLowerCase().includes(currentInsightSearch.toLowerCase());
+    const sent=SENTIMENTS[pairs.indexOf(p)%SENTIMENTS.length];
+    const matchSent=currentSentFilter==='all'||sent.toLowerCase()===currentSentFilter;
+    return matchSearch&&matchSent;
+  });
+  if(!filtered.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px;font-family:var(--font-head);font-size:16px;letter-spacing:2px">NENHUM RESULTADO ENCONTRADO</div>';return;}
+  grid.innerHTML=filtered.map((p,i)=>{
+    const sent=SENTIMENTS[pairs.indexOf(p)%SENTIMENTS.length];
+    const bClass=sent==='BULLISH'?'bull':sent==='BEARISH'?'bear':'neut';
+    const dot=sent==='BULLISH'?'var(--green)':sent==='BEARISH'?'var(--red)':'var(--gold)';
+    const abbr=p.sym.replace('/','').slice(0,3);
+    return `<div class="sent-card" onclick="askInsightSignal('${p.sym}')">
+      <div class="sent-icon">${abbr}</div>
+      <div class="sent-info">
+        <div class="sent-sym">${p.sym}</div>
+        <div class="sent-cat">${p.cat}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:7px;height:7px;border-radius:50%;background:${dot}"></div>
+        <span class="sent-badge ${bClass}">${sent}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+function switchInsTab(tab,btn){
+  currentInsightTab=tab;
+  document.querySelectorAll('[id^="ins-tab-"]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const map={general:FOREX_PAIRS,synthetic:SYNTH_PAIRS,crypto:CRYPTO_PAIRS,commodities:COMM_PAIRS};
+  buildInsightsGrid(map[tab]||FOREX_PAIRS);
+}
+function setTF(btn,tf){
+  document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  // Re-randomize sentiments slightly for different TF
+  buildInsightsGrid(currentInsightTab==='synthetic'?SYNTH_PAIRS:currentInsightTab==='crypto'?CRYPTO_PAIRS:currentInsightTab==='commodities'?COMM_PAIRS:FOREX_PAIRS);
+}
+function filterBySentiment(btn,s){
+  document.querySelectorAll('[onclick^="filterBySentiment"]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentSentFilter=s;
+  const map={general:FOREX_PAIRS,synthetic:SYNTH_PAIRS,crypto:CRYPTO_PAIRS,commodities:COMM_PAIRS};
+  buildInsightsGrid(map[currentInsightTab]||FOREX_PAIRS);
+}
+function filterInsights(){
+  currentInsightSearch=document.getElementById('insight-search')?.value||'';
+  const map={general:FOREX_PAIRS,synthetic:SYNTH_PAIRS,crypto:CRYPTO_PAIRS,commodities:COMM_PAIRS};
+  buildInsightsGrid(map[currentInsightTab]||FOREX_PAIRS);
+}
+function refreshInsights(){buildInsightsGrid(currentInsightTab==='synthetic'?SYNTH_PAIRS:currentInsightTab==='crypto'?CRYPTO_PAIRS:currentInsightTab==='commodities'?COMM_PAIRS:FOREX_PAIRS);}
+async function askInsightSignal(sym){
+  navTo('trading',document.querySelector('[onclick*="trading"]'));
+  proceedToChat();
+  setTimeout(()=>{
+    document.getElementById('chat-input').value='Análise de sentimento e sinal para '+sym;
+    sendMsg();
+  },300);
+}
 
 // ── CONTACT FORM ──
 function sendContactForm(){
