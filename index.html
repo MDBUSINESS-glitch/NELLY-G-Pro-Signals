@@ -940,6 +940,152 @@ canvas{max-width:100%}
 .firm-name{font-family:var(--font-head);font-size:14px;letter-spacing:1px;margin-bottom:2px}
 .firm-payout{font-size:11px;color:var(--green);font-family:var(--font-mono)}
 
+/* ══ TRADING SIGNALS PAGE ══ */
+.ts-hero{
+  text-align:center;padding:32px 20px 24px;
+  background:linear-gradient(180deg,rgba(57,255,20,0.06) 0%,transparent 100%);
+  border-bottom:1px solid var(--border2);margin-bottom:28px;position:relative;
+}
+.ts-hero::before{
+  content:'NELLY-G PRO SIGNALS';position:absolute;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:var(--font-head);font-size:90px;letter-spacing:8px;
+  color:rgba(57,255,20,0.025);white-space:nowrap;pointer-events:none;
+}
+.ts-hero-title{
+  font-family:var(--font-head);font-size:46px;letter-spacing:5px;
+  color:var(--green);text-shadow:0 0 40px rgba(57,255,20,0.5),0 0 80px rgba(57,255,20,0.2);
+  line-height:1;margin-bottom:10px;position:relative;
+}
+.ts-hero-sub{
+  font-size:12px;color:var(--muted);letter-spacing:2px;
+  text-transform:uppercase;max-width:700px;margin:0 auto;
+  position:relative;
+}
+.ts-packages{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:20px;margin-bottom:20px;
+}
+.ts-packages.row2{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:20px;max-width:800px;margin:0 auto 20px;
+}
+.ts-card{
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-radius:6px;overflow:hidden;
+  position:relative;transition:.3s;
+  display:flex;flex-direction:column;
+}
+.ts-card:hover{transform:translateY(-4px);border-color:var(--border);box-shadow:0 8px 40px rgba(57,255,20,0.15)}
+.ts-card.featured{border-color:var(--green);box-shadow:0 0 30px rgba(57,255,20,0.12)}
+.ts-card.free-card{border-color:rgba(57,255,20,0.3)}
+.ts-card-top-bar{height:3px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.ts-card.free-card .ts-card-top-bar{background:linear-gradient(90deg,transparent,rgba(57,255,20,0.5),transparent)}
+.ts-card-header{
+  padding:22px 22px 16px;
+  border-bottom:1px solid var(--border2);
+  position:relative;
+}
+.ts-badge{
+  position:absolute;top:16px;right:16px;
+  background:var(--green);color:#000;
+  font-family:var(--font-head);font-size:10px;letter-spacing:1.5px;
+  padding:3px 10px;border-radius:2px;
+}
+.ts-badge.free{background:rgba(57,255,20,0.15);color:var(--green);border:1px solid rgba(57,255,20,0.4)}
+.ts-badge.hot{background:var(--red);color:#fff}
+.ts-card-icon{
+  font-size:28px;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.ts-card-name{
+  font-family:var(--font-head);font-size:22px;letter-spacing:2px;
+  color:var(--text);line-height:1;margin-bottom:4px;
+}
+.ts-card-tagline{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.ts-price-block{
+  padding:14px 22px;
+  display:flex;align-items:baseline;gap:6px;
+  border-bottom:1px solid var(--border2);
+  background:rgba(0,0,0,0.2);
+}
+.ts-price{
+  font-family:var(--font-mono);font-size:34px;
+  color:var(--green);text-shadow:0 0 15px rgba(57,255,20,0.4);
+}
+.ts-price-period{font-size:12px;color:var(--muted);letter-spacing:1px}
+.ts-price-usd{
+  margin-left:auto;font-family:var(--font-mono);font-size:12px;
+  color:var(--muted);text-decoration:line-through;
+}
+.ts-price.free{color:var(--green);font-size:28px}
+.ts-features{
+  padding:18px 22px;flex:1;
+  display:flex;flex-direction:column;gap:10px;
+}
+.ts-feat{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:13px;font-weight:600;line-height:1.4;
+}
+.ts-feat-icon{
+  width:22px;height:22px;border-radius:3px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;
+}
+.ts-feat-icon.g{background:rgba(57,255,20,0.15);color:var(--green)}
+.ts-feat-icon.r{background:rgba(255,49,49,0.15);color:var(--red)}
+.ts-feat-icon.b{background:rgba(0,212,255,0.15);color:var(--blue)}
+.ts-feat-icon.y{background:rgba(255,215,0,0.15);color:var(--gold)}
+.ts-feat-text{color:var(--text)}
+.ts-feat-text.na{color:var(--muted);text-decoration:line-through}
+.ts-card-footer{padding:18px 22px;border-top:1px solid var(--border2)}
+.ts-sub-btn{
+  width:100%;padding:13px;
+  background:var(--green);border:none;border-radius:3px;
+  color:#000;font-family:var(--font-head);font-size:17px;letter-spacing:2px;
+  cursor:pointer;transition:.2s;
+  box-shadow:0 4px 20px rgba(57,255,20,0.25);
+}
+.ts-sub-btn:hover{background:var(--green2);box-shadow:0 6px 30px rgba(57,255,20,0.4);transform:translateY(-1px)}
+.ts-sub-btn.outline{
+  background:transparent;color:var(--green);
+  border:1px solid var(--green);
+  box-shadow:none;
+}
+.ts-sub-btn.outline:hover{background:var(--green3)}
+.ts-starburst{
+  position:absolute;top:-14px;right:18px;
+  width:64px;height:64px;background:var(--green);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+}
+.ts-starburst-price{font-family:var(--font-head);font-size:18px;color:#000;line-height:1}
+.ts-starburst-period{font-family:var(--font-head);font-size:8px;color:#000;letter-spacing:1px}
+.ts-comparison{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:4px;padding:20px;margin-top:4px;
+}
+.ts-cmp-title{font-family:var(--font-head);font-size:18px;letter-spacing:2px;margin-bottom:16px;text-align:center}
+.cmp-table{width:100%;border-collapse:collapse}
+.cmp-table th{
+  text-align:center;font-family:var(--font-head);font-size:11px;letter-spacing:2px;
+  color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--border2);
+}
+.cmp-table th:first-child{text-align:left}
+.cmp-table td{
+  padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.03);
+  text-align:center;font-size:12px;
+}
+.cmp-table td:first-child{text-align:left;color:var(--muted);font-weight:600;letter-spacing:.3px}
+.cmp-table tr:hover td{background:rgba(57,255,20,0.02)}
+.cmp-check{color:var(--green);font-size:14px}
+.cmp-cross{color:var(--muted);font-size:12px}
+.cmp-head-cell{
+  font-family:var(--font-head);font-size:12px;letter-spacing:1px;
+  color:var(--text);
+}
+.cmp-head-cell.featured{color:var(--green)}
 /* ══ NEWS ══ */
 .news-list{display:flex;flex-direction:column;gap:10px}
 .news-item{
@@ -1120,6 +1266,10 @@ canvas{max-width:100%}
     <button class="nav-item" onclick="navTo('signals',this)">
       <span class="nav-icon">📡</span><span>Sinais ao Vivo</span>
       <span class="nav-badge">LIVE</span>
+    </button>
+    <button class="nav-item" onclick="navTo('tradingsignals',this)">
+      <span class="nav-icon">💎</span><span>Trading Signals</span>
+      <span class="nav-badge" style="background:var(--green);color:#000">NEW</span>
     </button>
     <div style="border-top:1px solid var(--border2);margin:8px 0"></div>
     <div class="sidebar-section">FERRAMENTAS</div>
@@ -1725,6 +1875,315 @@ canvas{max-width:100%}
           <button class="btn-ghost" style="padding:7px 16px;font-size:13px" onclick="markAllRead()">MARCAR LIDAS</button>
         </div>
         <div class="notif-list" id="notif-list"></div>
+      </div>
+
+      <!-- ══ TRADING SIGNALS PAGE ══ -->
+      <div class="page" id="page-tradingsignals">
+        <div class="ts-hero">
+          <div class="ts-hero-title">TRADING SIGNALS</div>
+          <div class="ts-hero-sub">Escolha o plano certo para o seu estilo de trading — preços em Metical · Pagamento via M-Pesa &amp; e-Mola</div>
+        </div>
+
+        <!-- ROW 1: 3 packages -->
+        <div class="ts-packages">
+
+          <!-- FREE SIGNALS -->
+          <div class="ts-card free-card">
+            <div class="ts-card-top-bar"></div>
+            <div class="ts-card-header">
+              <div class="ts-badge free">GRÁTIS</div>
+              <div class="ts-card-icon">🚀</div>
+              <div class="ts-card-name">FREE SIGNALS</div>
+              <div class="ts-card-tagline">1 Trade por dia · Zero custo · Sem compromisso</div>
+            </div>
+            <div class="ts-price-block">
+              <div class="ts-price free">0 MT</div>
+              <div class="ts-price-period">/mês</div>
+            </div>
+            <div class="ts-features">
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">1 Trade Diário em Ouro (XAU/USD)</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon b">✈</div>
+                <div class="ts-feat-text">Canal Telegram Gratuito</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon r">✕</div>
+                <div class="ts-feat-text na">Sem Gestão de Risco incluída</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon r">✕</div>
+                <div class="ts-feat-text na">Sem Análise Detalhada</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon r">✕</div>
+                <div class="ts-feat-text na">Sem Suporte Prioritário</div>
+              </div>
+            </div>
+            <div class="ts-card-footer">
+              <button class="ts-sub-btn outline" onclick="window.open('https://t.me/NellyGFreeSignals','_blank')">✈️ SUBSCREVER GRÁTIS</button>
+            </div>
+          </div>
+
+          <!-- VIP GOLD SIGNALS -->
+          <div class="ts-card featured">
+            <div class="ts-card-top-bar"></div>
+            <div class="ts-card-header" style="position:relative;padding-top:28px">
+              <div class="ts-badge hot" style="background:var(--gold);color:#000">★ POPULAR</div>
+              <div class="ts-starburst">
+                <div class="ts-starburst-price">1.599</div>
+                <div class="ts-starburst-period">MT/MÊS</div>
+              </div>
+              <div class="ts-card-icon">🥇</div>
+              <div class="ts-card-name">VIP GOLD SIGNALS</div>
+              <div class="ts-card-tagline">Strike Gold Daily — Precision Trades, Elite Accuracy</div>
+            </div>
+            <div class="ts-price-block">
+              <div class="ts-price">1.599 MT</div>
+              <div class="ts-price-period">/mês</div>
+              <div class="ts-price-usd">≈ $25 USD</div>
+            </div>
+            <div class="ts-features">
+              <div class="ts-feat">
+                <div class="ts-feat-icon b">✈</div>
+                <div class="ts-feat-text">Sinais Premium Telegram — XAU/USD (Ouro)</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">3–5 Trades Diários de Alta Precisão</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon y">★</div>
+                <div class="ts-feat-text">80% Lucratividade Comprovada</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">Baixo Drawdown — Risco Controlado</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">Risk:Reward 1:3 — Máximo Retorno</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">Análise Técnica Incluída em Cada Sinal</div>
+              </div>
+            </div>
+            <div class="ts-card-footer">
+              <button class="ts-sub-btn" onclick="openModal('VIP Gold Signals','1.599 MT/mês')">🥇 SUBSCREVER AGORA</button>
+            </div>
+          </div>
+
+          <!-- VIP FOREX SIGNALS -->
+          <div class="ts-card">
+            <div class="ts-card-top-bar"></div>
+            <div class="ts-card-header" style="position:relative;padding-top:28px">
+              <div class="ts-starburst">
+                <div class="ts-starburst-price">1.599</div>
+                <div class="ts-starburst-period">MT/MÊS</div>
+              </div>
+              <div class="ts-card-icon">🌍</div>
+              <div class="ts-card-name">VIP FOREX SIGNALS</div>
+              <div class="ts-card-tagline">Master the Markets — Sharp Entries, Pro-Level Control</div>
+            </div>
+            <div class="ts-price-block">
+              <div class="ts-price">1.599 MT</div>
+              <div class="ts-price-period">/mês</div>
+              <div class="ts-price-usd">≈ $25 USD</div>
+            </div>
+            <div class="ts-features">
+              <div class="ts-feat">
+                <div class="ts-feat-icon b">✈</div>
+                <div class="ts-feat-text">Sinais Premium Forex no Telegram</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">3–5 Trades Diários — EUR, GBP, USD e mais</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">Risk:Reward 1:3 em cada operação</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon y">★</div>
+                <div class="ts-feat-text">80% de Lucratividade</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">Baixo Drawdown — Gestão de Risco</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">Cobertura: EUR/USD, GBP/USD, USD/JPY</div>
+              </div>
+            </div>
+            <div class="ts-card-footer">
+              <button class="ts-sub-btn" onclick="openModal('VIP Forex Signals','1.599 MT/mês')">🌍 SUBSCREVER AGORA</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 2: VIP Indices + VIP Bundle -->
+        <div class="ts-packages row2">
+
+          <!-- VIP INDICES SIGNALS -->
+          <div class="ts-card">
+            <div class="ts-card-top-bar"></div>
+            <div class="ts-card-header" style="position:relative;padding-top:28px">
+              <div class="ts-starburst">
+                <div class="ts-starburst-price">1.599</div>
+                <div class="ts-starburst-period">MT/MÊS</div>
+              </div>
+              <div class="ts-card-icon">📈</div>
+              <div class="ts-card-name">VIP INDICES SIGNALS</div>
+              <div class="ts-card-tagline">Crush the Markets — High Accuracy, Daily Trade Power</div>
+            </div>
+            <div class="ts-price-block">
+              <div class="ts-price">1.599 MT</div>
+              <div class="ts-price-period">/mês</div>
+              <div class="ts-price-usd">≈ $25 USD</div>
+            </div>
+            <div class="ts-features" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div class="ts-feat">
+                <div class="ts-feat-icon b">✈</div>
+                <div class="ts-feat-text">Sinais Premium Índices Telegram</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">1–3 Trades Diários de Alta Qualidade</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon y">★</div>
+                <div class="ts-feat-text">80% de Lucratividade</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">Baixo Drawdown</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">Risk:Reward 1:3</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">US30, NAS100, UK100, GER40</div>
+              </div>
+            </div>
+            <div class="ts-card-footer">
+              <button class="ts-sub-btn" onclick="openModal('VIP Indices Signals','1.599 MT/mês')">📈 SUBSCREVER AGORA</button>
+            </div>
+          </div>
+
+          <!-- VIP PREMIUM BUNDLE -->
+          <div class="ts-card featured" style="border-color:var(--gold);box-shadow:0 0 40px rgba(255,215,0,0.12)">
+            <div class="ts-card-top-bar" style="background:linear-gradient(90deg,transparent,var(--gold),transparent)"></div>
+            <div class="ts-card-header" style="position:relative;padding-top:28px;background:rgba(255,215,0,0.03)">
+              <div class="ts-badge" style="background:var(--gold);color:#000">💎 ALL-IN-ONE</div>
+              <div class="ts-starburst" style="background:var(--gold)">
+                <div class="ts-starburst-price" style="font-size:16px">3.198</div>
+                <div class="ts-starburst-period">MT/MÊS</div>
+              </div>
+              <div class="ts-card-icon">💎</div>
+              <div class="ts-card-name" style="color:var(--gold)">VIP PREMIUM BUNDLE</div>
+              <div class="ts-card-tagline">All-in-One · Forex + Gold + Indices + Full VIP Support</div>
+            </div>
+            <div class="ts-price-block" style="background:rgba(255,215,0,0.05)">
+              <div class="ts-price" style="color:var(--gold);text-shadow:0 0 15px rgba(255,215,0,0.4)">3.198 MT</div>
+              <div class="ts-price-period">/mês</div>
+              <div class="ts-price-usd" style="color:rgba(255,215,0,0.4)">≈ $50 USD</div>
+            </div>
+            <div class="ts-features" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div class="ts-feat">
+                <div class="ts-feat-icon y">💎</div>
+                <div class="ts-feat-text">Forex + Gold + Indices — Tudo Incluído</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon b">✈</div>
+                <div class="ts-feat-text">Canal VIP Premium no Telegram</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">Múltiplos Trades Diários — Volume Máximo</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon y">★</div>
+                <div class="ts-feat-text">85% Lucratividade — Máxima do Mercado</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">Baixo Drawdown — Gestão Profissional</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">Análise Completa de Risco em Cada Trade</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon y">★</div>
+                <div class="ts-feat-text">Suporte VIP 24/7 directo</div>
+              </div>
+              <div class="ts-feat">
+                <div class="ts-feat-icon g">▸</div>
+                <div class="ts-feat-text">Poupa 1.000 MT vs compra separada</div>
+              </div>
+            </div>
+            <div class="ts-card-footer" style="background:rgba(255,215,0,0.03)">
+              <button class="ts-sub-btn" style="background:var(--gold);box-shadow:0 4px 20px rgba(255,215,0,0.3)" onclick="openModal('VIP Premium Bundle','3.198 MT/mês')">💎 SUBSCREVER BUNDLE →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPARISON TABLE -->
+        <div class="ts-comparison">
+          <div class="ts-cmp-title">📊 COMPARAÇÃO COMPLETA DOS PLANOS</div>
+          <table class="cmp-table">
+            <thead>
+              <tr>
+                <th>FUNCIONALIDADE</th>
+                <th><div class="cmp-head-cell">FREE</div><div style="font-size:10px;color:var(--muted);font-family:var(--font-mono)">0 MT</div></th>
+                <th><div class="cmp-head-cell featured">VIP GOLD</div><div style="font-size:10px;color:var(--green);font-family:var(--font-mono)">1.599 MT</div></th>
+                <th><div class="cmp-head-cell">VIP FOREX</div><div style="font-size:10px;color:var(--muted);font-family:var(--font-mono)">1.599 MT</div></th>
+                <th><div class="cmp-head-cell">VIP INDICES</div><div style="font-size:10px;color:var(--muted);font-family:var(--font-mono)">1.599 MT</div></th>
+                <th><div class="cmp-head-cell" style="color:var(--gold)">BUNDLE 💎</div><div style="font-size:10px;color:var(--gold);font-family:var(--font-mono)">3.198 MT</div></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Trades por dia</td><td>1</td><td style="color:var(--green);font-family:var(--font-mono)">3–5</td><td style="color:var(--green);font-family:var(--font-mono)">3–5</td><td style="color:var(--green);font-family:var(--font-mono)">1–3</td><td style="color:var(--gold);font-family:var(--font-mono)">10+</td></tr>
+              <tr><td>Lucratividade</td><td style="color:var(--muted)">—</td><td style="color:var(--green)">80%</td><td style="color:var(--green)">80%</td><td style="color:var(--green)">80%</td><td style="color:var(--gold)">85%</td></tr>
+              <tr><td>Canal Telegram VIP</td><td><span class="cmp-cross">—</span></td><td><span class="cmp-check">✓</span></td><td><span class="cmp-check">✓</span></td><td><span class="cmp-check">✓</span></td><td><span class="cmp-check" style="color:var(--gold)">✓</span></td></tr>
+              <tr><td>Gestão de Risco</td><td><span class="cmp-cross">✕</span></td><td><span class="cmp-check">✓</span></td><td><span class="cmp-check">✓</span></td><td><span class="cmp-check">✓</span></td><td><span class="cmp-check" style="color:var(--gold)">✓</span></td></tr>
+              <tr><td>Análise por Trade</td><td><span class="cmp-cross">✕</span></td><td><span class="cmp-check">✓</span></td><td><span class="cmp-check">✓</span></td><td><span class="cmp-check">✓</span></td><td><span class="cmp-check" style="color:var(--gold)">✓</span></td></tr>
+              <tr><td>Risk:Reward 1:3</td><td><span class="cmp-cross">✕</span></td><td><span class="cmp-check">✓</span></td><td><span class="cmp-check">✓</span></td><td><span class="cmp-check">✓</span></td><td><span class="cmp-check" style="color:var(--gold)">✓</span></td></tr>
+              <tr><td>Ouro (XAU/USD)</td><td><span class="cmp-check">✓</span></td><td><span class="cmp-check">✓</span></td><td><span class="cmp-cross">—</span></td><td><span class="cmp-cross">—</span></td><td><span class="cmp-check" style="color:var(--gold)">✓</span></td></tr>
+              <tr><td>Forex (EUR/GBP/USD)</td><td><span class="cmp-cross">—</span></td><td><span class="cmp-cross">—</span></td><td><span class="cmp-check">✓</span></td><td><span class="cmp-cross">—</span></td><td><span class="cmp-check" style="color:var(--gold)">✓</span></td></tr>
+              <tr><td>Índices (US30/NAS100)</td><td><span class="cmp-cross">—</span></td><td><span class="cmp-cross">—</span></td><td><span class="cmp-cross">—</span></td><td><span class="cmp-check">✓</span></td><td><span class="cmp-check" style="color:var(--gold)">✓</span></td></tr>
+              <tr><td>Suporte VIP 24/7</td><td><span class="cmp-cross">✕</span></td><td><span class="cmp-cross">—</span></td><td><span class="cmp-cross">—</span></td><td><span class="cmp-cross">—</span></td><td><span class="cmp-check" style="color:var(--gold)">✓</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Payment info bottom -->
+        <div style="margin-top:20px;background:rgba(0,0,0,0.4);border:1px solid var(--border2);border-radius:4px;padding:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+          <div>
+            <div style="font-family:var(--font-head);font-size:16px;letter-spacing:2px;margin-bottom:4px">💳 COMO PAGAR</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Envie o valor via M-Pesa ou e-Mola · Use o seu email como referência · Activação em até 24h</div>
+          </div>
+          <div style="display:flex;gap:24px;align-items:center">
+            <div style="text-align:center">
+              <div style="font-size:26px">📱</div>
+              <div style="font-family:var(--font-head);font-size:14px;letter-spacing:1px">M-PESA</div>
+              <div style="font-family:var(--font-mono);font-size:13px;color:var(--green)">840 330 540</div>
+            </div>
+            <div style="width:1px;height:50px;background:var(--border2)"></div>
+            <div style="text-align:center">
+              <div style="font-size:26px">💚</div>
+              <div style="font-family:var(--font-head);font-size:14px;letter-spacing:1px">E-MOLA</div>
+              <div style="font-family:var(--font-mono);font-size:13px;color:var(--green)">877 480 775</div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
     </div>
