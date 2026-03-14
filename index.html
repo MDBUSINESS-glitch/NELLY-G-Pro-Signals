@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dr. Trade Pro — Sinais de Trading Inteligentes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050810;
+  --bg2: #090d1a;
+  --bg3: #0d1220;
+  --panel: rgba(13,18,32,0.95);
+  --border: rgba(99,179,237,0.12);
+  --blue: #3b82f6;
+  --cyan: #06b6d4;
+  --gold: #f59e0b;
+  --green: #10b981;
+  --red: #ef4444;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --accent: #6366f1;
+  --glow: 0 0 30px rgba(59,130,246,0.3);
+  --sidebar: 240px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  font-size:14px;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--blue);border-radius:2px}
+
+/* ── LANDING ── */
+#landing{
+  position:fixed;inset:0;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  z-index:1000;
+  overflow:auto;
+}
+.land-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(59,130,246,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(99,102,241,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(6,182,212,0.06) 0%, transparent 70%);
+  pointer-events:none;
+}
+.land-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none;
+}
+.land-content{
+  position:relative;z-index:1;
+  width:100%;max-width:440px;
+  padding:32px 20px;
+}
+.land-logo{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:40px;justify-content:center;
+}
+.land-logo .icon{
+  width:48px;height:48px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+  box-shadow:0 0 20px rgba(59,130,246,0.4);
+}
+.land-logo h1{
+  font-family:'Syne',sans-serif;
+  font-size:28px;font-weight:800;
+  background:linear-gradient(135deg,#fff,var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.land-tagline{
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  margin-bottom:36px;
+  line-height:1.6;
+}
+.land-tagline span{color:var(--cyan)}
+
+.auth-card{
+  background:rgba(13,18,32,0.9);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:32px;
+  backdrop-filter:blur(20px);
+  box-shadow:0 24px 60px rgba(0,0,0,0.5);
+}
+.auth-tabs{
+  display:flex;
+  background:rgba(255,255,255,0.04);
+  border-radius:10px;
+  padding:4px;
+  margin-bottom:28px;
+  gap:4px;
+}
+.auth-tab{
+  flex:1;padding:9px;
+  border:none;background:transparent;
+  color:var(--muted);
+  font-size:13px;font-weight:600;
+  border-radius:7px;cursor:pointer;
+  transition:.2s;
+  font-family:'Inter',sans-serif;
+}
+.auth-tab.active{
+  background:var(--blue);
+  color:#fff;
+  box-shadow:0 0 16px rgba(59,130,246,0.4);
+}
+.auth-form{display:none;flex-direction:column;gap:14px}
+.auth-form.active{display:flex}
+.field-label{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:5px}
+.field-input{
+  width:100%;padding:11px 14px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:10px;
+  color:var(--text);
+  font-size:14px;
+  font-family:'Inter',sans-serif;
+  outline:none;
+  transition:.2s;
+}
+.field-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,0.1)}
+.btn-primary{
+  padding:13px;
+  background:linear-gradient(135deg,var(--blue),var(--accent));
+  border:none;border-radius:10px;
+  color:#fff;font-size:14px;font-weight:700;
+  cursor:pointer;transition:.2s;
+  font-family:'Inter',sans-serif;
+  box-shadow:0 4px 20px rgba(59,130,246,0.3);
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(59,130,246,0.4)}
+.divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.plan-cards{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  margin-top:4px;
+}
+.plan-card{
+  border:2px solid var(--border);border-radius:12px;
+  padding:14px;cursor:pointer;transition:.2s;
+  text-align:center;
+}
+.plan-card:hover,.plan-card.selected{border-color:var(--blue);background:rgba(59,130,246,0.08)}
+.plan-card .plan-name{font-size:13px;font-weight:700;color:var(--text)}
+.plan-card .plan-price{font-size:18px;font-weight:800;color:var(--gold);font-family:'Syne',sans-serif}
+.plan-card .plan-desc{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── APP LAYOUT ── */
+#app{display:none;height:100vh;overflow:hidden}
+#app.visible{display:flex}
+
+/* SIDEBAR */
+.sidebar{
+  width:var(--sidebar);
+  background:var(--panel);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  padding:20px 0;
+  flex-shrink:0;
+  overflow-y:auto;
+}
+.sidebar-logo{
+  display:flex;align-items:center;gap:10px;
+  padding:0 18px 20px;
+  border-bottom:1px solid var(--border);
+}
+.sidebar-logo .icon{
+  width:36px;height:36px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+  box-shadow:0 0 12px rgba(59,130,246,0.3);
+}
+.sidebar-logo span{
+  font-family:'Syne',sans-serif;
+  font-size:18px;font-weight:800;
+  background:linear-gradient(135deg,#fff,var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.sidebar-section{
+  padding:16px 12px 4px;
+  font-size:10px;color:var(--muted);
+  font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 18px;margin:2px 8px;
+  border-radius:10px;cursor:pointer;
+  color:var(--muted);font-size:13px;font-weight:500;
+  transition:.2s;position:relative;
+  border:none;background:transparent;width:calc(100% - 16px);
+  text-align:left;font-family:'Inter',sans-serif;
+}
+.nav-item:hover{background:rgba(255,255,255,0.05);color:var(--text)}
+.nav-item.active{background:rgba(59,130,246,0.15);color:var(--blue)}
+.nav-item.active::before{
+  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:3px;height:20px;background:var(--blue);border-radius:2px;
+}
+.nav-item .nav-icon{font-size:16px;width:20px;text-align:center}
+.nav-badge{
+  margin-left:auto;background:var(--red);
+  color:#fff;font-size:10px;font-weight:700;
+  border-radius:10px;padding:2px 6px;
+}
+.nav-badge.gold{background:var(--gold);color:#000}
+.sidebar-user{
+  margin-top:auto;padding:16px 18px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.user-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--accent));
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;flex-shrink:0;
+}
+.user-info .user-name{font-size:13px;font-weight:600}
+.user-info .user-plan{font-size:11px;color:var(--gold);font-weight:600}
+.logout-btn{
+  margin-left:auto;background:none;border:none;
+  color:var(--muted);cursor:pointer;font-size:16px;
+  padding:4px;transition:.2s;
+}
+.logout-btn:hover{color:var(--red)}
+
+/* MAIN AREA */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* TICKER */
+.ticker-bar{
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  padding:8px 20px;
+  display:flex;align-items:center;gap:24px;
+  overflow:hidden;flex-shrink:0;
+}
+.ticker-item{
+  display:flex;align-items:center;gap:6px;
+  white-space:nowrap;
+  font-family:'DM Mono',monospace;font-size:12px;
+}
+.ticker-item .pair{color:var(--muted);font-weight:500}
+.ticker-item .price{color:var(--text);font-weight:500}
+.ticker-item .change.up{color:var(--green)}
+.ticker-item .change.dn{color:var(--red)}
+.ticker-sep{color:var(--border);font-size:18px;user-select:none}
+
+/* PAGE CONTAINER */
+.pages{flex:1;overflow:hidden;position:relative}
+.page{
+  position:absolute;inset:0;
+  overflow-y:auto;
+  display:none;
+  padding:24px;
+}
+.page.active{display:block}
+
+/* ── PAGE HEADERS ── */
+.page-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:24px;
+}
+.page-title{
+  font-family:'Syne',sans-serif;
+  font-size:22px;font-weight:800;
+  background:linear-gradient(135deg,#fff,var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.page-sub{font-size:13px;color:var(--muted);margin-top:2px}
+
+/* ── TRADING MODE ── */
+.trading-layout{
+  display:grid;grid-template-columns:1fr 300px;
+  gap:16px;height:calc(100vh - 130px);
+}
+.chat-area{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:16px;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.chat-header{
+  padding:16px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.chat-title{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
+.online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.chat-msgs{
+  flex:1;overflow-y:auto;
+  padding:16px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.msg{display:flex;gap:10px;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.msg-avatar{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;
+}
+.msg-bubble{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:0 12px 12px 12px;
+  padding:12px 14px;
+  max-width:85%;
+}
+.msg.user{flex-direction:row-reverse}
+.msg.user .msg-bubble{
+  background:rgba(59,130,246,0.15);
+  border-color:rgba(59,130,246,0.3);
+  border-radius:12px 0 12px 12px;
+}
+.msg.user .msg-avatar{
+  background:linear-gradient(135deg,var(--accent),var(--blue));
+}
+.msg-time{font-size:10px;color:var(--muted);margin-top:4px}
+.signal-card{
+  background:rgba(16,185,129,0.08);
+  border:1px solid rgba(16,185,129,0.25);
+  border-radius:10px;padding:12px;
+  margin-top:8px;
+}
+.signal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:8px;
+}
+.signal-type{
+  font-size:11px;font-weight:700;letter-spacing:1px;
+  padding:3px 8px;border-radius:6px;
+}
+.signal-type.buy{background:rgba(16,185,129,0.2);color:var(--green)}
+.signal-type.sell{background:rgba(239,68,68,0.2);color:var(--red)}
+.signal-pair{font-weight:700;font-size:15px;color:var(--text);font-family:'Syne',sans-serif}
+.signal-rows{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.signal-row{font-size:12px}
+.signal-label{color:var(--muted)}
+.signal-value{color:var(--text);font-family:'DM Mono',monospace;font-weight:500}
+.signal-value.green{color:var(--green)}
+.signal-value.red{color:var(--red)}
+
+.quick-btns{
+  display:flex;flex-wrap:wrap;gap:6px;
+  padding:10px 16px;
+  border-top:1px solid var(--border);
+}
+.quick-btn{
+  padding:5px 10px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:6px;color:var(--blue);
+  font-size:11px;font-weight:600;
+  cursor:pointer;transition:.15s;
+  font-family:'Inter',sans-serif;
+}
+.quick-btn:hover{background:rgba(59,130,246,0.1);border-color:var(--blue)}
+
+.chat-input-area{
+  padding:12px 16px;
+  border-top:1px solid var(--border);
+  display:flex;gap:8px;align-items:center;
+}
+.chat-input{
+  flex:1;padding:10px 14px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:10px;
+  color:var(--text);font-size:13px;
+  font-family:'Inter',sans-serif;
+  outline:none;resize:none;
+  max-height:100px;
+}
+.chat-input:focus{border-color:var(--blue)}
+.send-btn{
+  width:38px;height:38px;
+  background:var(--blue);
+  border:none;border-radius:10px;
+  color:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;transition:.2s;
+  flex-shrink:0;
+}
+.send-btn:hover{background:var(--accent)}
+.char-count{font-size:10px;color:var(--muted);text-align:right;padding:0 16px 8px}
+
+/* CHAT LIST */
+.chat-list-panel{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:16px;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.chat-list-header{
+  padding:16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.chat-list-title{font-weight:700;font-size:14px}
+.new-chat-btn{
+  padding:6px 12px;
+  background:var(--blue);
+  border:none;border-radius:8px;
+  color:#fff;font-size:12px;font-weight:600;
+  cursor:pointer;transition:.2s;
+  font-family:'Inter',sans-serif;
+}
+.new-chat-btn:hover{background:var(--accent)}
+.chat-list-items{flex:1;overflow-y:auto;padding:8px}
+.chat-list-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;
+  border-radius:10px;cursor:pointer;transition:.2s;
+  margin-bottom:2px;
+}
+.chat-list-item:hover{background:rgba(255,255,255,0.04)}
+.chat-list-item.active{background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2)}
+.chat-item-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:rgba(255,255,255,0.06);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+.chat-item-info{flex:1;min-width:0}
+.chat-item-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-item-time{font-size:11px;color:var(--muted)}
+.chat-item-del{
+  background:none;border:none;color:var(--muted);
+  cursor:pointer;font-size:14px;padding:4px;
+  opacity:0;transition:.2s;
+}
+.chat-list-item:hover .chat-item-del{opacity:1;color:var(--red)}
+.clear-btn{
+  margin:8px;padding:10px;
+  background:rgba(239,68,68,0.08);
+  border:1px solid rgba(239,68,68,0.2);
+  border-radius:10px;color:var(--red);
+  font-size:12px;font-weight:600;
+  cursor:pointer;transition:.2s;
+  font-family:'Inter',sans-serif;
+}
+.clear-btn:hover{background:rgba(239,68,68,0.15)}
+
+/* ── STAT CARDS ── */
+.stat-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:14px;margin-bottom:20px;
+}
+.stat-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:14px;padding:18px;
+  transition:.2s;
+}
+.stat-card:hover{border-color:rgba(59,130,246,0.3);box-shadow:var(--glow)}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+.stat-value{
+  font-family:'DM Mono',monospace;
+  font-size:26px;font-weight:500;
+  margin:6px 0 2px;
+}
+.stat-change{font-size:12px;font-weight:600}
+.stat-change.up{color:var(--green)}
+.stat-change.dn{color:var(--red)}
+
+/* GRID CARDS */
+.card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:14px;padding:20px;
+}
+.card-title{
+  font-size:14px;font-weight:700;
+  margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.card-title-icon{
+  width:28px;height:28px;border-radius:8px;
+  background:rgba(59,130,246,0.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;
+}
+
+/* ── INSIGHTS ── */
+.insights-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+.insight-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:14px;padding:20px;
+  cursor:pointer;transition:.2s;
+}
+.insight-card:hover{border-color:rgba(59,130,246,0.4);transform:translateY(-2px)}
+.insight-cat{
+  font-size:10px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;color:var(--cyan);margin-bottom:8px;
+}
+.insight-title{font-size:14px;font-weight:700;line-height:1.4;margin-bottom:8px}
+.insight-desc{font-size:12px;color:var(--muted);line-height:1.6}
+.insight-footer{
+  display:flex;align-items:center;gap:8px;
+  margin-top:12px;
+  font-size:11px;color:var(--muted);
+}
+.sentiment-bar{
+  height:4px;background:rgba(255,255,255,0.08);
+  border-radius:2px;margin:8px 0 4px;
+  overflow:hidden;
+}
+.sentiment-fill{height:100%;border-radius:2px;transition:.5s}
+.sentiment-fill.bull{background:linear-gradient(90deg,var(--green),#34d399)}
+.sentiment-fill.bear{background:linear-gradient(90deg,var(--red),#f87171)}
+
+/* ── NEWS ── */
+.news-list{display:flex;flex-direction:column;gap:12px}
+.news-item{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:12px;padding:16px;
+  display:flex;gap:14px;cursor:pointer;transition:.2s;
+}
+.news-item:hover{border-color:rgba(59,130,246,0.3);background:rgba(59,130,246,0.04)}
+.news-icon{
+  width:44px;height:44px;border-radius:10px;
+  background:rgba(255,255,255,0.06);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.news-content{flex:1}
+.news-cat{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.news-title{font-size:14px;font-weight:600;line-height:1.4;margin-bottom:4px}
+.news-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.news-footer{display:flex;gap:10px;margin-top:6px;font-size:11px;color:var(--muted)}
+
+/* ── HISTORY ── */
+.hist-table{width:100%;border-collapse:collapse}
+.hist-table th{
+  text-align:left;font-size:11px;font-weight:700;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.8px;
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+}
+.hist-table td{
+  padding:12px 14px;
+  border-bottom:1px solid rgba(255,255,255,0.03);
+  font-size:13px;
+}
+.hist-table tr:hover td{background:rgba(255,255,255,0.02)}
+.status-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 8px;border-radius:20px;
+  font-size:11px;font-weight:700;
+}
+.status-badge.profit{background:rgba(16,185,129,0.15);color:var(--green)}
+.status-badge.loss{background:rgba(239,68,68,0.15);color:var(--red)}
+.status-badge.open{background:rgba(59,130,246,0.15);color:var(--blue)}
+
+/* ── UPGRADE ── */
+.pricing-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:20px;max-width:900px;margin:0 auto;
+}
+.pricing-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:20px;padding:28px;
+  position:relative;transition:.2s;
+}
+.pricing-card.popular{
+  border-color:var(--blue);
+  box-shadow:0 0 30px rgba(59,130,246,0.2);
+}
+.pricing-card:hover{transform:translateY(-3px)}
+.popular-badge{
+  position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,var(--blue),var(--accent));
+  color:#fff;font-size:11px;font-weight:700;
+  padding:4px 14px;border-radius:20px;
+  white-space:nowrap;
+}
+.pricing-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:4px}
+.pricing-price{
+  font-family:'DM Mono',monospace;
+  font-size:36px;font-weight:500;
+  color:var(--gold);margin:12px 0;
+}
+.pricing-price span{font-size:16px;color:var(--muted)}
+.pricing-features{list-style:none;margin:16px 0 20px;display:flex;flex-direction:column;gap:8px}
+.pricing-features li{
+  display:flex;align-items:center;gap:8px;
+  font-size:13px;
+}
+.pricing-features li::before{content:'✓';color:var(--green);font-weight:700;font-size:12px}
+.pricing-features li.no::before{content:'✕';color:var(--muted)}
+.pricing-features li.no{color:var(--muted)}
+.btn-plan{
+  width:100%;padding:12px;
+  background:rgba(59,130,246,0.15);
+  border:1px solid rgba(59,130,246,0.3);
+  border-radius:10px;color:var(--blue);
+  font-size:13px;font-weight:700;cursor:pointer;transition:.2s;
+  font-family:'Inter',sans-serif;
+}
+.btn-plan:hover,.btn-plan.primary{
+  background:var(--blue);color:#fff;
+  box-shadow:0 4px 20px rgba(59,130,246,0.3);
+}
+
+/* PAYMENT MODAL */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.7);
+  backdrop-filter:blur(6px);
+  z-index:500;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;visibility:hidden;transition:.2s;
+}
+.modal-overlay.open{opacity:1;visibility:visible}
+.modal{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:20px;padding:32px;
+  width:100%;max-width:440px;
+  max-height:90vh;overflow-y:auto;
+}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.modal-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800}
+.modal-close{
+  background:none;border:none;color:var(--muted);
+  font-size:20px;cursor:pointer;transition:.2s;
+  padding:4px;
+}
+.modal-close:hover{color:var(--red)}
+.payment-methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.payment-method{
+  border:2px solid var(--border);border-radius:12px;
+  padding:16px;text-align:center;cursor:pointer;transition:.2s;
+}
+.payment-method:hover,.payment-method.selected{border-color:var(--blue);background:rgba(59,130,246,0.08)}
+.payment-method .pm-icon{font-size:28px;margin-bottom:6px}
+.payment-method .pm-name{font-size:13px;font-weight:700}
+.payment-method .pm-number{font-size:12px;color:var(--cyan);font-family:'DM Mono',monospace}
+.payment-steps{
+  background:rgba(255,255,255,0.03);
+  border-radius:12px;padding:16px;
+  margin-bottom:20px;
+}
+.payment-step{display:flex;gap:10px;margin-bottom:10px}
+.payment-step:last-child{margin-bottom:0}
+.step-num{
+  width:22px;height:22px;border-radius:50%;
+  background:rgba(59,130,246,0.2);color:var(--blue);
+  font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.step-text{font-size:13px;color:var(--muted);line-height:1.5}
+.step-text strong{color:var(--text)}
+.confirm-btn{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,var(--green),#059669);
+  border:none;border-radius:12px;
+  color:#fff;font-size:14px;font-weight:700;
+  cursor:pointer;transition:.2s;
+  font-family:'Inter',sans-serif;
+  box-shadow:0 4px 20px rgba(16,185,129,0.3);
+}
+.confirm-btn:hover{transform:translateY(-1px)}
+
+/* ── LEARNING MODE ── */
+.learn-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.learn-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:14px;padding:24px;
+  cursor:pointer;transition:.2s;
+}
+.learn-card:hover{border-color:rgba(59,130,246,0.4);transform:translateY(-2px)}
+.learn-icon{font-size:32px;margin-bottom:12px}
+.learn-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px}
+.learn-desc{font-size:12px;color:var(--muted);line-height:1.6}
+.learn-badge{
+  display:inline-block;margin-top:10px;
+  padding:3px 8px;border-radius:6px;
+  font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+}
+.learn-badge.beginner{background:rgba(16,185,129,0.15);color:var(--green)}
+.learn-badge.inter{background:rgba(245,158,11,0.15);color:var(--gold)}
+.learn-badge.adv{background:rgba(239,68,68,0.15);color:var(--red)}
+
+/* ── AUTO/COPY TRADE ── */
+.bot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.bot-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:14px;padding:20px;
+}
+.bot-status{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;margin-bottom:8px;
+}
+.status-dot{width:8px;height:8px;border-radius:50%}
+.status-dot.active{background:var(--green);animation:pulse 2s infinite}
+.status-dot.inactive{background:var(--muted)}
+.bot-name{font-weight:700;font-size:15px;margin-bottom:4px}
+.bot-desc{font-size:12px;color:var(--muted);margin-bottom:14px}
+.bot-stats{display:flex;gap:16px;margin-bottom:14px}
+.bot-stat .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.bot-stat .value{font-family:'DM Mono',monospace;font-size:16px;font-weight:500}
+.bot-stat .value.green{color:var(--green)}
+.toggle-switch{
+  position:relative;width:44px;height:24px;
+  background:rgba(255,255,255,0.1);
+  border-radius:12px;cursor:pointer;transition:.2s;
+}
+.toggle-switch.on{background:var(--green)}
+.toggle-switch::after{
+  content:'';position:absolute;
+  top:2px;left:2px;
+  width:20px;height:20px;
+  background:#fff;border-radius:50%;
+  transition:.2s;
+}
+.toggle-switch.on::after{left:22px}
+
+/* ── PROP FIRM ── */
+.prop-hero{
+  background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(99,102,241,0.1));
+  border:1px solid rgba(59,130,246,0.25);
+  border-radius:16px;padding:28px;
+  margin-bottom:20px;text-align:center;
+}
+.prop-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:8px}
+.prop-desc{font-size:14px;color:var(--muted);max-width:500px;margin:0 auto 16px}
+.prop-firms{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.firm-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:.2s;
+}
+.firm-card:hover{border-color:var(--gold);background:rgba(245,158,11,0.05)}
+.firm-logo{font-size:24px;margin-bottom:6px}
+.firm-name{font-size:13px;font-weight:700}
+.firm-payout{font-size:11px;color:var(--gold);font-weight:600}
+
+/* ── NOTIFICATIONS ── */
+.notif-list{display:flex;flex-direction:column;gap:10px}
+.notif-item{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:14px 16px;
+  display:flex;align-items:flex-start;gap:12px;
+  transition:.2s;cursor:pointer;
+}
+.notif-item:hover{border-color:rgba(59,130,246,0.3)}
+.notif-item.unread{border-left:3px solid var(--blue)}
+.notif-icon{
+  width:38px;height:38px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.notif-icon.signal{background:rgba(16,185,129,0.15)}
+.notif-icon.news{background:rgba(245,158,11,0.15)}
+.notif-icon.system{background:rgba(99,102,241,0.15)}
+.notif-content{flex:1}
+.notif-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.notif-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.notif-time{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* ── TYPING INDICATOR ── */
+.typing{display:flex;gap:4px;align-items:center;padding:4px 0}
+.typing span{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--muted);
+  animation:typingDot 1.4s infinite;
+}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes typingDot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){
+  .trading-layout{grid-template-columns:1fr}
+  .chat-list-panel{display:none}
+}
+@media(max-width:768px){
+  :root{--sidebar:60px}
+  .nav-item span,.sidebar-section,.user-info,.sidebar-logo span{display:none}
+  .sidebar-logo .icon{width:32px;height:32px}
+  .pricing-grid,.stat-grid,.insights-grid{grid-template-columns:1fr}
+  .page{padding:14px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LANDING PAGE ══ -->
+<div id="landing">
+  <div class="land-bg"></div>
+  <div class="land-grid"></div>
+  <div class="land-content">
+    <div class="land-logo">
+      <div class="icon">⊙</div>
+      <h1>Dr. Trade</h1>
+    </div>
+    <p class="land-tagline">
+      Sinais de trading <span>inteligentes</span> com IA.<br>
+      Análise em tempo real para todos os mercados.
+    </p>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login')">Entrar</button>
+        <button class="auth-tab" onclick="switchTab('register')">Criar Conta</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="auth-form active" id="login-form">
+        <div>
+          <div class="field-label">Email</div>
+          <input class="field-input" type="email" placeholder="seuemail@exemplo.com" id="login-email">
+        </div>
+        <div>
+          <div class="field-label">Senha</div>
+          <input class="field-input" type="password" placeholder="••••••••" id="login-pass">
+        </div>
+        <button class="btn-primary" onclick="doLogin()">Entrar na Plataforma →</button>
+        <div class="divider">ou</div>
+        <button class="btn-primary" style="background:rgba(255,255,255,0.06);color:var(--text);box-shadow:none" onclick="doLogin()">
+          👁 Ver Demo Gratuita
+        </button>
+      </div>
+
+      <!-- REGISTER -->
+      <div class="auth-form" id="register-form">
+        <div>
+          <div class="field-label">Nome Completo</div>
+          <input class="field-input" type="text" placeholder="Seu nome">
+        </div>
+        <div>
+          <div class="field-label">Email</div>
+          <input class="field-input" type="email" placeholder="seuemail@exemplo.com">
+        </div>
+        <div>
+          <div class="field-label">Número de Telefone (Mpesa/Emola)</div>
+          <input class="field-input" type="tel" placeholder="8XXXXXXXX">
+        </div>
+        <div>
+          <div class="field-label">Senha</div>
+          <input class="field-input" type="password" placeholder="••••••••">
+        </div>
+        <div>
+          <div class="field-label">Escolha o Plano</div>
+          <div class="plan-cards">
+            <div class="plan-card" onclick="selectPlan(this,'free')">
+              <div class="plan-name">Gratuito</div>
+              <div class="plan-price">0 MT</div>
+              <div class="plan-desc">3 sinais/dia</div>
+            </div>
+            <div class="plan-card selected" onclick="selectPlan(this,'pro')">
+              <div class="plan-name">⭐ Pro</div>
+              <div class="plan-price">299 MT</div>
+              <div class="plan-desc">Sinais ilimitados</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="doLogin()">Criar Conta & Entrar →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAYMENT MODAL ══ -->
+<div class="modal-overlay" id="payment-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">💳 Pagamento do Plano</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="plan-info" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px;margin-bottom:20px;text-align:center">
+      <div style="font-size:12px;color:var(--muted)">Plano Selecionado</div>
+      <div id="modal-plan-name" style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--gold)">Pro — 299 MT/mês</div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;font-weight:600">ESCOLHA O MÉTODO DE PAGAMENTO</div>
+    <div class="payment-methods">
+      <div class="payment-method selected" onclick="selectPM(this)">
+        <div class="pm-icon">📱</div>
+        <div class="pm-name">M-Pesa</div>
+        <div class="pm-number">840 330 540</div>
+      </div>
+      <div class="payment-method" onclick="selectPM(this)">
+        <div class="pm-icon">💚</div>
+        <div class="pm-name">e-Mola</div>
+        <div class="pm-number">877 480 775</div>
+      </div>
+    </div>
+    <div class="payment-steps">
+      <div style="font-size:12px;font-weight:700;margin-bottom:10px;color:var(--text)">COMO PAGAR:</div>
+      <div class="payment-step">
+        <div class="step-num">1</div>
+        <div class="step-text">Abra o <strong>M-Pesa</strong> ou <strong>e-Mola</strong> no seu telemóvel</div>
+      </div>
+      <div class="payment-step">
+        <div class="step-num">2</div>
+        <div class="step-text">Envie <strong id="payment-amount">299 MT</strong> para o número <strong id="payment-number">840 330 540</strong></div>
+      </div>
+      <div class="payment-step">
+        <div class="step-num">3</div>
+        <div class="step-text">Use o seu <strong>email de registo</strong> como referência</div>
+      </div>
+      <div class="payment-step">
+        <div class="step-num">4</div>
+        <div class="step-text">Clique em <strong>"Confirmar Pagamento"</strong> e aguarde activação (até 24h)</div>
+      </div>
+    </div>
+    <button class="confirm-btn" onclick="confirmPayment()">✓ Confirmar Pagamento Enviado</button>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="icon">⊙</div>
+      <span>Dr. Trade</span>
+    </div>
+    <div class="sidebar-section">Modo</div>
+    <button class="nav-item" onclick="showPage('learning')">
+      <span class="nav-icon">📚</span>
+      <span>Modo Aprendizagem</span>
+    </button>
+    <button class="nav-item active" onclick="showPage('trading')">
+      <span class="nav-icon">📊</span>
+      <span>Modo Trading</span>
+    </button>
+    <div style="border-top:1px solid var(--border);margin:10px 0"></div>
+    <div class="sidebar-section">Ferramentas</div>
+    <button class="nav-item" onclick="showPage('autotrade')">
+      <span class="nav-icon">🤖</span>
+      <span>Auto Trade</span>
+    </button>
+    <button class="nav-item" onclick="showPage('copytrade')">
+      <span class="nav-icon">📋</span>
+      <span>Copy Trade</span>
+    </button>
+    <button class="nav-item" onclick="showPage('propfirm')">
+      <span class="nav-icon">🏦</span>
+      <span>Prop Firm Mode</span>
+    </button>
+    <div style="border-top:1px solid var(--border);margin:10px 0"></div>
+    <button class="nav-item" onclick="showPage('insights')">
+      <span class="nav-icon">💡</span>
+      <span>Insights</span>
+    </button>
+    <button class="nav-item" onclick="showPage('news')">
+      <span class="nav-icon">📰</span>
+      <span>Notícias</span>
+    </button>
+    <button class="nav-item" onclick="showPage('history')">
+      <span class="nav-icon">📅</span>
+      <span>Histórico</span>
+    </button>
+    <div style="border-top:1px solid var(--border);margin:10px 0"></div>
+    <button class="nav-item" onclick="showPage('upgrade')">
+      <span class="nav-icon">⭐</span>
+      <span>Upgrade</span>
+      <span class="nav-badge gold">PRO</span>
+    </button>
+    <button class="nav-item" onclick="showPage('notifications')">
+      <span class="nav-icon">🔔</span>
+      <span>Notificações</span>
+      <span class="nav-badge" id="notif-count">3</span>
+    </button>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="user-av">U</div>
+      <div class="user-info">
+        <div class="user-name" id="user-name-display">Utilizador</div>
+        <div class="user-plan">⭐ Pro</div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()" title="Sair">↩</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <!-- TICKER -->
+    <div class="ticker-bar" id="ticker">
+      <div class="ticker-item"><span class="pair">BTC/USD</span><span class="price">--</span><span class="change up">--</span></div>
+      <div class="ticker-sep">|</div>
+      <div class="ticker-item"><span class="pair">EUR/USD</span><span class="price">--</span><span class="change up">--</span></div>
+      <div class="ticker-sep">|</div>
+      <div class="ticker-item"><span class="pair">XAU/USD</span><span class="price">--</span><span class="change dn">--</span></div>
+      <div class="ticker-sep">|</div>
+      <div class="ticker-item"><span class="pair">GBP/USD</span><span class="price">--</span><span class="change up">--</span></div>
+      <div class="ticker-sep">|</div>
+      <div class="ticker-item"><span class="pair">US30</span><span class="price">--</span><span class="change up">--</span></div>
+      <div class="ticker-sep">|</div>
+      <div class="ticker-item"><span class="pair">NAS100</span><span class="price">--</span><span class="change up">--</span></div>
+    </div>
+
+    <div class="pages">
+
+      <!-- ══ TRADING MODE ══ -->
+      <div class="page active" id="page-trading">
+        <div class="trading-layout">
+          <div class="chat-area">
+            <div class="chat-header">
+              <div class="chat-title">
+                <div class="online-dot"></div>
+                Dr. Trade IA
+              </div>
+              <div style="font-size:12px;color:var(--muted)">Powered by Claude AI</div>
+            </div>
+            <div class="chat-msgs" id="chat-msgs">
+              <div class="msg">
+                <div class="msg-avatar">⊙</div>
+                <div>
+                  <div class="msg-bubble">
+                    <div>Olá! Sou o <strong>Dr. Trade</strong>. Posso analisar qualquer par de moedas, criptomoedas, índices, commodities e muito mais. Clique nos atalhos abaixo ou escreva o que deseja analisar.</div>
+                    <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">
+                      <span onclick="quickAsk('CURRENCY PAIRS')" style="cursor:pointer;color:var(--blue);font-weight:600;font-size:12px;padding:3px 8px;border-radius:6px;background:rgba(59,130,246,0.1)">CURRENCY PAIRS</span>
+                      <span onclick="quickAsk('STOCKS')" style="cursor:pointer;color:var(--cyan);font-weight:600;font-size:12px;padding:3px 8px;border-radius:6px;background:rgba(6,182,212,0.1)">STOCKS</span>
+                      <span onclick="quickAsk('STOCK INDICES')" style="cursor:pointer;color:var(--gold);font-weight:600;font-size:12px;padding:3px 8px;border-radius:6px;background:rgba(245,158,11,0.1)">STOCK INDICES</span>
+                      <span onclick="quickAsk('COMMODITIES')" style="cursor:pointer;color:var(--green);font-weight:600;font-size:12px;padding:3px 8px;border-radius:6px;background:rgba(16,185,129,0.1)">COMMODITIES</span>
+                      <span onclick="quickAsk('CRYPTO')" style="cursor:pointer;color:var(--accent);font-weight:600;font-size:12px;padding:3px 8px;border-radius:6px;background:rgba(99,102,241,0.1)">CRYPTO</span>
+                    </div>
+                  </div>
+                  <div class="msg-time" id="welcome-time"></div>
+                </div>
+              </div>
+            </div>
+            <div class="quick-btns">
+              <button class="quick-btn" onclick="quickAsk('Trade BTC/USD')">₿ BTC/USD</button>
+              <button class="quick-btn" onclick="quickAsk('Trade EUR/USD')">€ EUR/USD</button>
+              <button class="quick-btn" onclick="quickAsk('Trade XAU/USD')">🥇 Ouro</button>
+              <button class="quick-btn" onclick="quickAsk('Trade GBP/USD')">£ GBP/USD</button>
+              <button class="quick-btn" onclick="quickAsk('Trade NAS100')">📈 NAS100</button>
+              <button class="quick-btn" onclick="quickAsk('Trade US30')">🏛 US30</button>
+              <button class="quick-btn" onclick="quickAsk('Trade ETH/USD')">⟠ ETH</button>
+              <button class="quick-btn" onclick="quickAsk('Análise de mercado completa')">🌍 Mercado</button>
+            </div>
+            <div class="chat-input-area">
+              <textarea class="chat-input" id="chat-input" placeholder="Pergunte ao Dr. Trade... (ex: Trade BTC, Analise EUR/USD)" rows="1" maxlength="500" onkeydown="handleKey(event)" oninput="updateCharCount(this)"></textarea>
+              <button class="send-btn" onclick="sendMessage()">➤</button>
+            </div>
+            <div class="char-count" id="char-count">0/500</div>
+          </div>
+
+          <!-- CHAT LIST -->
+          <div class="chat-list-panel">
+            <div class="chat-list-header">
+              <div class="chat-list-title">Conversas</div>
+              <button class="new-chat-btn" onclick="newChat()">+ Nova</button>
+            </div>
+            <div class="chat-list-items" id="chat-list-items"></div>
+            <button class="clear-btn" onclick="clearAllChats()">🗑 Limpar Tudo</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ LEARNING MODE ══ -->
+      <div class="page" id="page-learning">
+        <div class="page-header">
+          <div>
+            <div class="page-title">📚 Modo Aprendizagem</div>
+            <div class="page-sub">Aprenda trading do zero com os nossos recursos</div>
+          </div>
+        </div>
+        <div class="learn-grid">
+          <div class="learn-card" onclick="openLesson('basics')">
+            <div class="learn-icon">📖</div>
+            <div class="learn-title">Fundamentos do Trading</div>
+            <div class="learn-desc">Aprenda o básico sobre mercados financeiros, tipos de ordens, gestão de risco e psicologia de trading.</div>
+            <span class="learn-badge beginner">Iniciante</span>
+          </div>
+          <div class="learn-card" onclick="openLesson('technical')">
+            <div class="learn-icon">📉</div>
+            <div class="learn-title">Análise Técnica</div>
+            <div class="learn-desc">Domine padrões de velas, indicadores técnicos, suporte/resistência e estratégias de entrada e saída.</div>
+            <span class="learn-badge inter">Intermediário</span>
+          </div>
+          <div class="learn-card" onclick="openLesson('fundamental')">
+            <div class="learn-icon">🌍</div>
+            <div class="learn-title">Análise Fundamental</div>
+            <div class="learn-desc">Entenda como eventos económicos, relatórios de lucros e dados macroeconómicos afectam os mercados.</div>
+            <span class="learn-badge inter">Intermediário</span>
+          </div>
+          <div class="learn-card" onclick="openLesson('risk')">
+            <div class="learn-icon">🛡</div>
+            <div class="learn-title">Gestão de Risco</div>
+            <div class="learn-desc">Aprenda a proteger o seu capital com estratégias de dimensionamento de posição, stop loss e diversificação.</div>
+            <span class="learn-badge beginner">Iniciante</span>
+          </div>
+          <div class="learn-card" onclick="openLesson('crypto')">
+            <div class="learn-icon">₿</div>
+            <div class="learn-title">Criptomoedas</div>
+            <div class="learn-desc">Explore o mundo das criptomoedas, blockchain, DeFi e estratégias de trading no mercado cripto.</div>
+            <span class="learn-badge adv">Avançado</span>
+          </div>
+          <div class="learn-card" onclick="openLesson('prop')">
+            <div class="learn-icon">🏆</div>
+            <div class="learn-title">Trading Profissional</div>
+            <div class="learn-desc">Prepare-se para as avaliações de Prop Firms, estratégias institucionais e trading como profissional.</div>
+            <span class="learn-badge adv">Avançado</span>
+          </div>
+        </div>
+        <div class="card" style="margin-top:20px">
+          <div class="card-title"><div class="card-title-icon">🤖</div> Pergunte ao Dr. Trade sobre Trading</div>
+          <div style="display:flex;gap:8px">
+            <input class="field-input" id="learn-q" placeholder="Ex: O que é RSI? Como usar Fibonacci?" style="flex:1" onkeydown="if(event.key==='Enter')askLearnQ()">
+            <button class="btn-primary" style="padding:10px 18px;white-space:nowrap" onclick="askLearnQ()">Perguntar →</button>
+          </div>
+          <div id="learn-answer" style="margin-top:14px;display:none">
+            <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:14px;font-size:13px;line-height:1.7;color:var(--text)" id="learn-answer-text"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ AUTO TRADE ══ -->
+      <div class="page" id="page-autotrade">
+        <div class="page-header">
+          <div>
+            <div class="page-title">🤖 Auto Trade</div>
+            <div class="page-sub">Bots de trading automático com IA</div>
+          </div>
+          <button class="btn-primary" style="padding:10px 20px" onclick="openModal('Premium','999 MT/mês')">Activar Bots →</button>
+        </div>
+        <div class="bot-grid">
+          <div class="bot-card">
+            <div class="bot-status"><div class="status-dot active"></div><span style="color:var(--green)">ACTIVO</span></div>
+            <div class="bot-name">Bot Scalper Pro</div>
+            <div class="bot-desc">Scalping em pares de moedas com alta liquidez. Opera em M1 e M5.</div>
+            <div class="bot-stats">
+              <div class="bot-stat"><div class="label">Win Rate</div><div class="value green">78%</div></div>
+              <div class="bot-stat"><div class="label">Retorno</div><div class="value green">+24%</div></div>
+            </div>
+            <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="bot-card">
+            <div class="bot-status"><div class="status-dot inactive"></div><span style="color:var(--muted)">INACTIVO</span></div>
+            <div class="bot-name">Bot Swing Trader</div>
+            <div class="bot-desc">Swing trading em índices e commodities. Opera em H4 e D1.</div>
+            <div class="bot-stats">
+              <div class="bot-stat"><div class="label">Win Rate</div><div class="value green">65%</div></div>
+              <div class="bot-stat"><div class="label">Retorno</div><div class="value green">+18%</div></div>
+            </div>
+            <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="bot-card">
+            <div class="bot-status"><div class="status-dot inactive"></div><span style="color:var(--muted)">INACTIVO</span></div>
+            <div class="bot-name">Bot Crypto IA</div>
+            <div class="bot-desc">Análise de sentimento + IA para trading de criptomoedas 24/7.</div>
+            <div class="bot-stats">
+              <div class="bot-stat"><div class="label">Win Rate</div><div class="value green">71%</div></div>
+              <div class="bot-stat"><div class="label">Retorno</div><div class="value green">+42%</div></div>
+            </div>
+            <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+        <div class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
+          <div class="stat-card">
+            <div class="stat-label">Total de Trades</div>
+            <div class="stat-value" style="color:var(--blue)">1,247</div>
+            <div class="stat-change up">↑ Este mês</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Win Rate Médio</div>
+            <div class="stat-value" style="color:var(--green)">73%</div>
+            <div class="stat-change up">↑ +2% vs mês anterior</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Lucro Total</div>
+            <div class="stat-value" style="color:var(--gold)">+28%</div>
+            <div class="stat-change up">↑ ROI do mês</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Drawdown Máx.</div>
+            <div class="stat-value" style="color:var(--red)">-4.2%</div>
+            <div class="stat-change">Dentro do limite</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ COPY TRADE ══ -->
+      <div class="page" id="page-copytrade">
+        <div class="page-header">
+          <div>
+            <div class="page-title">📋 Copy Trade</div>
+            <div class="page-sub">Copie traders profissionais automaticamente</div>
+          </div>
+        </div>
+        <div class="bot-grid">
+          <div class="bot-card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <div class="user-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">M</div>
+              <div>
+                <div style="font-weight:700">Master Trader MZ</div>
+                <div style="font-size:11px;color:var(--muted)">📍 Maputo, Moçambique</div>
+              </div>
+            </div>
+            <div class="bot-stats">
+              <div class="bot-stat"><div class="label">Win Rate</div><div class="value green">82%</div></div>
+              <div class="bot-stat"><div class="label">Retorno/Mês</div><div class="value green">+31%</div></div>
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">1,240 seguidores</div>
+            <button class="btn-plan primary" onclick="openModal('Copy Trade','499 MT/mês')">Seguir Trader</button>
+          </div>
+          <div class="bot-card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <div class="user-avatar" style="background:linear-gradient(135deg,#06b6d4,#6366f1)">A</div>
+              <div>
+                <div style="font-weight:700">AlgoTrade Pro</div>
+                <div style="font-size:11px;color:var(--muted)">🤖 Bot Institucional</div>
+              </div>
+            </div>
+            <div class="bot-stats">
+              <div class="bot-stat"><div class="label">Win Rate</div><div class="value green">75%</div></div>
+              <div class="bot-stat"><div class="label">Retorno/Mês</div><div class="value green">+22%</div></div>
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">3,891 seguidores</div>
+            <button class="btn-plan primary" onclick="openModal('Copy Trade','499 MT/mês')">Seguir Bot</button>
+          </div>
+          <div class="bot-card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <div class="user-avatar" style="background:linear-gradient(135deg,#10b981,#3b82f6)">G</div>
+              <div>
+                <div style="font-weight:700">Gold Signal Expert</div>
+                <div style="font-size:11px;color:var(--muted)">🥇 Especialista em Ouro</div>
+              </div>
+            </div>
+            <div class="bot-stats">
+              <div class="bot-stat"><div class="label">Win Rate</div><div class="value green">88%</div></div>
+              <div class="bot-stat"><div class="label">Retorno/Mês</div><div class="value green">+19%</div></div>
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">2,156 seguidores</div>
+            <button class="btn-plan primary" onclick="openModal('Copy Trade','499 MT/mês')">Seguir Expert</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PROP FIRM ══ -->
+      <div class="page" id="page-propfirm">
+        <div class="page-header">
+          <div>
+            <div class="page-title">🏦 Prop Firm Mode</div>
+            <div class="page-sub">Prepare-se para avaliações de Prop Firms</div>
+          </div>
+        </div>
+        <div class="prop-hero">
+          <div class="prop-title">Seja Financiado 💰</div>
+          <div class="prop-desc">Use a IA do Dr. Trade para passar nas avaliações das principais Prop Firms do mundo e opere com capital de até $200,000.</div>
+          <button class="btn-primary" style="padding:12px 28px;margin:0 auto" onclick="showPage('trading')">Iniciar Treino com IA →</button>
+        </div>
+        <div style="margin-bottom:14px;font-weight:700">Prop Firms Suportadas</div>
+        <div class="prop-firms">
+          <div class="firm-card">
+            <div class="firm-logo">🦁</div>
+            <div class="firm-name">FTMO</div>
+            <div class="firm-payout">até 90% lucro</div>
+          </div>
+          <div class="firm-card">
+            <div class="firm-logo">⚡</div>
+            <div class="firm-name">MyForexFunds</div>
+            <div class="firm-payout">até 85% lucro</div>
+          </div>
+          <div class="firm-card">
+            <div class="firm-logo">🔷</div>
+            <div class="firm-name">The5ers</div>
+            <div class="firm-payout">até 100% lucro</div>
+          </div>
+          <div class="firm-card">
+            <div class="firm-logo">🚀</div>
+            <div class="firm-name">Funded Next</div>
+            <div class="firm-payout">até 90% lucro</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ INSIGHTS ══ -->
+      <div class="page" id="page-insights">
+        <div class="page-header">
+          <div>
+            <div class="page-title">💡 Insights de Mercado</div>
+            <div class="page-sub">Análise profunda dos mercados financeiros globais</div>
+          </div>
+        </div>
+        <div class="insights-grid">
+          <div class="insight-card">
+            <div class="insight-cat">🌍 Forex</div>
+            <div class="insight-title">EUR/USD em zona crítica de decisão</div>
+            <div class="insight-desc">O par testou a resistência de 1.0950 pela terceira vez esta semana. Dados de emprego dos EUA amanhã podem ser o catalisador decisivo.</div>
+            <div class="sentiment-bar"><div class="sentiment-fill bull" style="width:68%"></div></div>
+            <div style="font-size:11px;color:var(--muted)">68% Bullish — Sentimento de Mercado</div>
+            <div class="insight-footer">📊 Análise Técnica &nbsp;·&nbsp; Hoje, 14:30</div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-cat">₿ Crypto</div>
+            <div class="insight-title">Bitcoin consolida antes do próximo movimento</div>
+            <div class="insight-desc">BTC forma padrão de acumulação no suporte de $68,000. O volume diminuiu 35% sugerindo compressão antes de grande movimento.</div>
+            <div class="sentiment-bar"><div class="sentiment-fill bull" style="width:74%"></div></div>
+            <div style="font-size:11px;color:var(--muted)">74% Bullish — Sentimento de Mercado</div>
+            <div class="insight-footer">📊 On-Chain Analysis &nbsp;·&nbsp; Hoje, 12:15</div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-cat">🥇 Commodities</div>
+            <div class="insight-title">Ouro testa máximos históricos novamente</div>
+            <div class="insight-desc">XAU/USD subiu 2.1% com incerteza geopolítica e expectativas de cortes de juros pela Fed. Alvo técnico em $2,450.</div>
+            <div class="sentiment-bar"><div class="sentiment-fill bull" style="width:81%"></div></div>
+            <div style="font-size:11px;color:var(--muted)">81% Bullish — Sentimento de Mercado</div>
+            <div class="insight-footer">📊 Análise Fundamentalista &nbsp;·&nbsp; Ontem, 18:00</div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-cat">📈 Índices</div>
+            <div class="insight-title">S&P500 atinge novos máximos históricos</div>
+            <div class="insight-desc">Os principais índices americanos continuam a bater recordes impulsionados pelo sector tecnológico e pela AI.</div>
+            <div class="sentiment-bar"><div class="sentiment-fill bull" style="width:72%"></div></div>
+            <div style="font-size:11px;color:var(--muted)">72% Bullish — Sentimento de Mercado</div>
+            <div class="insight-footer">📊 Macro Analysis &nbsp;·&nbsp; Ontem, 21:00</div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-cat">⚡ Risco</div>
+            <div class="insight-title">Volatilidade aumenta com tensões geopolíticas</div>
+            <div class="insight-desc">VIX subiu 12% esta semana. Traders devem reduzir tamanho de posições e aguardar por confirmação de sinais.</div>
+            <div class="sentiment-bar"><div class="sentiment-fill bear" style="width:55%"></div></div>
+            <div style="font-size:11px;color:var(--muted)">55% Bearish — Sentimento de Mercado</div>
+            <div class="insight-footer">⚠️ Alerta de Risco &nbsp;·&nbsp; Hoje, 09:45</div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-cat">🔮 IA Signal</div>
+            <div class="insight-title">IA detecta padrão de reversão em GBP/JPY</div>
+            <div class="insight-desc">O nosso modelo de IA identificou um padrão de duplo topo em GBP/JPY com probabilidade de 79% de reversão bearish.</div>
+            <div class="sentiment-bar"><div class="sentiment-fill bear" style="width:62%"></div></div>
+            <div style="font-size:11px;color:var(--muted)">62% Bearish — Previsão IA</div>
+            <div class="insight-footer">🤖 IA Analysis &nbsp;·&nbsp; Hoje, 11:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ NEWS ══ -->
+      <div class="page" id="page-news">
+        <div class="page-header">
+          <div>
+            <div class="page-title">📰 Notícias do Mercado</div>
+            <div class="page-sub">Últimas notícias que movem os mercados</div>
+          </div>
+        </div>
+        <div class="news-list">
+          <div class="news-item">
+            <div class="news-icon">🏛</div>
+            <div class="news-content">
+              <div class="news-cat">Fed / Política Monetária</div>
+              <div class="news-title">Fed mantém taxas de juro — mercados reagem com volatilidade</div>
+              <div class="news-desc">O Federal Reserve decidiu manter as taxas nos actuais 5.25%-5.50%, sinalizando cautela perante dados de inflação mistos.</div>
+              <div class="news-footer"><span>🕐 2 horas atrás</span><span>•</span><span>📌 Alto Impacto</span></div>
+            </div>
+          </div>
+          <div class="news-item">
+            <div class="news-icon">₿</div>
+            <div class="news-content">
+              <div class="news-cat">Cripto</div>
+              <div class="news-title">Bitcoin ETF regista entrada de $500M em 24 horas</div>
+              <div class="news-desc">Os ETFs spot de Bitcoin nos EUA continuam a atrair capital institucional massivo, com BlackRock liderando as entradas.</div>
+              <div class="news-footer"><span>🕐 4 horas atrás</span><span>•</span><span>📌 Alto Impacto</span></div>
+            </div>
+          </div>
+          <div class="news-item">
+            <div class="news-icon">🥇</div>
+            <div class="news-content">
+              <div class="news-cat">Commodities</div>
+              <div class="news-title">Ouro sobe 1.8% com aumento de incerteza geopolítica</div>
+              <div class="news-desc">As tensões no Médio Oriente e a fraqueza do dólar americano impulsionaram o ouro para novos máximos de curto prazo.</div>
+              <div class="news-footer"><span>🕐 5 horas atrás</span><span>•</span><span>📌 Médio Impacto</span></div>
+            </div>
+          </div>
+          <div class="news-item">
+            <div class="news-icon">📊</div>
+            <div class="news-content">
+              <div class="news-cat">Dados Económicos</div>
+              <div class="news-title">CPI dos EUA abaixo das expectativas — Dollar enfraquece</div>
+              <div class="news-desc">O índice de preços ao consumidor registou 3.1% vs 3.4% esperado, aumentando probabilidade de corte de juros em Junho.</div>
+              <div class="news-footer"><span>🕐 6 horas atrás</span><span>•</span><span>📌 Alto Impacto</span></div>
+            </div>
+          </div>
+          <div class="news-item">
+            <div class="news-icon">🌍</div>
+            <div class="news-content">
+              <div class="news-cat">Forex</div>
+              <div class="news-title">EUR/USD ultrapassa resistência de 1.09 após dados positivos da Zona Euro</div>
+              <div class="news-desc">PMI da manufatura europeia superou expectativas, fortalecendo o euro e impulsionando o par EUR/USD acima de nível-chave.</div>
+              <div class="news-footer"><span>🕐 8 horas atrás</span><span>•</span><span>📌 Médio Impacto</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ HISTORY ══ -->
+      <div class="page" id="page-history">
+        <div class="page-header">
+          <div>
+            <div class="page-title">📅 Histórico de Sinais</div>
+            <div class="page-sub">Todos os sinais e resultados anteriores</div>
+          </div>
+        </div>
+        <div class="stat-grid" style="margin-bottom:20px">
+          <div class="stat-card">
+            <div class="stat-label">Total Sinais</div>
+            <div class="stat-value" style="color:var(--blue)">342</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Ganhos</div>
+            <div class="stat-value" style="color:var(--green)">241</div>
+            <div class="stat-change up">↑ 70.5% Win Rate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Perdas</div>
+            <div class="stat-value" style="color:var(--red)">101</div>
+            <div class="stat-change dn">↓ 29.5%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Lucro Médio</div>
+            <div class="stat-value" style="color:var(--gold)">+47 pip</div>
+          </div>
+        </div>
+        <div class="card">
+          <table class="hist-table">
+            <thead>
+              <tr>
+                <th>Par</th>
+                <th>Tipo</th>
+                <th>Entrada</th>
+                <th>TP / SL</th>
+                <th>Resultado</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ UPGRADE ══ -->
+      <div class="page" id="page-upgrade">
+        <div style="text-align:center;margin-bottom:32px">
+          <div class="page-title" style="display:inline">⭐ Escolha o Seu Plano</div>
+          <div class="page-sub" style="margin-top:8px">Desbloqueie todo o potencial do Dr. Trade Pro</div>
+        </div>
+        <div class="pricing-grid">
+          <div class="pricing-card">
+            <div class="pricing-name">Gratuito</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Comece a aprender</div>
+            <div class="pricing-price">0 MT<span>/mês</span></div>
+            <ul class="pricing-features">
+              <li>3 sinais por dia</li>
+              <li>Pares de moedas básicos</li>
+              <li>Modo Aprendizagem</li>
+              <li class="no">Trading Mode ilimitado</li>
+              <li class="no">Auto Trade</li>
+              <li class="no">Copy Trade</li>
+              <li class="no">Prop Firm Mode</li>
+            </ul>
+            <button class="btn-plan" onclick="doLogin()">Plano Actual</button>
+          </div>
+          <div class="pricing-card popular">
+            <div class="popular-badge">⭐ MAIS POPULAR</div>
+            <div class="pricing-name">Pro</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Para traders sérios</div>
+            <div class="pricing-price">299 MT<span>/mês</span></div>
+            <ul class="pricing-features">
+              <li>Sinais ilimitados</li>
+              <li>Todos os mercados</li>
+              <li>Análise IA avançada</li>
+              <li>Auto Trade (1 bot)</li>
+              <li>Copy Trade</li>
+              <li>Prop Firm Mode</li>
+              <li class="no">Suporte prioritário 24/7</li>
+            </ul>
+            <button class="btn-plan primary" onclick="openModal('Pro','299 MT/mês')">Subscrever Pro →</button>
+          </div>
+          <div class="pricing-card">
+            <div class="pricing-name">Premium</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Para profissionais</div>
+            <div class="pricing-price">999 MT<span>/mês</span></div>
+            <ul class="pricing-features">
+              <li>Tudo do Pro</li>
+              <li>3 bots Auto Trade</li>
+              <li>Copy Trade ilimitado</li>
+              <li>API de sinais</li>
+              <li>Suporte prioritário 24/7</li>
+              <li>Grupo VIP Telegram</li>
+              <li>Webinars mensais</li>
+            </ul>
+            <button class="btn-plan" onclick="openModal('Premium','999 MT/mês')">Subscrever Premium →</button>
+          </div>
+        </div>
+        <div class="card" style="max-width:500px;margin:24px auto 0;text-align:center">
+          <div style="font-size:14px;font-weight:700;margin-bottom:12px">💳 Métodos de Pagamento Aceites</div>
+          <div style="display:flex;justify-content:center;gap:20px">
+            <div style="text-align:center">
+              <div style="font-size:28px">📱</div>
+              <div style="font-weight:700;font-size:14px">M-Pesa</div>
+              <div style="color:var(--cyan);font-family:'DM Mono',monospace;font-size:13px">840 330 540</div>
+            </div>
+            <div style="width:1px;background:var(--border)"></div>
+            <div style="text-align:center">
+              <div style="font-size:28px">💚</div>
+              <div style="font-weight:700;font-size:14px">e-Mola</div>
+              <div style="color:var(--cyan);font-family:'DM Mono',monospace;font-size:13px">877 480 775</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ NOTIFICATIONS ══ -->
+      <div class="page" id="page-notifications">
+        <div class="page-header">
+          <div>
+            <div class="page-title">🔔 Notificações</div>
+            <div class="page-sub">Alertas de sinais, mercado e sistema</div>
+          </div>
+          <button style="padding:8px 16px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;font-size:12px" onclick="markAllRead()">Marcar todas como lidas</button>
+        </div>
+        <div class="notif-list" id="notif-list"></div>
+      </div>
+
+    </div><!-- /pages -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ── STATE ──
+let chatHistory = JSON.parse(localStorage.getItem('dt_chats') || '[]');
+let currentChatId = null;
+let isTyping = false;
+
+// ── AUTH ──
+function switchTab(t) {
+  document.querySelectorAll('.auth-tab').forEach((b,i)=>b.classList.toggle('active', (i===0&&t==='login')||(i===1&&t==='register')));
+  document.querySelectorAll('.auth-form').forEach(f=>f.classList.remove('active'));
+  document.getElementById(t+'-form').classList.add('active');
+}
+function selectPlan(el,plan) {
+  document.querySelectorAll('.plan-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function doLogin() {
+  document.getElementById('landing').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  initApp();
+}
+function doLogout() {
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('landing').style.display='flex';
+}
+
+// ── APP INIT ──
+function initApp() {
+  document.getElementById('welcome-time').textContent = new Date().toLocaleTimeString('pt',{hour:'2-digit',minute:'2-digit'});
+  renderChatList();
+  renderHistory();
+  renderNotifications();
+  startTicker();
+  if(!currentChatId) newChat();
+}
+
+// ── NAVIGATION ──
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ── TICKER ──
+const tickerData = [
+  {pair:'BTC/USD', base:70000, dec:2},
+  {pair:'EUR/USD', base:1.0852, dec:4},
+  {pair:'XAU/USD', base:2320, dec:2},
+  {pair:'GBP/USD', base:1.2640, dec:4},
+  {pair:'US30', base:39200, dec:0},
+  {pair:'NAS100', base:18450, dec:1},
+];
+function startTicker() {
+  const items = document.querySelectorAll('.ticker-item');
+  function update() {
+    tickerData.forEach((td,i) => {
+      const change = (Math.random()-0.48)*td.base*0.002;
+      td.base += change;
+      const pct = ((change/td.base)*100).toFixed(2);
+      const isUp = change >= 0;
+      items[i].querySelector('.price').textContent = td.base.toFixed(td.dec);
+      const ch = items[i].querySelector('.change');
+      ch.textContent = (isUp?'+':'')+pct+'%';
+      ch.className = 'change '+(isUp?'up':'dn');
+    });
+  }
+  update();
+  setInterval(update, 3000);
+}
+
+// ── CHAT ──
+function newChat() {
+  currentChatId = Date.now().toString();
+  const msgs = document.getElementById('chat-msgs');
+  // Clear dynamic messages, keep welcome
+  while(msgs.children.length > 1) msgs.removeChild(msgs.lastChild);
+  renderChatList();
+}
+
+function renderChatList() {
+  const c = document.getElementById('chat-list-items');
+  if(!c) return;
+  c.innerHTML = '';
+  const icons = {'BTC':'₿','Gold':'🥇','EUR':'€','GBP':'£','USD':'💵','XAG':'🥈','NAS':'📈','US':'🏛','ETH':'⟠'};
+  chatHistory.forEach((ch,i) => {
+    const icon = Object.entries(icons).find(([k])=>ch.name.includes(k))?.[1] || '📊';
+    const div = document.createElement('div');
+    div.className='chat-list-item'+(ch.id===currentChatId?' active':'');
+    div.innerHTML=`<div class="chat-item-icon">${icon}</div><div class="chat-item-info"><div class="chat-item-name">${ch.name}</div><div class="chat-item-time">${ch.time}</div></div><button class="chat-item-del" onclick="event.stopPropagation();deleteChat(${i})">🗑</button>`;
+    div.onclick=()=>loadChat(ch.id);
+    c.appendChild(div);
+  });
+}
+
+function loadChat(id) {
+  currentChatId = id;
+  renderChatList();
+}
+
+function deleteChat(i) {
+  chatHistory.splice(i,1);
+  localStorage.setItem('dt_chats', JSON.stringify(chatHistory));
+  renderChatList();
+}
+
+function clearAllChats() {
+  if(confirm('Limpar todas as conversas?')) {
+    chatHistory = [];
+    localStorage.setItem('dt_chats', JSON.stringify(chatHistory));
+    renderChatList();
+  }
+}
+
+function updateCharCount(el) {
+  document.getElementById('char-count').textContent = el.value.length+'/500';
+}
+function handleKey(e) {
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}
+}
+function quickAsk(q) {
+  document.getElementById('chat-input').value = q;
+  sendMessage();
+}
+
+function addMessage(content, isUser) {
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = 'msg'+(isUser?' user':'');
+  const time = new Date().toLocaleTimeString('pt',{hour:'2-digit',minute:'2-digit'});
+  const avatarContent = isUser ? (document.getElementById('user-av').textContent) : '⊙';
+  div.innerHTML = `<div class="msg-avatar">${avatarContent}</div><div><div class="msg-bubble">${content}</div><div class="msg-time">${time}</div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function addTyping() {
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className='msg';div.id='typing-ind';
+  div.innerHTML='<div class="msg-avatar">⊙</div><div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+function removeTyping(){const t=document.getElementById('typing-ind');if(t)t.remove();}
+
+async function sendMessage() {
+  if(isTyping) return;
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text) return;
+  input.value='';
+  document.getElementById('char-count').textContent='0/500';
+
+  addMessage(text, true);
+
+  // Save to chat history
+  const chatName = text.replace(/^(Trade|Analise|Analisar|Analisa)\s*/i,'').split(/[\s\/]/)[0];
+  const existing = chatHistory.find(c=>c.id===currentChatId);
+  if(!existing) {
+    chatHistory.unshift({id:currentChatId, name:'Trade '+chatName.toUpperCase(), time:'agora'});
+  } else {
+    existing.time='agora';
+  }
+  localStorage.setItem('dt_chats',JSON.stringify(chatHistory));
+  renderChatList();
+
+  isTyping=true;
+  addTyping();
+
+  try {
+    const systemPrompt = `Você é o Dr. Trade, um assistente especialista em sinais de trading com IA. Quando o utilizador pedir para "Trade [par]" ou "Analise [par]", forneça um sinal de trading detalhado em português com este formato EXACTO usando HTML simples:
+
+<strong>Análise para [PAR]:</strong><br>
+<strong>Sinal:</strong> <span style="color:#10b981;font-weight:700">BUY [PAR]</span> ou <span style="color:#ef4444;font-weight:700">SELL [PAR]</span><br>
+<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:12px;margin:8px 0">
+<strong>💰 Entry Price:</strong> [preço actual realista]<br>
+<strong>🎯 Take Profit 1:</strong> [TP1]<br>
+<strong>🎯 Take Profit 2:</strong> [TP2]<br>
+<strong>🎯 Take Profit 3:</strong> [TP3]<br>
+<strong>🛑 Stop Loss:</strong> [SL]<br>
+</div>
+<strong>📊 Análise:</strong> [2-3 frases sobre o porquê do sinal]<br>
+<strong>⚠️ Gestão de Risco:</strong> Arriscque no máximo 1-2% do seu capital por trade.
+
+Para outras perguntas, responda de forma útil e concisa em português sobre trading.`;
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: systemPrompt,
+        messages:[{role:'user',content:text}]
+      })
+    });
+    const data = await resp.json();
+    removeTyping();
+    const answer = data.content?.[0]?.text || 'Ocorreu um erro. Tente novamente.';
+    addMessage(answer, false);
+  } catch(e) {
+    removeTyping();
+    addMessage('⚠️ Erro ao conectar. Verifique a sua ligação à internet e tente novamente.', false);
+  }
+  isTyping=false;
+}
+
+// ── LEARNING ──
+async function askLearnQ() {
+  const q = document.getElementById('learn-q').value.trim();
+  if(!q) return;
+  const ansDiv = document.getElementById('learn-answer');
+  const ansText = document.getElementById('learn-answer-text');
+  ansDiv.style.display='block';
+  ansText.innerHTML='<div class="typing" style="justify-content:center"><span></span><span></span><span></span></div>';
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:800,
+        system:'Você é um professor especialista em trading financeiro. Responda de forma clara, educativa e concisa em português. Use exemplos práticos quando possível.',
+        messages:[{role:'user',content:q}]
+      })
+    });
+    const data = await resp.json();
+    ansText.innerHTML = (data.content?.[0]?.text || 'Erro ao obter resposta.').replace(/\n/g,'<br>');
+  } catch(e) {
+    ansText.innerHTML='⚠️ Erro ao conectar ao assistente.';
+  }
+}
+
+function openLesson(l) {
+  const lessons={
+    basics:'Aprenda os fundamentos!',
+    technical:'Análise Técnica',
+    fundamental:'Análise Fundamental',
+    risk:'Gestão de Risco',
+    crypto:'Criptomoedas',
+    prop:'Trading Profissional'
+  };
+  document.getElementById('learn-q').value='Explique-me os conceitos fundamentais de: '+lessons[l];
+  askLearnQ();
+}
+
+// ── HISTORY ──
+const histData = [
+  {pair:'BTC/USD',type:'BUY',entry:'68,240',tp:'68,950 / 69,420',result:'profit',pnl:'+$320',date:'Hoje, 14:20'},
+  {pair:'EUR/USD',type:'SELL',entry:'1.0872',tp:'1.0810 / 1.0775',result:'profit',pnl:'+$180',date:'Hoje, 11:15'},
+  {pair:'XAU/USD',type:'BUY',entry:'2,298',tp:'2,315 / 2,330',result:'profit',pnl:'+$540',date:'Ontem, 16:30'},
+  {pair:'GBP/USD',type:'BUY',entry:'1.2580',tp:'1.2640 / 1.2680',result:'loss',pnl:'-$90',date:'Ontem, 09:45'},
+  {pair:'NAS100',type:'BUY',entry:'18,120',tp:'18,350 / 18,500',result:'profit',pnl:'+$420',date:'14 Mar, 15:00'},
+  {pair:'US30',type:'SELL',entry:'39,450',tp:'39,200 / 39,050',result:'open',pnl:'+$120',date:'14 Mar, 12:30'},
+  {pair:'ETH/USD',type:'BUY',entry:'3,410',tp:'3,480 / 3,550',result:'profit',pnl:'+$280',date:'13 Mar, 10:15'},
+  {pair:'XAG/USD',type:'SELL',entry:'27.85',tp:'27.40 / 27.10',result:'loss',pnl:'-$60',date:'12 Mar, 14:00'},
+];
+function renderHistory() {
+  const b = document.getElementById('history-body');
+  if(!b) return;
+  b.innerHTML = histData.map(h=>`
+    <tr>
+      <td><strong>${h.pair}</strong></td>
+      <td><span class="signal-type ${h.type.toLowerCase()}" style="padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700">${h.type}</span></td>
+      <td style="font-family:'DM Mono',monospace">${h.entry}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">${h.tp}</td>
+      <td>
+        <span class="status-badge ${h.result}">${h.result==='profit'?'✓ Lucro':h.result==='loss'?'✕ Perda':'◎ Aberto'}</span>
+        <span style="margin-left:8px;font-family:'DM Mono',monospace;font-size:12px;color:${h.result==='profit'?'var(--green)':h.result==='loss'?'var(--red)':'var(--blue)'}">${h.pnl}</span>
+      </td>
+      <td style="color:var(--muted);font-size:12px">${h.date}</td>
+    </tr>
+  `).join('');
+}
+
+// ── NOTIFICATIONS ──
+const notifData = [
+  {type:'signal',icon:'📊',title:'Novo Sinal: BUY EUR/USD',desc:'Sinal de compra identificado em EUR/USD. Entry: 1.0852, TP: 1.0910, SL: 1.0820.',time:'Há 5 minutos',unread:true},
+  {type:'signal',icon:'🥇',title:'Sinal Fechado com Lucro: XAU/USD',desc:'O sinal de compra em XAU/USD foi fechado em TP1 com +$340 de lucro.',time:'Há 1 hora',unread:true},
+  {type:'news',icon:'📰',title:'Alerta de Notícia: NFP Amanhã',desc:'Dados de emprego dos EUA (Non-Farm Payroll) são publicados amanhã às 15:30 UTC. Espere alta volatilidade.',time:'Há 2 horas',unread:true},
+  {type:'system',icon:'⭐',title:'Seu plano expira em 7 dias',desc:'Renove o seu plano Pro para continuar a ter acesso a todos os sinais e funcionalidades.',time:'Há 3 horas',unread:false},
+  {type:'signal',icon:'📈',title:'Bot Scalper Pro: +12 trades vencedores',desc:'O seu bot de scalping completou 12 trades com sucesso hoje. Win rate diário: 83%.',time:'Há 4 horas',unread:false},
+  {type:'system',icon:'🔒',title:'Login detectado em novo dispositivo',desc:'Novo acesso detectado a partir de Maputo, MZ. Se não foi você, altere a sua senha imediatamente.',time:'Ontem',unread:false},
+];
+function renderNotifications() {
+  const c = document.getElementById('notif-list');
+  if(!c) return;
+  c.innerHTML = notifData.map(n=>`
+    <div class="notif-item ${n.unread?'unread':''}" onclick="this.classList.remove('unread')">
+      <div class="notif-icon ${n.type}">${n.icon}</div>
+      <div class="notif-content">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-desc">${n.desc}</div>
+        <div class="notif-time">🕐 ${n.time}</div>
+      </div>
+      ${n.unread?'<div style="width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:4px"></div>':''}
+    </div>
+  `).join('');
+}
+function markAllRead() {
+  notifData.forEach(n=>n.unread=false);
+  renderNotifications();
+  document.getElementById('notif-count').style.display='none';
+}
+
+// ── MODAL ──
+function openModal(planName, price) {
+  document.getElementById('modal-plan-name').textContent = planName+' — '+price;
+  document.getElementById('payment-amount').textContent = price;
+  document.getElementById('payment-modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('payment-modal').classList.remove('open');
+}
+function selectPM(el) {
+  document.querySelectorAll('.payment-method').forEach(m=>m.classList.remove('selected'));
+  el.classList.add('selected');
+  const isMpesa = el.querySelector('.pm-name').textContent==='M-Pesa';
+  document.getElementById('payment-number').textContent = isMpesa?'840 330 540':'877 480 775';
+}
+function confirmPayment() {
+  closeModal();
+  alert('✅ Pagamento confirmado! A sua conta será activada em até 24 horas. Obrigado!');
+}
+document.getElementById('payment-modal').addEventListener('click',function(e){
+  if(e.target===this) closeModal();
+});
+</script>
+</body>
+</html>
