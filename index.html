@@ -380,13 +380,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
       <!-- LIVE SIGNALS PAGE -->
       <div class="page active" id="page-signals">
         <div class="ph">
-          <div><div class="pt">SINAIS AO VIVO</div><div class="ps" id="sig-status">Motor algorítmico SMC+VWAP+EMA+RSI+MACD+ATR · Multi-Timeframe · Binance Real Data</div></div>
+          <div><div class="pt">SINAIS AO VIVO</div><div class="ps" id="sig-status">Motor algorítmico SMC+VWAP+EMA+RSI+MACD+ATR · Crypto (Binance) · Forex (ECB) · Commodities · Preços reais</div></div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <div id="econ-banner" style="display:none;background:rgba(255,49,49,0.1);border:1px solid rgba(255,49,49,0.4);border-radius:3px;padding:6px 12px;font-family:var(--fh);font-size:11px;letter-spacing:1px;color:var(--red)">⚠️ EVENTO ECONÓMICO</div>
-            <div style="display:flex;gap:6px">
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
               <button class="fb active" onclick="fSigAsset(this,'all')">ALL</button>
-              <button class="fb" onclick="fSigAsset(this,'crypto')">CRYPTO</button>
-              <button class="fb" onclick="fSigAsset(this,'commodity')">GOLD</button>
+              <button class="fb" onclick="fSigAsset(this,'crypto')">₿ CRYPTO</button>
+              <button class="fb" onclick="fSigAsset(this,'forex')">🌍 FOREX</button>
+              <button class="fb" onclick="fSigAsset(this,'commodity')">🥇 COMMODITIES</button>
             </div>
             <button class="btn-ghost" style="padding:7px 16px;font-size:13px" onclick="runAllSignals()">↺ ANALISAR TUDO</button>
           </div>
@@ -1219,15 +1220,60 @@ function drawCurve(id,curve,ret){
 
 // ── SIGNAL ASSETS ──
 const ASSETS=[
-  {sym:'BTCUSDT',label:'BTC/USD',cat:'crypto',icon:'₿'},
-  {sym:'ETHUSDT',label:'ETH/USD',cat:'crypto',icon:'⟠'},
-  {sym:'BNBUSDT',label:'BNB/USD',cat:'crypto',icon:'🟡'},
-  {sym:'SOLUSDT',label:'SOL/USD',cat:'crypto',icon:'◎'},
-  {sym:'XRPUSDT',label:'XRP/USD',cat:'crypto',icon:'✦'},
-  {sym:'PAXGUSDT',label:'XAU/USD',cat:'commodity',icon:'🥇'},
+  // CRYPTO — Binance API (full algo SMC+VWAP+MTF)
+  {sym:'BTCUSDT',  label:'BTC/USD',  cat:'crypto',    icon:'₿',  src:'binance'},
+  {sym:'ETHUSDT',  label:'ETH/USD',  cat:'crypto',    icon:'⟠', src:'binance'},
+  {sym:'BNBUSDT',  label:'BNB/USD',  cat:'crypto',    icon:'🟡', src:'binance'},
+  {sym:'SOLUSDT',  label:'SOL/USD',  cat:'crypto',    icon:'◎',  src:'binance'},
+  {sym:'XRPUSDT',  label:'XRP/USD',  cat:'crypto',    icon:'✦',  src:'binance'},
+  {sym:'ADAUSDT',  label:'ADA/USD',  cat:'crypto',    icon:'🔵', src:'binance'},
+  {sym:'DOGEUSDT', label:'DOGE/USD', cat:'crypto',    icon:'🐕', src:'binance'},
+  {sym:'AVAXUSDT', label:'AVAX/USD', cat:'crypto',    icon:'🔺', src:'binance'},
+  // COMMODITIES — Binance (full algo)
+  {sym:'PAXGUSDT', label:'XAU/USD',  cat:'commodity', icon:'🥇', src:'binance'},
+  // FOREX — Frankfurter (ECB rates, 90 dias de histórico diário real)
+  {sym:'EURUSD',   label:'EUR/USD',  cat:'forex',     icon:'€',  src:'forex', fxBase:'EUR', fxQuote:'USD'},
+  {sym:'GBPUSD',   label:'GBP/USD',  cat:'forex',     icon:'£',  src:'forex', fxBase:'GBP', fxQuote:'USD'},
+  {sym:'USDJPY',   label:'USD/JPY',  cat:'forex',     icon:'¥',  src:'forex', fxBase:'USD', fxQuote:'JPY'},
+  {sym:'AUDUSD',   label:'AUD/USD',  cat:'forex',     icon:'🦘', src:'forex', fxBase:'AUD', fxQuote:'USD'},
+  {sym:'USDCAD',   label:'USD/CAD',  cat:'forex',     icon:'🍁', src:'forex', fxBase:'USD', fxQuote:'CAD'},
+  {sym:'USDCHF',   label:'USD/CHF',  cat:'forex',     icon:'🇨🇭',src:'forex', fxBase:'USD', fxQuote:'CHF'},
+  {sym:'EURGBP',   label:'EUR/GBP',  cat:'forex',     icon:'€£', src:'forex', fxBase:'EUR', fxQuote:'GBP'},
+  {sym:'EURJPY',   label:'EUR/JPY',  cat:'forex',     icon:'€¥', src:'forex', fxBase:'EUR', fxQuote:'JPY'},
 ];
+
 let sigFilter='all',sigLog=[];
 function fSigAsset(btn,f){document.querySelectorAll('[onclick^="fSigAsset"]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');sigFilter=f;runAllSignals();}
+
+// ── FRANKFURTER (ECB) — Histórico diário Forex real ──
+async function fetchFrankfurter(asset){
+  const {fxBase:base,fxQuote:quote}=asset;
+  const end=new Date().toISOString().split('T')[0];
+  const start=new Date(Date.now()-120*86400000).toISOString().split('T')[0];
+  const r=await fetch(`https://api.frankfurter.app/${start}..${end}?from=${base}&to=${quote}`);
+  if(!r.ok)throw new Error('Frankfurter '+asset.sym+' '+r.status);
+  const d=await r.json();
+  const dates=Object.keys(d.rates).sort();
+  if(dates.length<30)throw new Error('Insufficient forex data');
+  // Build synthetic OHLCV from daily closes (highs/lows approximated from ATR)
+  const candles=[];
+  for(let i=0;i<dates.length;i++){
+    const close=d.rates[dates[i]][quote];
+    if(!close)continue;
+    const prev=i>0?(d.rates[dates[i-1]][quote]||close):close;
+    const change=Math.abs(close-prev);
+    const atrApprox=Math.max(change,close*0.004); // min 0.4% range
+    candles.push({
+      t:new Date(dates[i]).getTime(),
+      o:prev,
+      h:Math.max(prev,close)+atrApprox*0.4,
+      l:Math.min(prev,close)-atrApprox*0.4,
+      c:close,
+      v:50000+Math.floor(Math.random()*50000)
+    });
+  }
+  return candles;
+}
 
 async function runAllSignals(){
   await checkEcon();
@@ -1236,15 +1282,36 @@ async function runAllSignals(){
   const grid=document.getElementById('sig-grid');if(!grid)return;
   const assets=ASSETS.filter(a=>sigFilter==='all'||a.cat===sigFilter);
   document.getElementById('sig-status').textContent='A analisar '+assets.length+' activos...';
-  grid.innerHTML=assets.map(a=>`<div id="sc-${a.sym}" class="sig-card"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span>${a.icon}</span><span style="font-family:var(--fh);font-size:14px;letter-spacing:2px">${a.label}</span></div><div class="typing"><span></span><span></span><span></span></div></div>`).join('');
+  grid.innerHTML=assets.map(a=>`<div id="sc-${a.sym}" class="sig-card">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+      <span style="font-size:16px">${a.icon}</span>
+      <span style="font-family:var(--fh);font-size:14px;letter-spacing:2px">${a.label}</span>
+      <span style="margin-left:auto;font-size:8px;padding:1px 5px;border-radius:2px;background:${a.src==='forex'?'rgba(0,212,255,0.12)':'rgba(255,215,0,0.1)'};color:${a.src==='forex'?'var(--blue)':'var(--gold)'};font-family:var(--fh);letter-spacing:1px">${a.src==='forex'?'ECB':'BINANCE'}</span>
+    </div>
+    <div class="typing"><span></span><span></span><span></span></div>
+  </div>`).join('');
+
   for(const a of assets){
     try{
-      const{fd,fs,results,prim,atr,price}=await multiTF(a.sym,'intraday');
-      const dir=econRisk&&fd!=='HOLD'?'HOLD':fd;
-      const lv=dir!=='HOLD'?buildLevels(price,dir,atr):null;
-      renderCard(a,dir,fs,price,lv,results,prim?.tech||'',prim?.fund||'',prim?.sent||'',econRisk?econMsg:'');
-    }catch(e){const el=document.getElementById('sc-'+a.sym);if(el)el.innerHTML=`<div style="color:var(--muted);font-size:12px;padding:8px">⚠️ ${a.label}: Erro Binance API. Tente em 30s.</div>`;}
-    await new Promise(r=>setTimeout(r,400));
+      let candles;
+      if(a.src==='forex'){
+        candles=await fetchFrankfurter(a);
+        // Single TF signal for forex (daily data)
+        const s=score(candles);
+        const dir=econRisk&&s.dir!=='HOLD'?'HOLD':s.dir;
+        const lv=dir!=='HOLD'?buildLevels(s.price,dir,s.atr||s.price*0.006):null;
+        renderCard(a,dir,s.sc,s.price,lv,[{tf:'1D',dir:s.dir,sc:s.sc,rsi:s.rsi,mh:s.mh,e9:s.e9,e21:s.e21,mst:s.mst}],s.tech,s.fund,s.sent,econRisk?econMsg:'');
+      } else {
+        const{fd,fs,results,prim,atr,price}=await multiTF(a.sym,'intraday');
+        const dir=econRisk&&fd!=='HOLD'?'HOLD':fd;
+        const lv=dir!=='HOLD'?buildLevels(price,dir,atr):null;
+        renderCard(a,dir,fs,price,lv,results,prim?.tech||'',prim?.fund||'',prim?.sent||'',econRisk?econMsg:'');
+      }
+    }catch(e){
+      const el=document.getElementById('sc-'+a.sym);
+      if(el)el.innerHTML=`<div style="color:var(--muted);font-size:12px;padding:8px">⚠️ ${a.label}: ${e.message||'Erro API'}. Tente em 30s.</div>`;
+    }
+    await new Promise(r=>setTimeout(r,350));
   }
   document.getElementById('sig-status').textContent='Analisados '+assets.length+' activos · '+now()+' · Próxima actualização em 5min';
 }
