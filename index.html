@@ -1003,83 +1003,114 @@ function score(cn){
   const atrV=IND.atr(cn),stk=IND.stoch(cn).k,vrV=IND.vr(vl);
   const bb=IND.bb(cl),vwapV=IND.vwap(cn.slice(-60)),pocV=IND.poc(cn.slice(-80));
   const obs=IND.ob(cn);const ms=IND.ms(cn);
+  // ── FILOSOFIA: TREND-FIRST (como Dr Trade)
+  // A tendência EMA é o sinal base. Outros indicadores ajustam a confiança.
+  // Só damos HOLD se há sinais de reversão FORTES e confirmados.
+  
+  const emaBull = e9>e21&&e21>e50;
+  const emaBear = e9<e21&&e21<e50;
+  const emaTrend = emaBull?1:emaBear?-1:0;
+
+  // ── BASE: EMA STACK (sinal principal)
   let bs=0,ss=0;
-  // EMA(3), RSI(2), MACD(2), VOL(1), STOCH(1), BB(1), VWAP(1), SMC(1.5+0.5), OB(1), POC(0.5), PA(0.5)
-  if(e9>e21&&e21>e50&&e50>e200)bs+=3;else if(e9<e21&&e21<e50&&e50<e200)ss+=3;
-  else if(e9>e21&&e21>e50)bs+=2;else if(e9<e21&&e21<e50)ss+=2;
-  else if(e9>e21)bs+=1;else ss+=1;
-  if(e9>e21&&p9<=p21)bs+=0.5;if(e9<e21&&p9>=p21)ss+=0.5;
+  if(e9>e21&&e21>e50&&e50>e200){bs+=4;}     // perfeito bull
+  else if(e9<e21&&e21<e50&&e50<e200){ss+=4;} // perfeito bear
+  else if(e9>e21&&e21>e50){bs+=3;}            // bull forte
+  else if(e9<e21&&e21<e50){ss+=3;}            // bear forte
+  else if(e9>e21){bs+=1.5;}                   // bull fraco
+  else if(e9<e21){ss+=1.5;}                   // bear fraco
+  // Golden/Death Cross bonus
+  if(e9>e21&&p9<=p21)bs+=0.5;
+  if(e9<e21&&p9>=p21)ss+=0.5;
 
-  // RSI — melhorado: zona 44-68 não penaliza quando tendência é clara
-  if(rsiN<30)bs+=2;
-  else if(rsiN<44)bs+=1.2;
-  else if(rsiN<56){bs+=0.6;ss+=0.4;}  // leve viés bull em neutro
-  else if(rsiN<68){bs+=0.3;ss+=0.3;}  // 56-68: reduzido, não penaliza bull
-  else if(rsiN<78)ss+=1.2;             // 68-78: ligeiramente overbought
-  else ss+=2;                           // >78: sobrecompra forte
-  if(rsiN<22)bs+=0.5;if(rsiN>82)ss+=0.5;
+  // ── VWAP: Viés institucional (peso alto — instituições usam VWAP)
+  const vwapBull=price>vwapV*1.0005;
+  const vwapBear=price<vwapV*0.9995;
+  if(vwapBull)bs+=1.5;
+  else if(vwapBear)ss+=1.5;
+  else{bs+=0.5;ss+=0.5;}
 
-  // MACD — peso reduzido quando EMA trend é claro (evita falsos hold em tendências)
-  const emaTrend=(e9>e21&&e21>e50)?1:(e9<e21&&e21<e50)?-1:0;
-  if(mN>sN&&hN>0&&hN>hP)bs+=2;
-  else if(mN>sN&&hN>0)bs+=1;
-  else if(mN<sN&&hN<0&&hN<hP){
-    // Se EMA stack bullish, MACD negativo tem menos peso (momentum atrasado)
-    ss+=(emaTrend===1)?1:2;
-  }
-  else if(mN<sN&&hN<0){
-    ss+=(emaTrend===1)?0.5:1;
-  }
-  // MACD crossover bonus
-  if(mN>sN&&mP<=sP)bs+=0.5;if(mN<sN&&mP>=sP)ss+=0.5;
+  // ── RSI: só penaliza em extremos, não em zona 40-70
+  if(rsiN<30){bs+=1.5;ss-=0.5;}              // sobrevenda forte → reversal bull
+  else if(rsiN<44){bs+=0.8;}                  // fraqueza → bull acumulando
+  else if(rsiN<=68){bs+=0.3;}                 // zona normal → leve viés bull
+  else if(rsiN<=80){ss+=0.8;}                 // overbought leve
+  else{ss+=1.5;bs-=0.5;}                      // overbought forte → reversal bear
 
-  // Volume — baixo volume não bloqueia sinal, apenas reduz confiança
-  if(vrV>1.5){if(bs>ss)bs+=1;else ss+=1;}
+  // ── MACD: confirma momentum mas não bloqueia se EMA é claro
+  if(mN>sN&&hN>0){
+    bs+=(hN>hP)?1.5:1.0;  // bullish e crescente = 1.5, só bullish = 1.0
+  } else if(mN<sN&&hN<0){
+    const penalty=emaTrend===1?0.5:1.5; // penaliza menos se EMA é bull
+    ss+=penalty;
+  } else if(mN>sN){bs+=0.5;}  // MACD signal acima mas hist negativo
+  // Crossover bonus
+  if(mN>sN&&mP<=sP)bs+=0.5;
+  if(mN<sN&&mP>=sP)ss+=0.5;
+
+  // ── VOLUME: só bónus, sem penalidade
+  if(vrV>1.5){if(bs>ss)bs+=1.0;else ss+=1.0;}
   else if(vrV>1.1){if(bs>ss)bs+=0.5;else ss+=0.5;}
-  // volume baixo: sem penalidade, apenas sem bónus
+  // volume baixo: sem impacto (mercado pode fazer grandes movimentos com pouco volume)
 
-  // Stochastic — zonas neutras não penalizam
-  if(stk<20)bs+=1;else if(stk<35)bs+=0.5;
-  else if(stk>80)ss+=1;else if(stk>70)ss+=0.5;
-  // 35-70: neutro, sem pontos
+  // ── STOCHASTIC: só extremos importam
+  if(stk<20){bs+=1.0;ss-=0.3;}   // oversold extremo
+  else if(stk>85){ss+=1.0;bs-=0.3;} // overbought extremo
+  // 20-85: neutro, zero pontos
 
-  // Bollinger Bands
-  if(price<=bb.lower)bs+=1;else if(price>=bb.upper)ss+=1;
-  else if(price>bb.mid)bs+=0.3;else ss+=0.3;  // corrigido: acima da média é bullish
+  // ── BOLLINGER BANDS
+  if(price<=bb.lower){bs+=0.8;}    // toca suporte
+  else if(price>=bb.upper){ss+=0.8;} // toca resistência
+  else if(price>bb.mid){bs+=0.3;}  // acima da média → viés bull
+  else{ss+=0.3;}
 
-  // VWAP — institucional
-  if(price>vwapV*1.001)bs+=1;else if(price<vwapV*0.999)ss+=1;else{bs+=0.5;ss+=0.5;}
-
-  // SMC Market Structure
-  if(ms.trend==='BULLISH')bs+=1.5;else if(ms.trend==='BEARISH')ss+=1.5;
+  // ── SMC MARKET STRUCTURE: dá pontos mas RANGING não bloqueia
+  const msBull=ms.trend==='BULLISH';
+  const msBear=ms.trend==='BEARISH';
+  if(msBull){bs+=1.5;}
+  else if(msBear){ss+=1.5;}
+  else if(ms.trend==='RANGING'){
+    // Em ranging, a EMA decide o viés
+    if(emaBull)bs+=0.5;
+    else if(emaBear)ss+=0.5;
+  }
   if(ms.bos==='ChoCH↑'){bs+=0.5;ss=Math.max(0,ss-0.3);}
   if(ms.bos==='ChoCH↓'){ss+=0.5;bs=Math.max(0,bs-0.3);}
 
-  // Order Blocks
-  const nBO=obs.bull.some(ob=>price>=ob.l&&price<=ob.h*1.005);
-  const nBO2=obs.bear.some(ob=>price<=ob.h&&price>=ob.l*0.995);
-  if(nBO)bs+=1;if(nBO2)ss+=1;
+  // ── ORDER BLOCKS SMC
+  const nBO=obs.bull.some(ob=>price>=ob.l&&price<=ob.h*1.006);
+  const nBO2=obs.bear.some(ob=>price<=ob.h&&price>=ob.l*0.994);
+  if(nBO)bs+=0.8;
+  if(nBO2)ss+=0.8;
 
-  // Volume Profile POC
-  if(price>pocV*1.001)bs+=0.5;else if(price<pocV*0.999)ss+=0.5;
+  // ── VOLUME PROFILE POC
+  if(price>pocV*1.001)bs+=0.5;
+  else if(price<pocV*0.999)ss+=0.5;
 
-  // Price action últimas 3 velas
+  // ── PRICE ACTION (últimas 3 velas)
   const l3=cn.slice(-3);
-  if(l3.filter(c=>c.c>c.o).length>=2)bs+=0.5;
-  if(l3.filter(c=>c.c<c.o).length>=2)ss+=0.5;
+  const bullCandles=l3.filter(c=>c.c>c.o).length;
+  const bearCandles=l3.filter(c=>c.c<c.o).length;
+  if(bullCandles>=2)bs+=0.5;
+  if(bearCandles>=2)ss+=0.5;
 
-  // BÓNUS: Convergência multi-indicador — quando tendência é muito clara
-  // Se EMA stack + VWAP + MS concordam, dar bónus extra
-  const emaBull=e9>e21&&e21>e50;const emaBear=e9<e21&&e21<e50;
-  const vwapBull=price>vwapV;const msBull=ms.trend==='BULLISH';const msBear=ms.trend==='BEARISH';
-  if(emaBull&&vwapBull&&msBull)bs+=0.8;    // triple convergência bullish
-  if(emaBear&&!vwapBull&&msBear)ss+=0.8;   // triple convergência bearish
+  // ── CONVERGÊNCIA FORTE: EMA + VWAP alinhados = bónus adicional
+  if(emaBull&&vwapBull)bs+=0.8;   // as 2 mais importantes concordam bull
+  if(emaBear&&vwapBear)ss+=0.8;   // as 2 mais importantes concordam bear
 
   bs=Math.max(0,bs);ss=Math.max(0,ss);
+  const maxPts=16; // novo máximo total
+  const bN=Math.min(bs/maxPts*10,10);
+  const sNN=Math.min(ss/maxPts*10,10);
 
-  // THR ajustado: 5.5/10 para scalp/intraday com tendência clara, 6.0 para outros
-  const THR=(emaBull||emaBear)&&(msBull||msBear)?5.5:6.0;
-  const bN=Math.min(bs/14*10,10),sNN=Math.min(ss/14*10,10);
+  // ── THRESHOLD INTELIGENTE
+  // Mais baixo quando EMA + VWAP concordam (sinal de alta qualidade)
+  // Mais alto quando apenas EMA (sem confirmação)
+  let THR;
+  if(emaBull&&vwapBull)THR=4.5;        // EMA bull + VWAP bull = sinal forte
+  else if(emaBear&&vwapBear)THR=4.5;   // EMA bear + VWAP bear = sinal forte
+  else if(emaBull||emaBear)THR=5.5;    // apenas EMA alinhada
+  else THR=6.5;                          // sem tendência clara
 
   // Build readable explanations
   const techParts=[];
@@ -1135,9 +1166,8 @@ async function multiTF(sym,style='intraday'){
   let bW=0,sW=0;results.forEach((r,i)=>{if(r.dir==='BUY')bW+=r.sc*W[i];else if(r.dir==='SELL')sW+=r.sc*W[i];});
   const buyC=results.filter(r=>r.dir==='BUY').length,sellC=results.filter(r=>r.dir==='SELL').length;
   const prim=results[1]||results[0];
-  // Threshold adaptativo: mais baixo se 3/3 TF concordam, normal se 2/3
-  const allBuy=buyC===3,allSell=sellC===3;
-  const buyThr=allBuy?4.5:5.5,sellThr=allSell?4.5:5.5;
+  // Threshold multiTF adaptativo: 3/3 TF → 4.0, 2/3 → 5.0
+  const buyThr=buyC===3?4.0:5.0,sellThr=sellC===3?4.0:5.0;
   let fd,fs;
   if(buyC>=2&&bW>=buyThr){fd='BUY';fs=bW;}
   else if(sellC>=2&&sW>=sellThr){fd='SELL';fs=sW;}
