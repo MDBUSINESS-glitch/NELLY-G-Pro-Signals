@@ -412,45 +412,106 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
 
       <!-- TRADING / ALGO TERMINAL -->
       <div class="page" id="page-trading">
-        <div class="ph"><div><div class="pt">ANALISAR ACTIVO</div><div class="ps">Motor SMC+VWAP+Indicadores · Dados reais Binance</div></div></div>
-        <div class="card" style="padding:14px;margin-bottom:14px">
+        <div class="ph"><div><div class="pt">ANALISAR ACTIVO</div><div class="ps">Motor SMC+VWAP+Indicadores · Gráfico Live TradingView · Zonas de Entrada/Saída/Breakeven</div></div></div>
+        <!-- Controls -->
+        <div class="card" style="padding:12px;margin-bottom:12px">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-            <select id="tm-asset" style="background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:3px;color:var(--green);font-family:var(--fh);font-size:13px;letter-spacing:1px;padding:8px 12px;outline:none;cursor:pointer">
-              <option value="BTCUSDT">₿ BTC/USDT</option>
-              <option value="ETHUSDT">⟠ ETH/USDT</option>
-              <option value="BNBUSDT">🟡 BNB/USDT</option>
-              <option value="SOLUSDT">◎ SOL/USDT</option>
-              <option value="XRPUSDT">✦ XRP/USDT</option>
-              <option value="ADAUSDT">🔵 ADA/USDT</option>
-              <option value="PAXGUSDT">🥇 XAU/USDT (PAXG)</option>
-            </select>
-            <select id="tm-tf" style="background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:3px;color:var(--blue);font-family:var(--fh);font-size:13px;letter-spacing:1px;padding:8px 12px;outline:none;cursor:pointer">
-              <option value="scalp">⚡ SCALP (5-15 min)</option>
-              <option value="intraday" selected>📊 INTRADAY (1-4h)</option>
-              <option value="swing">🌊 SWING (1-3 dias)</option>
-            </select>
-            <button class="btn-primary" style="padding:9px 22px;font-size:15px" onclick="runTerm()">⚡ ANALISAR →</button>
+            <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+              <div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;font-family:var(--fh)">CATEGORIA</div>
+              <select id="tm-cat" onchange="updateAssetList()" style="background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:3px;color:var(--gold);font-family:var(--fh);font-size:13px;letter-spacing:1px;padding:7px 10px;outline:none;cursor:pointer">
+                <option value="crypto">₿ CRYPTO</option>
+                <option value="forex">🌍 CURRENCY PAIRS</option>
+                <option value="stocks">📱 STOCKS</option>
+                <option value="indices">📈 STOCK INDICES</option>
+                <option value="commodities">🥇 COMMODITIES</option>
+                <option value="synthetic">🎲 SYNTHETIC INDICES</option>
+              </select>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+              <div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;font-family:var(--fh)">ACTIVO</div>
+              <select id="tm-asset" style="background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:3px;color:var(--green);font-family:var(--fh);font-size:13px;letter-spacing:1px;padding:7px 10px;outline:none;cursor:pointer;min-width:160px">
+                <option value="BTCUSDT">₿ BTC/USDT</option>
+              </select>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;font-family:var(--fh)">ESTILO</div>
+              <select id="tm-tf" style="background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:3px;color:var(--blue);font-family:var(--fh);font-size:13px;letter-spacing:1px;padding:7px 10px;outline:none;cursor:pointer">
+                <option value="scalp">⚡ SCALP</option>
+                <option value="intraday" selected>📊 INTRADAY</option>
+                <option value="swing">🌊 SWING</option>
+              </select>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="font-size:9px;color:var(--muted);letter-spacing:1.5px;font-family:var(--fh)">TIMEFRAME CHART</div>
+              <select id="tm-chart-tf" onchange="reloadChart()" style="background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:3px;color:var(--muted);font-family:var(--fh);font-size:13px;letter-spacing:1px;padding:7px 10px;outline:none;cursor:pointer">
+                <option value="5">5 min</option>
+                <option value="15">15 min</option>
+                <option value="60" selected>1 hora</option>
+                <option value="240">4 horas</option>
+                <option value="D">1 dia</option>
+              </select>
+            </div>
+            <button class="btn-primary" style="padding:9px 22px;font-size:15px;margin-top:14px" onclick="runTerm()">⚡ ANALISAR →</button>
             <div id="tm-price" style="margin-left:auto;font-family:var(--fm);font-size:20px;color:var(--green)">—</div>
           </div>
         </div>
-        <div id="tm-out" class="algo-out" style="margin-bottom:14px">
-          <div style="text-align:center;color:var(--muted);padding:40px 0">
-            <div style="font-size:36px;margin-bottom:10px">⚡</div>
-            <div style="font-family:var(--fh);font-size:18px;letter-spacing:2px">Seleccione activo e clique ANALISAR</div>
-            <div style="font-size:12px;margin-top:8px">SMC + VWAP + EMA + RSI + MACD + ATR + Bollinger + Stoch + Volume Profile</div>
+
+        <div style="display:grid;grid-template-columns:1fr 360px;gap:12px">
+          <!-- LEFT: Chart + Signal -->
+          <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+            <!-- TradingView Chart -->
+            <div style="position:relative;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;overflow:hidden">
+              <div id="tv_chart_container" style="height:380px"></div>
+              <!-- Signal Zone Overlay -->
+              <canvas id="zone-canvas" style="position:absolute;top:0;left:0;pointer-events:none;width:100%;height:380px"></canvas>
+              <!-- Zone Legend -->
+              <div id="zone-legend" style="position:absolute;top:8px;right:8px;background:rgba(7,10,7,0.92);border:1px solid var(--border2);border-radius:3px;padding:8px 12px;font-size:11px;display:none;z-index:10">
+                <div style="font-family:var(--fh);letter-spacing:1px;color:var(--text);margin-bottom:6px;font-size:12px">ZONAS DO SINAL</div>
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><div style="width:20px;height:3px;background:var(--red)"></div><span>Stop Loss</span></div>
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><div style="width:20px;height:3px;background:var(--blue)"></div><span>Entry Zone</span></div>
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><div style="width:20px;height:3px;background:rgba(57,255,20,0.6)"></div><span>Breakeven</span></div>
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><div style="width:20px;height:3px;background:var(--green)"></div><span>TP1 / TP2 / TP3</span></div>
+                <div style="display:flex;align-items:center;gap:6px"><div style="width:20px;height:3px;background:var(--gold)"></div><span>VWAP</span></div>
+              </div>
+            </div>
+
+            <!-- Signal Output -->
+            <div id="tm-out" class="algo-out">
+              <div style="text-align:center;color:var(--muted);padding:30px 0">
+                <div style="font-size:36px;margin-bottom:10px">⚡</div>
+                <div style="font-family:var(--fh);font-size:18px;letter-spacing:2px">Seleccione activo e clique ANALISAR</div>
+                <div style="font-size:12px;margin-top:8px;line-height:1.6">SMC + VWAP + EMA + RSI + MACD + ATR<br>O gráfico mostra as zonas de entrada, saída e breakeven</div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div id="tm-ind-wrap" style="display:none;margin-bottom:14px" class="card">
-          <div class="ct">📊 DASHBOARD DE INDICADORES</div>
-          <div class="ind-grid" id="tm-ind"></div>
-        </div>
-        <div id="tm-mtf-wrap" style="display:none" class="card">
-          <div class="ct">🕐 ANÁLISE MULTI-TIMEFRAME</div>
-          <table class="pt2" style="width:100%"><thead><tr><th>TF</th><th>EMA TREND</th><th>RSI</th><th>MACD</th><th>SCORE</th><th>DIRECÇÃO</th></tr></thead><tbody id="tm-mtf"></tbody></table>
-        </div>
-        <div id="tm-bt-wrap" style="display:none;margin-top:14px" class="card">
-          <div class="ct" style="justify-content:space-between"><span>📈 BACKTEST — <span id="tm-bt-sym">BTC</span></span><span id="tm-bt-stats" style="font-size:11px;color:var(--muted)"></span></div>
-          <canvas id="tm-bt-canvas" height="110" style="width:100%"></canvas>
+
+          <!-- RIGHT: Indicators + MTF + Backtest -->
+          <div style="display:flex;flex-direction:column;gap:12px;overflow-y:auto;max-height:calc(100vh - 200px)">
+            <!-- Signal Summary Card -->
+            <div id="tm-summary" style="display:none" class="card">
+              <div class="ct" style="margin-bottom:10px">📡 RESUMO DO SINAL</div>
+              <div id="tm-summary-content"></div>
+            </div>
+
+            <!-- MTF -->
+            <div id="tm-mtf-wrap" style="display:none" class="card">
+              <div class="ct">🕐 MULTI-TIMEFRAME</div>
+              <table class="pt2" style="width:100%"><thead><tr><th>TF</th><th>TREND</th><th>RSI</th><th>DIR</th></tr></thead><tbody id="tm-mtf"></tbody></table>
+            </div>
+
+            <!-- Indicators -->
+            <div id="tm-ind-wrap" style="display:none" class="card">
+              <div class="ct">📊 INDICADORES</div>
+              <div class="ind-grid" style="grid-template-columns:1fr 1fr" id="tm-ind"></div>
+            </div>
+
+            <!-- Backtest for this asset -->
+            <div id="tm-bt-wrap" style="display:none" class="card">
+              <div class="ct" style="justify-content:space-between"><span>📈 BACKTEST — <span id="tm-bt-sym">BTC</span></span><span id="tm-bt-stats" style="font-size:10px;color:var(--muted)"></span></div>
+              <canvas id="tm-bt-canvas" height="100" style="width:100%;margin-top:6px"></canvas>
+              <div id="tm-bt-detail" style="margin-top:8px;font-size:11px;color:var(--muted)"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -576,11 +637,40 @@ Trading é o acto de <strong>comprar e vender activos</strong> para obter lucro 
 
       <!-- COPY TRADE -->
       <div class="page" id="page-copytrade">
-        <div class="ph"><div><div class="pt">COPY TRADE</div><div class="ps">Copie traders profissionais automaticamente</div></div></div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
-          <div class="card"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div class="uav" style="background:var(--green)">N</div><div><div style="font-family:var(--fh);font-size:15px;letter-spacing:1px">NELLY-G MASTER</div><div style="font-size:10px;color:var(--muted)">📍 Maputo, Moçambique</div></div></div><div style="display:flex;gap:14px;margin-bottom:12px"><div><div style="font-size:9px;color:var(--muted);letter-spacing:1px">WIN RATE</div><div style="font-family:var(--fm);font-size:18px;color:var(--green)">82%</div></div><div><div style="font-size:9px;color:var(--muted);letter-spacing:1px">MÊS</div><div style="font-family:var(--fm);font-size:18px;color:var(--green)">+31%</div></div></div><div style="font-size:11px;color:var(--muted);margin-bottom:12px">2,841 seguidores</div><button class="btn-primary" style="width:100%;font-size:14px;padding:10px" onclick="openModal('Copy Trade','499 MT/mês')">SEGUIR →</button></div>
-          <div class="card"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div class="uav" style="background:var(--blue);color:#000">A</div><div><div style="font-family:var(--fh);font-size:15px;letter-spacing:1px">ALGO TRADE MZ</div><div style="font-size:10px;color:var(--muted)">🤖 Bot Institucional</div></div></div><div style="display:flex;gap:14px;margin-bottom:12px"><div><div style="font-size:9px;color:var(--muted);letter-spacing:1px">WIN RATE</div><div style="font-family:var(--fm);font-size:18px;color:var(--green)">75%</div></div><div><div style="font-size:9px;color:var(--muted);letter-spacing:1px">MÊS</div><div style="font-family:var(--fm);font-size:18px;color:var(--green)">+22%</div></div></div><div style="font-size:11px;color:var(--muted);margin-bottom:12px">3,891 seguidores</div><button class="btn-primary" style="width:100%;font-size:14px;padding:10px" onclick="openModal('Copy Trade','499 MT/mês')">SEGUIR →</button></div>
-          <div class="card"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div class="uav" style="background:var(--gold);color:#000">G</div><div><div style="font-family:var(--fh);font-size:15px;letter-spacing:1px">GOLD EXPERT PRO</div><div style="font-size:10px;color:var(--muted)">🥇 XAU/USD Specialist</div></div></div><div style="display:flex;gap:14px;margin-bottom:12px"><div><div style="font-size:9px;color:var(--muted);letter-spacing:1px">WIN RATE</div><div style="font-family:var(--fm);font-size:18px;color:var(--green)">88%</div></div><div><div style="font-size:9px;color:var(--muted);letter-spacing:1px">MÊS</div><div style="font-family:var(--fm);font-size:18px;color:var(--green)">+19%</div></div></div><div style="font-size:11px;color:var(--muted);margin-bottom:12px">2,156 seguidores</div><button class="btn-primary" style="width:100%;font-size:14px;padding:10px" onclick="openModal('Copy Trade','499 MT/mês')">SEGUIR →</button></div>
+        <div class="ph">
+          <div><div class="pt">COPY TRADE</div><div class="ps">Top traders globais · Performance verificada · Siga automaticamente</div></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="fb active" onclick="filterCT(this,'all')">TODOS</button>
+            <button class="fb" onclick="filterCT(this,'forex')">FOREX</button>
+            <button class="fb" onclick="filterCT(this,'crypto')">CRYPTO</button>
+            <button class="fb" onclick="filterCT(this,'gold')">GOLD</button>
+          </div>
+        </div>
+        <!-- Stats bar -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px">
+          <div class="card"><div class="sl">TRADERS ACTIVOS</div><div class="sv2" style="color:var(--green)">1,247</div><div class="ss up">↑ +23 esta semana</div></div>
+          <div class="card"><div class="sl">MELHOR WIN RATE</div><div class="sv2" style="color:var(--green)">94%</div><div class="ss">Top trader global</div></div>
+          <div class="card"><div class="sl">MELHOR RETORNO MÊS</div><div class="sv2" style="color:var(--gold)">+68%</div><div class="ss">Verified account</div></div>
+          <div class="card"><div class="sl">TOTAL SEGUIDORES</div><div class="sv2" style="color:var(--blue)">48K+</div><div class="ss">Plataforma NELLY-G</div></div>
+        </div>
+        <div id="ct-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px"></div>
+        <!-- Platform links -->
+        <div class="card" style="margin-top:18px">
+          <div class="ct">🔗 PLATAFORMAS DE COPY TRADE RECOMENDADAS</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+            <a href="https://www.etoro.com/copytrader/" target="_blank" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;background:rgba(0,0,0,0.3);border:1px solid var(--border2);border-radius:4px;transition:.2s;cursor:pointer" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border2)'">
+              <div style="font-size:28px">👁</div><div style="font-family:var(--fh);font-size:14px;letter-spacing:1px;color:var(--text)">eToro</div><div style="font-size:11px;color:var(--muted)">Social Trading</div><div style="font-size:10px;color:var(--green);margin-top:4px">↗ Visitar</div>
+            </a>
+            <a href="https://www.zulutrade.com/" target="_blank" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;background:rgba(0,0,0,0.3);border:1px solid var(--border2);border-radius:4px;transition:.2s;cursor:pointer" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border2)'">
+              <div style="font-size:28px">⚡</div><div style="font-family:var(--fh);font-size:14px;letter-spacing:1px;color:var(--text)">ZuluTrade</div><div style="font-size:11px;color:var(--muted)">Auto-Copy Signals</div><div style="font-size:10px;color:var(--blue);margin-top:4px">↗ Visitar</div>
+            </a>
+            <a href="https://www.mql5.com/en/signals" target="_blank" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;background:rgba(0,0,0,0.3);border:1px solid var(--border2);border-radius:4px;transition:.2s;cursor:pointer" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)'">
+              <div style="font-size:28px">🤖</div><div style="font-family:var(--fh);font-size:14px;letter-spacing:1px;color:var(--text)">MQL5 Signals</div><div style="font-size:11px;color:var(--muted)">MT4/MT5 Signals</div><div style="font-size:10px;color:var(--gold);margin-top:4px">↗ Visitar</div>
+            </a>
+            <a href="https://app.deriv.com/bot" target="_blank" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;background:rgba(0,0,0,0.3);border:1px solid var(--border2);border-radius:4px;transition:.2s;cursor:pointer" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='var(--border2)'">
+              <div style="font-size:28px">🎯</div><div style="font-family:var(--fh);font-size:14px;letter-spacing:1px;color:var(--text)">Deriv Bot</div><div style="font-size:11px;color:var(--muted)">Synthetic Indices</div><div style="font-size:10px;color:var(--red);margin-top:4px">↗ Visitar</div>
+            </a>
+          </div>
         </div>
       </div>
 
@@ -726,14 +816,16 @@ function now(){return new Date().toLocaleTimeString('pt',{hour:'2-digit',minute:
 
 function initApp(){
   buildTicker();
+  updateAssetList();
   renderCurriculum();
+  renderCTGrid();
   buildInsights(FOREX_PAIRS);
   fetchMarketPrices();
   renderHistory();
+  // Load TradingView on page-trading activation
   setInterval(()=>{
     const ap=document.querySelector('.page.active');
     if(ap?.id==='page-signals')runAllSignals();
-    if(ap?.id==='page-trading')runTerm();
   },5*60*1000);
 }
 
@@ -1200,12 +1292,39 @@ async function runBacktests(){
 let tmRunning=false;
 async function runTerm(){
   if(tmRunning)return;tmRunning=true;
-  const sym=document.getElementById('tm-asset')?.value||'BTCUSDT';
+  const sel=document.getElementById('tm-asset');
+  const sym=sel?.value||'BTCUSDT';
+  const opt=sel?.options[sel.selectedIndex];
+  const tvSym=opt?.dataset?.tv||'BINANCE:'+sym;
+  const isTV=opt?.dataset?.tvonly==='true';
   const style=document.getElementById('tm-tf')?.value||'intraday';
+  const chartTf=document.getElementById('tm-chart-tf')?.value||'60';
   const out=document.getElementById('tm-out'),prEl=document.getElementById('tm-price');
   const indW=document.getElementById('tm-ind-wrap'),mtfW=document.getElementById('tm-mtf-wrap'),btW=document.getElementById('tm-bt-wrap');
+  const sumW=document.getElementById('tm-summary');
+
+  // Load TradingView chart immediately
+  initTVChart(tvSym, chartTf);
+
   if(out)out.innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)"><div class="typing" style="justify-content:center"><span></span><span></span><span></span></div><div style="margin-top:10px;font-family:var(--fh);font-size:14px;letter-spacing:2px">A ANALISAR '+sym+'...<br><span style="font-size:11px;color:var(--muted)">SMC+VWAP+EMA+RSI+MACD+ATR+BB+Stoch+Volume Profile</span></div></div>';
-  [indW,mtfW,btW].forEach(el=>{if(el)el.style.display='none';});
+  [indW,mtfW,btW,sumW].forEach(el=>{if(el)el.style.display='none';});
+
+  // For TV-only assets (forex/stocks/indices) — chart only, no Binance algo
+  if(isTV){
+    if(out)out.innerHTML=`<div style="background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.15);border-radius:4px;padding:18px;font-size:13px;line-height:1.9">
+      <div style="font-family:var(--fh);font-size:16px;letter-spacing:2px;color:var(--blue);margin-bottom:10px">📊 GRÁFICO LIVE — ${opt?.dataset?.label||sym}</div>
+      O gráfico TradingView ao vivo está activo em cima.<br>
+      <span style="color:var(--muted)">O motor algorítmico (Binance API) suporta apenas activos Crypto e XAU/USD.<br>
+      Para Forex, Stocks e Índices — use o gráfico e a análise manual SMC.</span><br><br>
+      <strong style="color:var(--gold)">💡 COMO ANALISAR:</strong><br>
+      • Observe EMAs 9/21/50 no gráfico<br>
+      • Identifique Order Blocks (zonas de suporte/resistência)<br>
+      • Use o VWAP como referência institucional<br>
+      • Confirme com RSI e MACD antes de entrar
+    </div>`;
+    tmRunning=false;return;
+  }
+
   try{
     await checkEcon();
     const{fd,fs,results,prim,atr,price}=await multiTF(sym,style);
@@ -1213,6 +1332,10 @@ async function runTerm(){
     const lv=dir!=='HOLD'?buildLevels(price,dir,atr):null;
     const conf=(fs/10*100).toFixed(0),iB=dir==='BUY',iS=dir==='SELL',dc=iB?'var(--green)':iS?'var(--red)':'var(--gold)';
     if(prEl)prEl.textContent=fmtP(price);
+
+    // Draw signal zones on canvas overlay
+    if(lv) setTimeout(()=>drawSignalZones(price,dir,lv,prim?.vwap||0),500);
+
     const econN=econRisk?`<div style="background:rgba(255,49,49,0.08);border:1px solid rgba(255,49,49,0.3);border-radius:3px;padding:10px;margin-bottom:12px;font-size:12px;color:var(--red)">⚠️ EVENTO ACTIVO: ${econMsg}</div>`:'';
     if(out)out.innerHTML=`${econN}
       <div style="display:flex;justify-content:space-between;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border2)">
@@ -1223,17 +1346,25 @@ async function runTerm(){
         </div>
         <div style="text-align:right"><div style="font-size:10px;color:var(--muted)">PREÇO REAL (BINANCE)</div><div style="font-family:var(--fm);font-size:22px;color:var(--green)">${fmtP(price)}</div></div>
       </div>
-      ${lv?`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
-        <div style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:4px;padding:12px;text-align:center"><div style="font-size:10px;color:var(--muted);font-family:var(--fh)">💰 ENTRADA</div><div style="font-family:var(--fm);font-size:16px;color:var(--blue);font-weight:700">${fmtP(lv.entry)}</div></div>
-        <div style="background:rgba(57,255,20,0.06);border:1px solid rgba(57,255,20,0.15);border-radius:4px;padding:12px;text-align:center"><div style="font-size:10px;color:var(--muted);font-family:var(--fh)">🎯 TP1/2/3</div><div style="font-family:var(--fm);font-size:12px;color:var(--green)">${fmtP(lv.tp1)}<br>${fmtP(lv.tp2)} / ${fmtP(lv.tp3)}</div></div>
-        <div style="background:rgba(255,49,49,0.06);border:1px solid rgba(255,49,49,0.15);border-radius:4px;padding:12px;text-align:center"><div style="font-size:10px;color:var(--muted);font-family:var(--fh)">🛑 STOP LOSS</div><div style="font-family:var(--fm);font-size:16px;color:var(--red);font-weight:700">${fmtP(lv.sl)}</div><div style="font-size:10px;color:var(--gold)">${lv.rr}</div></div>
+      ${lv?`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
+        <div style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:4px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--muted);font-family:var(--fh)">💰 ENTRADA</div><div style="font-family:var(--fm);font-size:14px;color:var(--blue);font-weight:700">${fmtP(lv.entry)}</div></div>
+        <div style="background:rgba(57,255,20,0.05);border:1px solid rgba(57,255,20,0.1);border-radius:4px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--muted);font-family:var(--fh)">⚖️ BREAKEVEN</div><div style="font-family:var(--fm);font-size:13px;color:rgba(57,255,20,0.6)">${fmtP(iB?lv.entry+(lv.entry-lv.sl):lv.entry-(lv.sl-lv.entry))}</div></div>
+        <div style="background:rgba(57,255,20,0.06);border:1px solid rgba(57,255,20,0.15);border-radius:4px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--muted);font-family:var(--fh)">🎯 TP1/2/3</div><div style="font-family:var(--fm);font-size:11px;color:var(--green)">${fmtP(lv.tp1)}<br>${fmtP(lv.tp2)} / ${fmtP(lv.tp3)}</div></div>
+        <div style="background:rgba(255,49,49,0.06);border:1px solid rgba(255,49,49,0.15);border-radius:4px;padding:10px;text-align:center"><div style="font-size:9px;color:var(--muted);font-family:var(--fh)">🛑 STOP LOSS</div><div style="font-family:var(--fm);font-size:14px;color:var(--red);font-weight:700">${fmtP(lv.sl)}</div><div style="font-size:9px;color:var(--gold)">${lv.rr}</div></div>
+      </div>
+      <div style="background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.15);border-radius:4px;padding:10px;font-size:11px;color:var(--muted);margin-bottom:12px">
+        📊 VWAP: <span style="color:var(--gold);font-family:var(--fm)">${fmtP(prim?.vwap||0)}</span> ·
+        POC: <span style="color:var(--blue);font-family:var(--fm)">${fmtP(prim?.poc||0)}</span> ·
+        ATR: <span style="color:var(--text);font-family:var(--fm)">${fmtP(atr)}</span> · 
+        Vol: <span style="color:${(prim?.vr||1)>1.2?'var(--green)':'var(--muted)';font-family:var(--fm)}">${((prim?.vr||1)*100).toFixed(0)}%</span>
       </div>`:''}
-      <div style="display:grid;gap:10px">
-        <div class="expl-panel" style="border-left-color:${dc}">${prim?.tech||'—'}</div>
-        <div class="expl-panel fund">${prim?.fund||'—'}</div>
-        <div class="expl-panel sent">${prim?.sent||'—'}</div>
-        ${!dir.includes('HOLD')?'<div style="font-size:11px;color:var(--muted);background:rgba(0,0,0,0.2);border-radius:3px;padding:8px">⚠️ Máximo 1-2% do capital · ATR-based SL/TP · Confirme no broker</div>':''}
+      <div style="display:grid;gap:8px">
+        <div style="border-left:3px solid ${dc};background:rgba(0,0,0,0.25);border-radius:0 4px 4px 0;padding:12px;font-size:12px;line-height:1.9;color:var(--text);white-space:pre-wrap">${prim?.tech||'—'}</div>
+        <div style="border-left:3px solid var(--blue);background:rgba(0,212,255,0.03);border-radius:0 4px 4px 0;padding:12px;font-size:12px;line-height:1.9;color:var(--text);white-space:pre-wrap">${prim?.fund||'—'}</div>
+        <div style="border-left:3px solid var(--gold);background:rgba(255,215,0,0.03);border-radius:0 4px 4px 0;padding:12px;font-size:12px;line-height:1.9;color:var(--text);white-space:pre-wrap">${prim?.sent||'—'}</div>
+        ${!dir.includes('HOLD')?'<div style="font-size:11px;color:var(--muted);background:rgba(0,0,0,0.2);border-radius:3px;padding:8px">⚠️ Máximo 1-2% do capital · ATR-based SL/TP · Confirme no broker · As zonas são visíveis no gráfico acima</div>':''}
       </div>`;
+
     if(indW&&prim){indW.style.display='block';const ig=document.getElementById('tm-ind');
       if(ig)ig.innerHTML=[
         {lb:'EMA 9',vl:fmtP(prim.e9),cl:prim.e9>prim.e21?'var(--green)':'var(--red)'},
@@ -1249,20 +1380,28 @@ async function runTerm(){
         {lb:'OB',vl:prim.nBO?'BULL✓':prim.nBO2?'BEAR✓':'None',cl:prim.nBO?'var(--green)':prim.nBO2?'var(--red)':'var(--muted)'},
         {lb:'ATR',vl:fmtP(atr),cl:'var(--blue)'},
       ].map(i=>`<div class="ind-cell"><div class="ind-lbl">${i.lb}</div><div class="ind-val" style="color:${i.cl}">${i.vl}</div></div>`).join('');}
+
     if(mtfW){mtfW.style.display='block';const mb=document.getElementById('tm-mtf');
       if(mb)mb.innerHTML=results.map(r=>`<tr>
-        <td style="font-family:var(--fh);font-size:13px;letter-spacing:1px">${r.tf.toUpperCase()}</td>
-        <td style="color:${r.e9>r.e21?'var(--green)':'var(--red)'}">${r.e9>r.e21?'↑ BULL':'↓ BEAR'} <span style="font-size:9px;color:var(--muted)">${r.mst||''}</span></td>
-        <td style="font-family:var(--fm);color:${r.rsi<40?'var(--green)':r.rsi>60?'var(--red)':'var(--muted)'}">${(r.rsi||50).toFixed(1)}</td>
-        <td style="color:${r.mh>0?'var(--green)':'var(--red)'}">${r.mh>0?'↑':'↓'}</td>
-        <td><div style="background:rgba(255,255,255,0.06);border-radius:2px;height:4px;width:50px;display:inline-block;vertical-align:middle"><div style="height:100%;width:${(r.sc/10*100).toFixed(0)}%;background:${r.dir==='BUY'?'var(--green)':r.dir==='SELL'?'var(--red)':'var(--gold)'};border-radius:2px"></div></div><span style="font-family:var(--fm);font-size:11px;margin-left:4px">${(r.sc/10*100).toFixed(0)}%</span></td>
-        <td style="color:${r.dir==='BUY'?'var(--green)':r.dir==='SELL'?'var(--red)':'var(--gold)'};font-family:var(--fh);font-size:14px;letter-spacing:1px">${r.dir}</td>
+        <td style="font-family:var(--fh);font-size:12px;letter-spacing:1px">${r.tf.toUpperCase()}</td>
+        <td style="color:${r.e9>r.e21?'var(--green)':'var(--red)';font-size:12px}">${r.e9>r.e21?'↑ BULL':'↓ BEAR'}<span style="font-size:9px;color:var(--muted);margin-left:3px">${r.mst||''}</span></td>
+        <td style="font-family:var(--fm);color:${r.rsi<40?'var(--green)':r.rsi>60?'var(--red)':'var(--muted)';font-size:11px}">${(r.rsi||50).toFixed(1)}</td>
+        <td style="color:${r.dir==='BUY'?'var(--green)':r.dir==='SELL'?'var(--red)':'var(--gold)'};font-family:var(--fh);font-size:13px;letter-spacing:1px">${r.dir}</td>
       </tr>`).join('');}
+
     if(btW){btW.style.display='block';document.getElementById('tm-bt-sym').textContent=sym;
       try{const h=await fetchBin(sym,'1h',200);const btR=backtest(h);
-        if(btR){document.getElementById('tm-bt-stats').textContent=`WR:${btR.winRate.toFixed(0)}% · PF:${btR.pf.toFixed(2)} · Ret:${btR.ret>=0?'+':''}${btR.ret.toFixed(1)}% · ${btR.trades}T`;
+        if(btR){
+          document.getElementById('tm-bt-stats').textContent=`WR:${btR.winRate.toFixed(0)}% · PF:${btR.pf.toFixed(2)} · Ret:${btR.ret>=0?'+':''}${btR.ret.toFixed(1)}% · ${btR.trades} trades`;
+          const det=document.getElementById('tm-bt-detail');
+          if(det)det.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px">
+            <span style="color:var(--green)">✓ Wins: ${btR.wins}</span><span style="color:var(--red)">✗ Losses: ${btR.losses}</span>
+            <span>Max DD: <strong style="color:var(--red)">-${btR.maxDD.toFixed(1)}%</strong></span>
+            <span>Sharpe: <strong style="color:var(--blue)">${btR.sharpe}</strong></span>
+          </div>`;
           setTimeout(()=>drawCurve('tm-bt-canvas',btR.equityCurve,btR.ret),100);}
       }catch(e){}}
+
     if(dir!=='HOLD'&&lv){sigLog.unshift({asset:sym,dir,price:fmtP(price),score:conf,time:now(),levels:lv,icon:'📊',tech:prim?.tech||'',fund:prim?.fund||'',sent:prim?.sent||''});sigLog=sigLog.slice(0,100);updateHistTable();}
   }catch(e){if(out)out.innerHTML=`<div style="color:var(--red);padding:30px;text-align:center">❌ Erro: ${e.message}<br><span style="color:var(--muted);font-size:12px">Binance API limitada. Aguarde 30s.</span><br><br><button class="btn-ghost" style="padding:8px 16px" onclick="runTerm()">↺ Tentar</button></div>`;}
   tmRunning=false;
@@ -1284,6 +1423,228 @@ function updateHistTable(f='all'){
     <td style="font-family:var(--fm);color:var(--gold)">${s.score}%</td>
     <td style="font-size:11px;color:var(--muted);font-family:var(--fm)">${s.time}</td>
   </tr>`).join('');
+}
+
+// ── ASSET CATEGORIES ──
+const ASSET_CATS={
+  crypto:[
+    {sym:'BTCUSDT',label:'BTC/USDT',tv:'BINANCE:BTCUSDT',icon:'₿'},
+    {sym:'ETHUSDT',label:'ETH/USDT',tv:'BINANCE:ETHUSDT',icon:'⟠'},
+    {sym:'BNBUSDT',label:'BNB/USDT',tv:'BINANCE:BNBUSDT',icon:'🟡'},
+    {sym:'SOLUSDT',label:'SOL/USDT',tv:'BINANCE:SOLUSDT',icon:'◎'},
+    {sym:'XRPUSDT',label:'XRP/USDT',tv:'BINANCE:XRPUSDT',icon:'✦'},
+    {sym:'ADAUSDT',label:'ADA/USDT',tv:'BINANCE:ADAUSDT',icon:'🔵'},
+    {sym:'DOGEUSDT',label:'DOGE/USDT',tv:'BINANCE:DOGEUSDT',icon:'🐕'},
+    {sym:'AVAXUSDT',label:'AVAX/USDT',tv:'BINANCE:AVAXUSDT',icon:'🔺'},
+    {sym:'LINKUSDT',label:'LINK/USDT',tv:'BINANCE:LINKUSDT',icon:'⛓'},
+    {sym:'DOTUSDT',label:'DOT/USDT',tv:'BINANCE:DOTUSDT',icon:'⚫'},
+  ],
+  forex:[
+    {sym:'PAXGUSDT',label:'EUR/USD',tv:'FX:EURUSD',tvOnly:true,icon:'€'},
+    {sym:'PAXGUSDT',label:'GBP/USD',tv:'FX:GBPUSD',tvOnly:true,icon:'£'},
+    {sym:'PAXGUSDT',label:'USD/JPY',tv:'FX:USDJPY',tvOnly:true,icon:'¥'},
+    {sym:'PAXGUSDT',label:'AUD/USD',tv:'FX:AUDUSD',tvOnly:true,icon:'🦘'},
+    {sym:'PAXGUSDT',label:'USD/CAD',tv:'FX:USDCAD',tvOnly:true,icon:'🍁'},
+    {sym:'PAXGUSDT',label:'USD/CHF',tv:'FX:USDCHF',tvOnly:true,icon:'🇨🇭'},
+    {sym:'PAXGUSDT',label:'NZD/USD',tv:'FX:NZDUSD',tvOnly:true,icon:'🥝'},
+    {sym:'PAXGUSDT',label:'EUR/JPY',tv:'FX:EURJPY',tvOnly:true,icon:'€¥'},
+    {sym:'PAXGUSDT',label:'GBP/JPY',tv:'FX:GBPJPY',tvOnly:true,icon:'£¥'},
+    {sym:'PAXGUSDT',label:'EUR/GBP',tv:'FX:EURGBP',tvOnly:true,icon:'€£'},
+  ],
+  stocks:[
+    {sym:'PAXGUSDT',label:'Apple (AAPL)',tv:'NASDAQ:AAPL',tvOnly:true,icon:'🍎'},
+    {sym:'PAXGUSDT',label:'Tesla (TSLA)',tv:'NASDAQ:TSLA',tvOnly:true,icon:'⚡'},
+    {sym:'PAXGUSDT',label:'Microsoft (MSFT)',tv:'NASDAQ:MSFT',tvOnly:true,icon:'🪟'},
+    {sym:'PAXGUSDT',label:'Amazon (AMZN)',tv:'NASDAQ:AMZN',tvOnly:true,icon:'📦'},
+    {sym:'PAXGUSDT',label:'NVIDIA (NVDA)',tv:'NASDAQ:NVDA',tvOnly:true,icon:'🟢'},
+    {sym:'PAXGUSDT',label:'Google (GOOGL)',tv:'NASDAQ:GOOGL',tvOnly:true,icon:'🔍'},
+    {sym:'PAXGUSDT',label:'Meta (META)',tv:'NASDAQ:META',tvOnly:true,icon:'👤'},
+    {sym:'PAXGUSDT',label:'Netflix (NFLX)',tv:'NASDAQ:NFLX',tvOnly:true,icon:'🎬'},
+    {sym:'PAXGUSDT',label:'Berkshire (BRK.A)',tv:'NYSE:BRK.A',tvOnly:true,icon:'🏦'},
+    {sym:'PAXGUSDT',label:'JPMorgan (JPM)',tv:'NYSE:JPM',tvOnly:true,icon:'💰'},
+  ],
+  indices:[
+    {sym:'PAXGUSDT',label:'S&P 500',tv:'SP:SPX',tvOnly:true,icon:'🏛'},
+    {sym:'PAXGUSDT',label:'NASDAQ 100',tv:'NASDAQ:NDX',tvOnly:true,icon:'📈'},
+    {sym:'PAXGUSDT',label:'Dow Jones (US30)',tv:'DJ:DJI',tvOnly:true,icon:'🏦'},
+    {sym:'PAXGUSDT',label:'DAX 40 (Germany)',tv:'XETR:DAX',tvOnly:true,icon:'🇩🇪'},
+    {sym:'PAXGUSDT',label:'FTSE 100 (UK)',tv:'TVC:UKX',tvOnly:true,icon:'🇬🇧'},
+    {sym:'PAXGUSDT',label:'CAC 40 (France)',tv:'EURONEXT:CAC40',tvOnly:true,icon:'🇫🇷'},
+    {sym:'PAXGUSDT',label:'Nikkei 225',tv:'TVC:NI225',tvOnly:true,icon:'🇯🇵'},
+    {sym:'PAXGUSDT',label:'VIX Fear Index',tv:'TVC:VIX',tvOnly:true,icon:'😱'},
+  ],
+  commodities:[
+    {sym:'PAXGUSDT',label:'Gold (XAU/USD)',tv:'TVC:GOLD',icon:'🥇'},
+    {sym:'PAXGUSDT',label:'Silver (XAG/USD)',tv:'TVC:SILVER',tvOnly:true,icon:'🥈'},
+    {sym:'PAXGUSDT',label:'WTI Crude Oil',tv:'NYMEX:CL1!',tvOnly:true,icon:'🛢'},
+    {sym:'PAXGUSDT',label:'Brent Crude',tv:'TVC:USOIL',tvOnly:true,icon:'⛽'},
+    {sym:'PAXGUSDT',label:'Natural Gas',tv:'NYMEX:NG1!',tvOnly:true,icon:'🔥'},
+    {sym:'PAXGUSDT',label:'Copper',tv:'COMEX:HG1!',tvOnly:true,icon:'🟤'},
+    {sym:'PAXGUSDT',label:'Wheat',tv:'CBOT:ZW1!',tvOnly:true,icon:'🌾'},
+    {sym:'PAXGUSDT',label:'Corn',tv:'CBOT:ZC1!',tvOnly:true,icon:'🌽'},
+  ],
+  synthetic:[
+    {sym:'PAXGUSDT',label:'Volatility 10 (V10)',tv:'DERIVDEX:V10',tvOnly:true,icon:'🎲'},
+    {sym:'PAXGUSDT',label:'Volatility 25 (V25)',tv:'DERIVDEX:V25',tvOnly:true,icon:'🎲'},
+    {sym:'PAXGUSDT',label:'Volatility 50 (V50)',tv:'DERIVDEX:V50',tvOnly:true,icon:'🎯'},
+    {sym:'PAXGUSDT',label:'Volatility 75 (V75)',tv:'DERIVDEX:V75',tvOnly:true,icon:'💥'},
+    {sym:'PAXGUSDT',label:'Volatility 100 (V100)',tv:'DERIVDEX:V100',tvOnly:true,icon:'🚀'},
+    {sym:'PAXGUSDT',label:'Boom 1000 Index',tv:'DERIVDEX:BOOM1000',tvOnly:true,icon:'📊'},
+    {sym:'PAXGUSDT',label:'Crash 1000 Index',tv:'DERIVDEX:CRASH1000',tvOnly:true,icon:'📉'},
+    {sym:'PAXGUSDT',label:'Step Index',tv:'DERIVDEX:STPIDX',tvOnly:true,icon:'📶'},
+  ]
+};
+function updateAssetList(){
+  const cat=document.getElementById('tm-cat')?.value||'crypto';
+  const sel=document.getElementById('tm-asset');
+  if(!sel)return;
+  const assets=ASSET_CATS[cat]||ASSET_CATS.crypto;
+  sel.innerHTML=assets.map(a=>`<option value="${a.sym}" data-tv="${a.tv||'BINANCE:'+a.sym}" data-label="${a.label}" data-tvonly="${a.tvOnly||false}">${a.icon} ${a.label}</option>`).join('');
+}
+
+// ── TRADINGVIEW CHART ──
+let tvScriptLoaded=false;
+function initTVChart(symbol,interval='60'){
+  const container=document.getElementById('tv_chart_container');
+  if(!container)return;
+  const doCreate=()=>{
+    if(!window.TradingView)return;
+    container.innerHTML='';
+    new window.TradingView.widget({
+      container_id:'tv_chart_container',symbol,interval,
+      timezone:'Africa/Maputo',theme:'dark',style:'1',locale:'pt',
+      toolbar_bg:'#0c110c',enable_publishing:false,hide_side_toolbar:true,
+      allow_symbol_change:true,save_image:false,height:380,width:'100%',
+      backgroundColor:'#070a07',
+      overrides:{
+        'paneProperties.background':'#070a07',
+        'mainSeriesProperties.candleStyle.upColor':'#39ff14',
+        'mainSeriesProperties.candleStyle.downColor':'#ff3131',
+        'mainSeriesProperties.candleStyle.borderUpColor':'#39ff14',
+        'mainSeriesProperties.candleStyle.borderDownColor':'#ff3131',
+        'mainSeriesProperties.candleStyle.wickUpColor':'#39ff14',
+        'mainSeriesProperties.candleStyle.wickDownColor':'#ff3131',
+      },
+      disabled_features:['header_symbol_search'],
+    });
+  };
+  if(window.TradingView){doCreate();return;}
+  if(tvScriptLoaded){setTimeout(doCreate,500);return;}
+  tvScriptLoaded=true;
+  container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:380px;color:var(--muted);font-family:var(--fh);font-size:14px;letter-spacing:2px;flex-direction:column;gap:12px"><div class="typing"><span></span><span></span><span></span></div>A CARREGAR GRÁFICO LIVE...</div>';
+  const s=document.createElement('script');
+  s.src='https://s3.tradingview.com/tv.js';s.async=true;
+  s.onload=doCreate;document.head.appendChild(s);
+}
+function reloadChart(){
+  const sel=document.getElementById('tm-asset');
+  const tf=document.getElementById('tm-chart-tf')?.value||'60';
+  if(!sel)return;
+  const opt=sel.options[sel.selectedIndex];
+  initTVChart(opt?.dataset?.tv||'BINANCE:BTCUSDT',tf);
+}
+
+// ── DRAW SIGNAL ZONES ──
+function drawSignalZones(price,dir,levels,vwap){
+  const canvas=document.getElementById('zone-canvas');
+  const legend=document.getElementById('zone-legend');
+  if(!canvas||!levels||!levels.entry)return;
+  const H=380,W=canvas.offsetWidth||600;
+  canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  const isBuy=dir==='BUY';
+  const all=[levels.entry,levels.tp1,levels.tp2,levels.tp3,levels.sl,vwap||levels.entry].filter(p=>p>0);
+  const minP=Math.min(...all)*0.9997,maxP=Math.max(...all)*1.0003;
+  const rng=maxP-minP||1;
+  const toY=p=>H-((p-minP)/rng)*(H-20)-10;
+  const drawZone=(y1,y2,col)=>{ctx.fillStyle=col;ctx.fillRect(0,Math.min(y1,y2),W,Math.abs(y2-y1));};
+  const drawLine=(p,col,label,dash=false)=>{
+    if(!p||p<=0)return;
+    const y=toY(p);
+    ctx.save();ctx.setLineDash(dash?[5,4]:[]);
+    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);
+    ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.stroke();
+    ctx.restore();
+    ctx.font='bold 10px "Share Tech Mono"';ctx.fillStyle=col;
+    ctx.fillText(label+' '+fmtP(p),8,y-3);
+    ctx.fillStyle=col+'28';ctx.fillRect(W-82,y-10,80,18);
+    ctx.fillStyle=col;ctx.font='10px "Share Tech Mono"';
+    ctx.fillText(fmtP(p),W-79,y+4);
+  };
+  const eY=toY(levels.entry),slY=toY(levels.sl),t1Y=toY(levels.tp1);
+  drawZone(eY,slY,'rgba(255,49,49,0.07)');
+  drawZone(eY,t1Y,'rgba(57,255,20,0.05)');
+  drawLine(levels.sl,'#ff3131','🛑 SL');
+  drawLine(levels.entry,'#00d4ff','💰 ENTRY');
+  const be=isBuy?levels.entry+(levels.entry-levels.sl):levels.entry-(levels.sl-levels.entry);
+  drawLine(be,'rgba(57,255,20,0.55)','⚖ BE',true);
+  if(vwap&&vwap>0) drawLine(vwap,'#ffd700','📊 VWAP',true);
+  drawLine(levels.tp1,'#39ff14','🎯 TP1');
+  drawLine(levels.tp2,'#2dd90f','🎯 TP2');
+  drawLine(levels.tp3,'#1a9607','🎯 TP3');
+  // Current price
+  const curY=toY(price);
+  ctx.fillStyle='#39ff14';
+  ctx.beginPath();
+  if(isBuy){ctx.moveTo(W-18,curY+7);ctx.lineTo(W-6,curY+7);ctx.lineTo(W-12,curY-5);}
+  else{ctx.moveTo(W-18,curY-7);ctx.lineTo(W-6,curY-7);ctx.lineTo(W-12,curY+5);}
+  ctx.fill();
+  if(legend)legend.style.display='block';
+}
+
+// ── COPY TRADE LEADERBOARD ──
+const CT_TRADERS=[
+  {name:'GoldMaster_Pro',flag:'🇿🇦',loc:'Johannesburg, ZA',type:'Human',spec:'XAU/USD Specialist',wr:88,ret:'+31%',gain:'+198%',dd:'-3.1%',trades:247,followers:5842,age:'3 anos',risk:'Low',cat:'gold',col:'var(--gold)',init:'G'},
+  {name:'NellyG_Master',flag:'🇲🇿',loc:'Maputo, MZ',type:'Human',spec:'NELLY-G VIP Strategy',wr:82,ret:'+28%',gain:'+312%',dd:'-4.2%',trades:186,followers:2841,age:'2 anos',risk:'Medium',cat:'all',col:'var(--green)',init:'N'},
+  {name:'AlgoTrade_X9',flag:'🤖',loc:'Bot Institucional',type:'Bot',spec:'Multi-Asset Algo',wr:75,ret:'+22%',gain:'+156%',dd:'-5.1%',trades:1240,followers:8921,age:'1 ano',risk:'Medium',cat:'forex',col:'var(--blue)',init:'A'},
+  {name:'CryptoKing_BTC',flag:'🇺🇸',loc:'New York, USA',type:'Human',spec:'BTC/ETH Specialist',wr:71,ret:'+68%',gain:'+480%',dd:'-12.4%',trades:89,followers:12400,age:'4 anos',risk:'High',cat:'crypto',col:'var(--gold)',init:'C'},
+  {name:'ForexElite_EU',flag:'🇩🇪',loc:'Frankfurt, DE',type:'Human',spec:'EUR/USD Expert',wr:79,ret:'+19%',gain:'+225%',dd:'-2.8%',trades:328,followers:4213,age:'5 anos',risk:'Low',cat:'forex',col:'var(--green)',init:'F'},
+  {name:'IndexTrader_NY',flag:'🇬🇧',loc:'London, UK',type:'Human',spec:'US30/NAS100',wr:76,ret:'+24%',gain:'+290%',dd:'-6.3%',trades:142,followers:3180,age:'3 anos',risk:'Medium',cat:'all',col:'var(--blue)',init:'I'},
+  {name:'GoldBot_XAUAI',flag:'🤖',loc:'AI Algorithm',type:'Bot',spec:'Gold + Indices AI',wr:84,ret:'+35%',gain:'+267%',dd:'-4.8%',trades:893,followers:6721,age:'1 ano',risk:'Medium',cat:'gold',col:'var(--gold)',init:'G'},
+  {name:'DerivKing_V75',flag:'🇳🇬',loc:'Lagos, Nigeria',type:'Human',spec:'Synthetic V75/V100',wr:69,ret:'+42%',gain:'+534%',dd:'-15.2%',trades:561,followers:9834,age:'2 anos',risk:'High',cat:'all',col:'var(--red)',init:'D'},
+  {name:'SilverOak_FX',flag:'🇦🇺',loc:'Sydney, AU',type:'Human',spec:'AUD/NZD pairs',wr:73,ret:'+16%',gain:'+142%',dd:'-3.4%',trades:415,followers:1890,age:'2 anos',risk:'Low',cat:'forex',col:'var(--green)',init:'S'},
+];
+let ctFilter='all';
+function filterCT(btn,f){document.querySelectorAll('[onclick^="filterCT"]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');ctFilter=f;renderCTGrid();}
+function renderCTGrid(){
+  const g=document.getElementById('ct-grid');if(!g)return;
+  const traders=CT_TRADERS.filter(t=>ctFilter==='all'||t.cat===ctFilter||t.cat==='all');
+  g.innerHTML=traders.map(t=>`
+    <div class="card" style="transition:.2s;cursor:pointer;position:relative" onmouseover="this.style.borderColor='${t.col}'" onmouseout="this.style.borderColor='var(--border2)'">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:42px;height:42px;border-radius:4px;background:${t.col};display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:18px;color:#000;flex-shrink:0">${t.init}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:var(--fh);font-size:14px;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.flag} ${t.name}</div>
+          <div style="font-size:10px;color:var(--muted)">${t.loc} · ${t.type==='Bot'?'🤖':'👤'} ${t.type}</div>
+        </div>
+        <div style="font-size:9px;padding:2px 6px;border-radius:2px;background:${t.risk==='Low'?'rgba(57,255,20,0.1)':t.risk==='High'?'rgba(255,49,49,0.1)':'rgba(0,212,255,0.1)'};color:${t.risk==='Low'?'var(--green)':t.risk==='High'?'var(--red)':'var(--blue)'};font-family:var(--fh);letter-spacing:1px">${t.risk}</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px">📊 ${t.spec}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+        <div style="background:rgba(0,0,0,0.25);border-radius:3px;padding:8px;text-align:center">
+          <div style="font-size:9px;color:var(--muted);letter-spacing:1px">WIN RATE</div>
+          <div style="font-family:var(--fm);font-size:18px;color:${t.wr>=80?'var(--green)':t.wr>=70?'var(--gold)':'var(--red)'}">${t.wr}%</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.25);border-radius:3px;padding:8px;text-align:center">
+          <div style="font-size:9px;color:var(--muted);letter-spacing:1px">MÊS</div>
+          <div style="font-family:var(--fm);font-size:18px;color:var(--green)">${t.ret}</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.25);border-radius:3px;padding:8px;text-align:center">
+          <div style="font-size:9px;color:var(--muted);letter-spacing:1px">TOTAL</div>
+          <div style="font-family:var(--fm);font-size:16px;color:var(--blue)">${t.gain}</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:10px">
+        <span>👥 ${t.followers.toLocaleString()}</span>
+        <span>📅 ${t.age}</span>
+        <span style="color:var(--red)">DD: ${t.dd}</span>
+      </div>
+      <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;margin-bottom:10px">
+        <div style="height:100%;width:${t.wr}%;background:${t.col};border-radius:2px;transition:.8s"></div>
+      </div>
+      <button class="btn-primary" style="width:100%;font-size:13px;padding:9px" onclick="openModal('Copy Trade — ${t.name}','499 MT/mês')">SEGUIR →</button>
+    </div>`).join('');
 }
 
 // ── CURRICULUM ──
@@ -1323,16 +1684,16 @@ async function learnQ(){
   ans.innerHTML='<div class="typing" style="justify-content:center;padding:12px"><span></span><span></span><span></span></div>';
   if(!apiKey){ans.innerHTML='<div style="color:var(--gold)">⚠️ Insira a API Key do Claude para usar o Professor IA.<br><button onclick="openApiKey()" style="margin-top:8px;background:var(--green);border:none;border-radius:3px;color:#000;padding:7px 14px;font-family:var(--fh);font-size:13px;cursor:pointer">🔑 API KEY</button></div>';return;}
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-opus-4-5',max_tokens:1000,system:'Você é o Professor NELLY-G — especialista em trading. Ensine em português de forma clara, prática e detalhada. Use formatação HTML básica: <strong> para conceitos, <br><br> entre secções.',messages:[{role:'user',content:q}]})});
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:'Você é o Professor NELLY-G — especialista em trading. Ensine em português de forma clara, prática e detalhada.',messages:[{role:'user',content:q}]})});
     const d=await r.json();
     ans.innerHTML=d.content?.[0]?.text?.replace(/\n/g,'<br>')||'Erro na resposta.';
   }catch(e){ans.innerHTML=`<div style="color:var(--red)">Erro: ${e.message}</div>`;}
 }
 
 // ── INSIGHTS ──
-const FOREX_PAIRS=[{sym:'EURUSD',cat:'FOREX'},{sym:'GBPUSD',cat:'FOREX'},{sym:'USDJPY',cat:'FOREX'},{sym:'AUDUSD',cat:'FOREX'},{sym:'USDCAD',cat:'FOREX'},{sym:'USDCHF',cat:'FOREX'},{sym:'EURJPY',cat:'FOREX'},{sym:'GBPJPY',cat:'FOREX'},{sym:'EURGBP',cat:'FOREX'},{sym:'NZDUSD',cat:'FOREX'},{sym:'CADJPY',cat:'FOREX'},{sym:'EURAUD',cat:'FOREX'}];
-const CRYPTO_PAIRS=[{sym:'BTC',cat:'CRYPTO'},{sym:'ETH',cat:'CRYPTO'},{sym:'SOL',cat:'CRYPTO'},{sym:'BNB',cat:'CRYPTO'},{sym:'XRP',cat:'CRYPTO'},{sym:'ADA',cat:'CRYPTO'},{sym:'DOGE',cat:'CRYPTO'},{sym:'AVAX',cat:'CRYPTO'}];
-const COMM_PAIRS=[{sym:'XAU/USD',cat:'GOLD'},{sym:'XAG/USD',cat:'SILVER'},{sym:'WTI',cat:'OIL'},{sym:'BRENT',cat:'OIL'},{sym:'COPPER',cat:'METAL'},{sym:'NATGAS',cat:'ENERGY'},{sym:'WHEAT',cat:'GRAIN'},{sym:'CORN',cat:'GRAIN'}];
+const FOREX_PAIRS=[{sym:'EUR/USD',cat:'FOREX'},{sym:'GBP/USD',cat:'FOREX'},{sym:'USD/JPY',cat:'FOREX'},{sym:'AUD/USD',cat:'FOREX'},{sym:'USD/CAD',cat:'FOREX'},{sym:'USD/CHF',cat:'FOREX'},{sym:'EUR/JPY',cat:'FOREX'},{sym:'GBP/JPY',cat:'FOREX'},{sym:'EUR/GBP',cat:'FOREX'},{sym:'NZD/USD',cat:'FOREX'},{sym:'CAD/JPY',cat:'FOREX'},{sym:'EUR/AUD',cat:'FOREX'}];
+const CRYPTO_PAIRS=[{sym:'BTC/USD',cat:'CRYPTO'},{sym:'ETH/USD',cat:'CRYPTO'},{sym:'SOL/USD',cat:'CRYPTO'},{sym:'BNB/USD',cat:'CRYPTO'},{sym:'XRP/USD',cat:'CRYPTO'},{sym:'ADA/USD',cat:'CRYPTO'},{sym:'DOGE/USD',cat:'CRYPTO'},{sym:'AVAX/USD',cat:'CRYPTO'},{sym:'LINK/USD',cat:'CRYPTO'},{sym:'DOT/USD',cat:'CRYPTO'},{sym:'MATIC/USD',cat:'CRYPTO'},{sym:'LTC/USD',cat:'CRYPTO'}];
+const COMM_PAIRS=[{sym:'XAU/USD',cat:'GOLD'},{sym:'XAG/USD',cat:'SILVER'},{sym:'WTI OIL',cat:'OIL'},{sym:'BRENT',cat:'OIL'},{sym:'COPPER',cat:'METAL'},{sym:'NAT GAS',cat:'ENERGY'},{sym:'S&P 500',cat:'INDEX'},{sym:'NASDAQ',cat:'INDEX'},{sym:'DOW30',cat:'INDEX'},{sym:'DAX40',cat:'INDEX'},{sym:'V75 IDX',cat:'SYNTH'},{sym:'V100 IDX',cat:'SYNTH'}];
 const SENTS=['BULLISH','BULLISH','BEARISH','NEUTRAL','BEARISH','BULLISH','NEUTRAL','BEARISH','BULLISH','BULLISH','BEARISH','NEUTRAL'];
 let insTab='general';
 function swIns(tab,btn){insTab=tab;document.querySelectorAll('[onclick^="swIns"]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');buildInsights(tab==='crypto'?CRYPTO_PAIRS:tab==='commodities'?COMM_PAIRS:FOREX_PAIRS);}
@@ -1343,8 +1704,8 @@ function buildInsights(pairs){
     const s=SENTS[i%SENTS.length];
     const cl=s==='BULLISH'?'bull':s==='BEARISH'?'bear':'neut';
     const dc=s==='BULLISH'?'var(--green)':s==='BEARISH'?'var(--red)':'var(--gold)';
-    const abbr=p.sym.replace('/','').slice(0,3);
-    return`<div class="sent-card"><div class="sico">${abbr}</div><div style="flex:1;min-width:0"><div style="font-family:var(--fh);font-size:13px;letter-spacing:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.sym}</div><div style="font-size:9px;color:var(--muted);letter-spacing:1px">${p.cat}</div></div><div style="display:flex;align-items:center;gap:5px"><div style="width:6px;height:6px;border-radius:50%;background:${dc}"></div><span class="sbadge ${cl}">${s}</span></div></div>`;
+    const abbr=p.sym.replace('/','').replace(' ','').slice(0,4);
+    return`<div class="sent-card"><div class="sico" style="font-size:10px">${abbr}</div><div style="flex:1;min-width:0"><div style="font-family:var(--fh);font-size:12px;letter-spacing:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.sym}</div><div style="font-size:9px;color:var(--muted);letter-spacing:1px">${p.cat}</div></div><span class="sbadge ${cl}">${s}</span></div>`;
   }).join('');
 }
 
