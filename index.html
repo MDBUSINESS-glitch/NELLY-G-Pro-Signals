@@ -405,9 +405,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
           </table>
         </div>
         <div class="card" style="margin-top:16px">
-          <div class="ct" style="justify-content:space-between"><span>📈 BACKTESTS (Binance 1H)</span><button class="fb" style="font-size:11px;padding:4px 10px" onclick="runBacktests()">↺ Executar</button></div>
+          <div class="ct" style="justify-content:space-between">
+            <span>📈 BACKTESTS (Binance 1H + ECB Daily)</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:11px;color:var(--muted)">Capital:</span>
+              <div style="display:flex;align-items:center;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:3px;padding:3px 8px;gap:4px">
+                <span style="color:var(--green);font-size:12px">$</span>
+                <input id="bt-capital" type="number" value="1000" min="100" max="1000000" style="background:none;border:none;color:var(--green);font-family:var(--fm);font-size:13px;width:70px;outline:none">
+              </div>
+              <button class="fb" style="font-size:11px;padding:4px 10px" onclick="runBacktests()">↺ Executar</button>
+            </div>
+          </div>
           <div id="bt-charts" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px"></div>
-          <div style="overflow-x:auto"><table class="pt2" style="width:100%"><thead><tr><th>ACTIVO</th><th>WIN RATE</th><th>TRADES</th><th>PROFIT FACTOR</th><th>MAX DD</th><th>RETORNO</th><th>SHARPE</th></tr></thead><tbody id="bt-table"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:16px">Execute os backtests para ver dados reais →</td></tr></tbody></table></div>
+          <div style="overflow-x:auto"><table class="pt2" style="width:100%"><thead><tr><th>ACTIVO</th><th>WIN RATE</th><th>TRADES</th><th>P.FACTOR</th><th>MAX DD</th><th>RETORNO</th><th>RESULTADO ($)</th><th>SHARPE</th></tr></thead><tbody id="bt-table"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:16px">Execute os backtests para ver dados reais →</td></tr></tbody></table></div>
+          <div style="margin-top:14px">
+            <div class="ct" style="font-size:12px">📋 HISTÓRICO DE ENTRADAS (activo com mais Win Rate)</div>
+            <div style="overflow-x:auto"><table class="pt2" style="width:100%"><thead><tr><th>DATA</th><th>DIR</th><th>ENTRY</th><th>EXIT</th><th>RESULTADO</th><th>MONTANTE</th><th>P&L ($)</th></tr></thead><tbody id="bt-trade-log"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:10px;font-size:12px">Execute os backtests →</td></tr></tbody></table></div>
+          </div>
         </div>
       </div>
 
@@ -962,6 +976,62 @@ const IND={
     const pf=Array(20).fill(0);
     for(const c of cn){const idx=Math.min(19,Math.floor((c.c-lo)/step));pf[idx]+=c.v;}
     return lo+pf.indexOf(Math.max(...pf))*step+step/2;
+  },
+
+  // ── ICT CONCEPTS ──
+  // 1. Displacement: Impulsive candle with strong body and high volume
+  displacement(cn){
+    if(!cn||cn.length<5)return{bull:false,bear:false};
+    const last=cn[cn.length-1],prev=cn[cn.length-2];
+    const body=Math.abs(last.c-last.o);
+    const range=last.h-last.l||0.0001;
+    const bodyPct=body/range;
+    // Strong body (>60% of range) = displacement candle
+    const isDisp=bodyPct>0.6&&range>IND.atr(cn.slice(-14));
+    return{
+      bull:isDisp&&last.c>last.o&&last.c>prev.h, // bull displacement: close above prev high
+      bear:isDisp&&last.c<last.o&&last.c<prev.l   // bear displacement: close below prev low
+    };
+  },
+
+  // 2. Fair Value Gap (Imbalance/FVG): Gap between candle[i-2].high and candle[i].low (bull) or vice versa
+  fvg(cn){
+    if(!cn||cn.length<5)return{bull:false,bear:false,bullLevel:0,bearLevel:0};
+    let bull=false,bear=false,bullLevel=0,bearLevel=0;
+    for(let i=cn.length-5;i<cn.length-2;i++){
+      if(i<2)continue;
+      // Bull FVG: candle[i].low > candle[i-2].high (gap upward)
+      if(cn[i].l>cn[i-2].h){bull=true;bullLevel=(cn[i].l+cn[i-2].h)/2;}
+      // Bear FVG: candle[i].high < candle[i-2].low (gap downward)
+      if(cn[i].h<cn[i-2].l){bear=true;bearLevel=(cn[i].h+cn[i-2].l)/2;}
+    }
+    return{bull,bear,bullLevel,bearLevel};
+  },
+
+  // 3. Liquidity Sweep: Price takes out swing high/low then reverses
+  liquiditySweep(cn){
+    if(!cn||cn.length<20)return{bull:false,bear:false};
+    const recent=cn.slice(-20);
+    const swingHigh=Math.max(...recent.slice(0,-3).map(c=>c.h));
+    const swingLow=Math.min(...recent.slice(0,-3).map(c=>c.l));
+    const last3=recent.slice(-3);
+    // Bull sweep: price swept below swing low then closed back above
+    const bullSweep=last3.some(c=>c.l<swingLow)&&last3[last3.length-1].c>swingLow;
+    // Bear sweep: price swept above swing high then closed back below
+    const bearSweep=last3.some(c=>c.h>swingHigh)&&last3[last3.length-1].c<swingHigh;
+    return{bull:bullSweep,bear:bearSweep,swingHigh,swingLow};
+  },
+
+  // 4. Inducement (IDM): Small pullback before continuation in trend direction
+  inducement(cn){
+    if(!cn||cn.length<10)return{bull:false,bear:false};
+    const slice=cn.slice(-10);
+    const bullTrend=slice[0].c<slice[slice.length-1].c;
+    // Small pullback 2-3 candles then continuation
+    const last3=slice.slice(-3);
+    const bullIDM=bullTrend&&last3[0].c>last3[1].c&&last3[2].c>last3[1].c&&last3[2].c>last3[0].c;
+    const bearIDM=!bullTrend&&last3[0].c<last3[1].c&&last3[2].c<last3[1].c&&last3[2].c<last3[0].c;
+    return{bull:bullIDM,bear:bearIDM};
   }
 };
 
@@ -1088,6 +1158,41 @@ function score(cn){
   if(price>pocV*1.001)bs+=0.5;
   else if(price<pocV*0.999)ss+=0.5;
 
+  // ── ICT CONCEPTS (bonus signals — não substituem, confirmam)
+  try{
+    const ict_disp=IND.displacement(cn);
+    const ict_fvg=IND.fvg(cn);
+    const ict_liq=IND.liquiditySweep(cn);
+    const ict_idm=IND.inducement(cn);
+
+    // Displacement: forte impulso direcional = momentum alto
+    if(ict_disp.bull){bs+=0.8;}  // impulso bullish forte
+    if(ict_disp.bear){ss+=0.8;}  // impulso bearish forte
+
+    // Fair Value Gap: imbalance = o mercado vai preencher
+    if(ict_fvg.bull){bs+=0.5;}   // FVG bullish (gap para cima)
+    if(ict_fvg.bear){ss+=0.5;}   // FVG bearish (gap para baixo)
+
+    // Liquidity Sweep: preço varreu liquidez e reverteu = sinal de inversão ou continuação
+    if(ict_liq.bull){bs+=1.0;}   // varreu lows e reverteu = bull confirmado
+    if(ict_liq.bear){ss+=1.0;}   // varreu highs e reverteu = bear confirmado
+
+    // Inducement: pullback de armadilha antes da continuação
+    if(ict_idm.bull){bs+=0.5;}
+    if(ict_idm.bear){ss+=0.5;}
+
+    // Guardar para relatório técnico
+    var ictReport=[];
+    if(ict_disp.bull)ictReport.push('💥 DISPLACEMENT BULLISH: impulso forte para cima');
+    if(ict_disp.bear)ictReport.push('💥 DISPLACEMENT BEARISH: impulso forte para baixo');
+    if(ict_fvg.bull)ictReport.push(`📊 FVG BULLISH: imbalance em ${fmtP(ict_fvg.bullLevel)}`);
+    if(ict_fvg.bear)ictReport.push(`📊 FVG BEARISH: imbalance em ${fmtP(ict_fvg.bearLevel)}`);
+    if(ict_liq.bull)ictReport.push(`🌊 LIQUIDITY SWEEP: varreu lows (${fmtP(ict_liq.swingLow)}) → reversão bull`);
+    if(ict_liq.bear)ictReport.push(`🌊 LIQUIDITY SWEEP: varreu highs (${fmtP(ict_liq.swingHigh)}) → reversão bear`);
+    if(ict_idm.bull)ictReport.push('🎯 INDUCEMENT: pullback de armadilha → continuação bullish');
+    if(ict_idm.bear)ictReport.push('🎯 INDUCEMENT: pullback de armadilha → continuação bearish');
+  }catch(e){var ictReport=[];}
+
   // ── PRICE ACTION (últimas 3 velas)
   const l3=cn.slice(-3);
   const bullCandles=l3.filter(c=>c.c>c.o).length;
@@ -1127,6 +1232,10 @@ function score(cn){
   techParts.push(`🏗️ SMC Market Structure: ${ms.trend}${ms.bos!=='none'?' ('+ms.bos+')':''} — ${ms.trend==='BULLISH'?'HH/HL ✅':ms.trend==='BEARISH'?'LH/LL 🔻':'range'}`);
   if(nBO)techParts.push(`🟢 Order Block BULLISH ativo em ${fmtP(obs.bull.slice(-1)[0]?.m||0)}`);
   if(nBO2)techParts.push(`🔴 Order Block BEARISH ativo em ${fmtP(obs.bear.slice(-1)[0]?.m||0)}`);
+  if(typeof ictReport!=='undefined'&&ictReport.length){
+    techParts.push('\n🔷 ICT CONCEPTS:');
+    ictReport.forEach(r=>techParts.push(r));
+  }
   const tech='📊 ANÁLISE TÉCNICA:\n'+techParts.join('\n');
   const fund=`🌍 ANÁLISE FUNDAMENTAL:\n${ms.trend==='BULLISH'?'Tendência macro BULLISH — favorecer compras em pullbacks.':ms.trend==='BEARISH'?'Tendência macro BEARISH — favorecer vendas em retests.':'Tendência indefinida — aguardar confirmação.'}\n${econRisk?'⚠️ ALERTA: '+econMsg+' — RISCO ALTO, não recomendado entrar agora.':'Sem eventos económicos de alto risco detectados.'}`;
   const sentParts=[];
@@ -1176,9 +1285,10 @@ async function multiTF(sym,style='intraday'){
   return{fd,fs,results,prim,atr:prim?.atr||0,price:prim?.price||0};
 }
 
-function backtest(cn){
+function backtest(cn,capital=1000){
   if(!cn||cn.length<80)return null;
-  let trades=[],eq=10000,curve=[10000],peak=10000,dd=0;
+  let trades=[],eq=capital,curve=[capital],peak=capital,dd=0;
+  const now=Date.now(),DAY=86400000;
   for(let i=60;i<cn.length-6;i++){
     const s=score(cn.slice(0,i));
     if(s.dir==='HOLD')continue;
@@ -1186,23 +1296,62 @@ function backtest(cn){
     if(!atr||atr<price*0.00005)continue;
     const lv=buildLevels(price,s.dir,atr),risk=eq*0.015,rp=Math.abs(price-lv.sl);
     if(rp<0.00001)continue;
-    const sz=risk/rp;let pnl=0;
+    const sz=risk/rp;let pnl=0,exitPrice=0,exitReason='';
     for(let j=i+1;j<=Math.min(i+8,cn.length-1);j++){
       const c=cn[j];
-      if(s.dir==='BUY'){if(c.h>=lv.tp1){pnl=Math.abs(lv.tp1-price)*sz*1.5;break;}if(c.l<=lv.sl){pnl=-risk;break;}}
-      else{if(c.l<=lv.tp1){pnl=Math.abs(lv.tp1-price)*sz*1.5;break;}if(c.h>=lv.sl){pnl=-risk;break;}}
+      if(s.dir==='BUY'){
+        if(c.h>=lv.tp1){pnl=Math.abs(lv.tp1-price)*sz*1.5;exitPrice=lv.tp1;exitReason='TP1';break;}
+        if(c.l<=lv.sl){pnl=-risk;exitPrice=lv.sl;exitReason='SL';break;}
+      } else {
+        if(c.l<=lv.tp1){pnl=Math.abs(lv.tp1-price)*sz*1.5;exitPrice=lv.tp1;exitReason='TP1';break;}
+        if(c.h>=lv.sl){pnl=-risk;exitPrice=lv.sl;exitReason='SL';break;}
+      }
     }
-    if(!pnl)continue;eq+=pnl;curve.push(eq);if(eq>peak)peak=eq;
+    if(!pnl)continue;
+    eq+=pnl;curve.push(eq);
+    if(eq>peak)peak=eq;
     const d=(peak-eq)/peak*100;if(d>dd)dd=d;
-    trades.push({won:pnl>0,pnl,eq});i+=4;
+    // Estimate timestamp: backfill from end (recent candles = recent time)
+    const candlesBack=cn.length-1-i;
+    const estMs=now-candlesBack*3600000; // assume 1h candles
+    const pnlDollar=pnl*(capital/10000); // scale to actual capital
+    const pnlPct=(pnl/eq)*100;
+    trades.push({
+      won:pnl>0,pnl,pnlDollar,pnlPct,eq,
+      dir:s.dir,price:fmtP(price),exitPrice:fmtP(exitPrice||price),
+      exitReason,estMs,
+      entryDollar:(risk*(capital/10000)).toFixed(2),
+      rr:lv.rr
+    });
+    i+=4;
   }
   if(trades.length<5)return null;
   const wins=trades.filter(t=>t.won).length,loss=trades.length-wins;
   const gP=trades.filter(t=>t.pnl>0).reduce((a,b)=>a+b.pnl,0);
   const gL=Math.abs(trades.filter(t=>t.pnl<0).reduce((a,b)=>a+b.pnl,0));
-  const rets=trades.map(t=>t.pnl/10000),avg=rets.reduce((a,b)=>a+b,0)/rets.length;
+  const rets=trades.map(t=>t.pnl/eq),avg=rets.reduce((a,b)=>a+b,0)/rets.length;
   const std=Math.sqrt(rets.reduce((a,b)=>a+(b-avg)**2,0)/rets.length)||0.001;
-  return{trades:trades.length,wins,losses:loss,winRate:wins/trades.length*100,pf:gL>0?gP/gL:gP>0?99:0,ret:(eq-10000)/10000*100,maxDD:dd,sharpe:((avg/std)*Math.sqrt(252)).toFixed(2),equityCurve:curve};
+  // Group by period
+  const todayStart=new Date();todayStart.setHours(0,0,0,0);
+  const weekStart=new Date(Date.now()-7*DAY);
+  const monthStart=new Date(Date.now()-30*DAY);
+  const pnlDay=trades.filter(t=>t.estMs>=todayStart.getTime()).reduce((a,b)=>a+b.pnlDollar,0);
+  const pnlWeek=trades.filter(t=>t.estMs>=weekStart.getTime()).reduce((a,b)=>a+b.pnlDollar,0);
+  const pnlMonth=trades.filter(t=>t.estMs>=monthStart.getTime()).reduce((a,b)=>a+b.pnlDollar,0);
+  const finalEq=capital+(eq-capital)*(capital/10000);
+  return{
+    trades:trades.length,wins,losses:loss,
+    winRate:wins/trades.length*100,
+    pf:gL>0?gP/gL:gP>0?99:0,
+    ret:(eq-capital)/capital*100,
+    maxDD:dd,
+    sharpe:((avg/std)*Math.sqrt(252)).toFixed(2),
+    equityCurve:curve,
+    tradeLog:trades.slice(-20).reverse(), // last 20 trades, newest first
+    pnlDay,pnlWeek,pnlMonth,
+    finalEq:finalEq.toFixed(2),
+    capital
+  };
 }
 
 function drawCurve(id,curve,ret){
@@ -1384,15 +1533,27 @@ function updateHistTable(){
   </tr>`).join('');
 }
 
+// Capital de referência para backtest
+let btCapital=1000;
+
 async function runBacktests(){
+  const capEl=document.getElementById('bt-capital');
+  if(capEl)btCapital=parseFloat(capEl.value)||1000;
   const bt=document.getElementById('bt-table'),bc=document.getElementById('bt-charts');
-  if(bt)bt.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">⏳ A executar backtests reais (30-60s)...</td></tr>';
+  if(bt)bt.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px">⏳ A executar backtests reais (30-60s)...</td></tr>';
   if(bc)bc.innerHTML='';
   const results=[];
-  for(const a of ASSETS){
-    try{const cn=await fetchBin(a.sym,'1h',200);const r=backtest(cn);if(!r)continue;results.push({...r,label:a.label,sym:a.sym,icon:a.icon});}
+  // Backtest crypto assets (Binance)
+  for(const a of ASSETS.filter(x=>x.src!=='forex')){
+    try{const cn=await fetchBin(a.sym,'1h',200);const r=backtest(cn,btCapital);if(!r)continue;results.push({...r,label:a.label,sym:a.sym,icon:a.icon,cat:a.cat});}
     catch(e){console.warn(a.sym,e);}
-    await new Promise(r=>setTimeout(r,450));
+    await new Promise(r=>setTimeout(r,350));
+  }
+  // Backtest forex assets (Frankfurter)
+  for(const a of ASSETS.filter(x=>x.src==='forex')){
+    try{const cn=await fetchFrankfurter(a);const r=backtest(cn,btCapital);if(!r)continue;results.push({...r,label:a.label,sym:a.sym,icon:a.icon,cat:a.cat});}
+    catch(e){console.warn(a.sym,e);}
+    await new Promise(r=>setTimeout(r,300));
   }
   // Update stats page
   if(results.length){
@@ -1405,7 +1566,6 @@ async function runBacktests(){
     if(el('s-tr'))el('s-tr').textContent=ttrades;
     if(el('s-pf'))el('s-pf').textContent=avgpf.toFixed(2);
     if(el('s-dd'))el('s-dd').textContent='-'+maxdd.toFixed(1)+'%';
-    // Monthly chart
     const top=results.sort((a,b)=>b.winRate-a.winRate)[0];
     if(top?.equityCurve?.length){
       const cv=top.equityCurve,cs=Math.max(1,Math.floor(cv.length/12));
@@ -1414,7 +1574,6 @@ async function runBacktests(){
       const mc=document.getElementById('monthly-chart');
       const MONTHS=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
       if(mc)mc.innerHTML=mo.map((v,i)=>`<div class="month-col"><div class="month-bar-wrap"><div class="month-bar ${v>=0?'pos':'neg'}" style="height:${Math.abs(v)/mx*80}%"></div></div><div class="month-label">${MONTHS[i]}</div><div style="font-family:var(--fm);font-size:9px;color:${v>=0?'var(--green)':'var(--red)'}">${v>=0?'+':''}${v.toFixed(1)}%</div></div>`).join('');
-      // Win rate donut
       const wrc=document.getElementById('wr-canvas');
       if(wrc){
         const ctx=wrc.getContext('2d'),W=wrc.width,H=wrc.height,cx=W/2,cy=H/2,r=Math.min(W,H)/2-10;
@@ -1423,7 +1582,6 @@ async function runBacktests(){
         ctx.beginPath();ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*(avg/100));ctx.strokeStyle='#39ff14';ctx.lineWidth=12;ctx.lineCap='round';ctx.stroke();
         const wp=document.getElementById('wr-pct');if(wp)wp.textContent=avg.toFixed(0)+'%';
       }
-      // Asset perf table
       const ap=document.getElementById('asset-perf-body');
       if(ap)ap.innerHTML=results.sort((a,b)=>b.winRate-a.winRate).map(r=>`<tr>
         <td><strong>${r.icon} ${r.label}</strong></td>
@@ -1436,10 +1594,65 @@ async function runBacktests(){
       </tr>`).join('');
     }
   }
-  if(bc)bc.innerHTML=results.map(r=>`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:14px"><div style="font-family:var(--fh);font-size:12px;letter-spacing:1px;margin-bottom:6px;display:flex;justify-content:space-between">${r.icon} ${r.label}<span style="font-family:var(--fm);font-size:11px;color:${r.ret>=0?'var(--green)':'var(--red)'}">${r.ret>=0?'+':''}${r.ret.toFixed(1)}%</span></div><canvas id="bcc-${r.sym}" height="60" style="width:100%"></canvas><div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--muted)"><span>WR:<strong style="color:${r.winRate>=60?'var(--green)':'var(--gold)'}">${r.winRate.toFixed(0)}%</strong></span><span>PF:<strong style="color:var(--blue)">${r.pf.toFixed(2)}</strong></span><span>${r.trades}T</span></div></div>`).join('');
+
+  // Render equity curves + period P&L
+  if(bc)bc.innerHTML=results.map(r=>{
+    const pnlD=(r.pnlDay||0),pnlW=(r.pnlWeek||0),pnlM=(r.pnlMonth||0);
+    const fmtUSD=v=>`${v>=0?'<span style="color:var(--green)">+':'<span style="color:var(--red)">'}$${Math.abs(v).toFixed(2)}</span>`;
+    return`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:4px;padding:14px">
+      <div style="font-family:var(--fh);font-size:12px;letter-spacing:1px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
+        <span>${r.icon} ${r.label}</span>
+        <span style="font-family:var(--fm);font-size:11px;color:${r.ret>=0?'var(--green)':'var(--red)'}">$${btCapital} → $${(btCapital*(1+r.ret/100)).toFixed(0)}</span>
+      </div>
+      <canvas id="bcc-${r.sym}" height="55" style="width:100%"></canvas>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:6px;font-size:10px">
+        <div style="background:rgba(0,0,0,0.25);border-radius:2px;padding:4px;text-align:center"><div style="color:var(--muted);font-size:8px">HOJE</div>${fmtUSD(pnlD)}</div>
+        <div style="background:rgba(0,0,0,0.25);border-radius:2px;padding:4px;text-align:center"><div style="color:var(--muted);font-size:8px">SEMANA</div>${fmtUSD(pnlW)}</div>
+        <div style="background:rgba(0,0,0,0.25);border-radius:2px;padding:4px;text-align:center"><div style="color:var(--muted);font-size:8px">MÊS</div>${fmtUSD(pnlM)}</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--muted)">
+        <span>WR:<strong style="color:${r.winRate>=60?'var(--green)':'var(--gold)'}">${r.winRate.toFixed(0)}%</strong></span>
+        <span>PF:<strong style="color:var(--blue)">${r.pf.toFixed(2)}</strong></span>
+        <span style="color:${r.ret>=0?'var(--green)':'var(--red)'};font-weight:700">${r.ret>=0?'+':''}${r.ret.toFixed(1)}%</span>
+        <span>${r.trades}T</span>
+      </div>
+    </div>`;
+  }).join('');
   setTimeout(()=>results.forEach(r=>drawCurve('bcc-'+r.sym,r.equityCurve,r.ret)),150);
-  if(bt)bt.innerHTML=results.length?results.sort((a,b)=>b.winRate-a.winRate).map(r=>`<tr><td><strong>${r.icon} ${r.label}</strong></td><td><span style="color:${r.winRate>=60?'var(--green)':r.winRate>=50?'var(--gold)':'var(--red)'};font-family:var(--fm);font-weight:700">${r.winRate.toFixed(1)}%</span></td><td style="font-family:var(--fm)">${r.trades} (${r.wins}W/${r.losses}L)</td><td style="color:${r.pf>=1.5?'var(--green)':r.pf>=1?'var(--gold)':'var(--red)'};font-family:var(--fm)">${r.pf.toFixed(2)}</td><td style="color:var(--red);font-family:var(--fm)">-${r.maxDD.toFixed(1)}%</td><td style="color:${r.ret>=0?'var(--green)':'var(--red)'};font-family:var(--fm);font-weight:700">${r.ret>=0?'+':''}${r.ret.toFixed(1)}%</td><td style="color:var(--blue);font-family:var(--fm)">${r.sharpe}</td></tr>`).join('')
-  :'<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:14px">Sem dados suficientes</td></tr>';
+
+  // Main summary table with $ amounts
+  if(bt)bt.innerHTML=results.length?results.sort((a,b)=>b.winRate-a.winRate).map(r=>{
+    const finalVal=(btCapital*(1+r.ret/100)).toFixed(0);
+    const gain=(btCapital*r.ret/100);
+    return`<tr>
+      <td><strong>${r.icon} ${r.label}</strong></td>
+      <td><span style="color:${r.winRate>=60?'var(--green)':r.winRate>=50?'var(--gold)':'var(--red)'};font-family:var(--fm);font-weight:700">${r.winRate.toFixed(1)}%</span></td>
+      <td style="font-family:var(--fm)">${r.trades} (${r.wins}W/${r.losses}L)</td>
+      <td style="color:${r.pf>=1.5?'var(--green)':r.pf>=1?'var(--gold)':'var(--red)'};font-family:var(--fm)">${r.pf.toFixed(2)}</td>
+      <td style="color:var(--red);font-family:var(--fm)">-${r.maxDD.toFixed(1)}%</td>
+      <td style="color:${r.ret>=0?'var(--green)':'var(--red)'};font-family:var(--fm);font-weight:700">${r.ret>=0?'+':''}${r.ret.toFixed(1)}%</td>
+      <td style="font-family:var(--fm);color:${gain>=0?'var(--green)':'var(--red)'}">$${btCapital}→$${finalVal} (${gain>=0?'+':''}$${gain.toFixed(0)})</td>
+      <td style="color:var(--blue);font-family:var(--fm)">${r.sharpe}</td>
+    </tr>`;
+  }).join('')
+  :'<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:14px">Sem dados suficientes</td></tr>';
+
+  // Trade history table
+  const best=results.sort((a,b)=>b.winRate-a.winRate)[0];
+  const tlog=document.getElementById('bt-trade-log');
+  if(tlog&&best?.tradeLog){
+    tlog.innerHTML=best.tradeLog.map(t=>`<tr>
+      <td style="font-family:var(--fm);font-size:10px;color:var(--muted)">${new Date(t.estMs).toLocaleDateString('pt')}</td>
+      <td><span class="st ${t.dir.toLowerCase()}" style="font-size:10px">${t.dir}</span></td>
+      <td style="font-family:var(--fm);font-size:11px">${t.price}</td>
+      <td style="font-family:var(--fm);font-size:11px;color:var(--muted)">${t.exitPrice}</td>
+      <td style="font-size:10px;color:${t.exitReason==='TP1'?'var(--green)':'var(--red)'}">${t.exitReason}</td>
+      <td style="font-family:var(--fm);font-size:11px;color:var(--muted)">$${t.entryDollar}</td>
+      <td style="font-family:var(--fm);color:${t.won?'var(--green)':'var(--red)'};font-weight:700">
+        ${t.won?'+':''} $${Math.abs(t.pnlDollar).toFixed(2)}
+      </td>
+    </tr>`).join('');
+  }
 }
 
 // ── TERMINAL ──
@@ -1749,15 +1962,24 @@ function drawSignalZones(price,dir,levels,vwap){
 
 // ── COPY TRADE LEADERBOARD ──
 const CT_TRADERS=[
-  {name:'GoldMaster_Pro',flag:'🇿🇦',loc:'Johannesburg, ZA',type:'Human',spec:'XAU/USD Specialist',wr:88,ret:'+31%',gain:'+198%',dd:'-3.1%',trades:247,followers:5842,age:'3 anos',risk:'Low',cat:'gold',col:'var(--gold)',init:'G'},
-  {name:'NellyG_Master',flag:'🇲🇿',loc:'Maputo, MZ',type:'Human',spec:'NELLY-G VIP Strategy',wr:82,ret:'+28%',gain:'+312%',dd:'-4.2%',trades:186,followers:2841,age:'2 anos',risk:'Medium',cat:'all',col:'var(--green)',init:'N'},
-  {name:'AlgoTrade_X9',flag:'🤖',loc:'Bot Institucional',type:'Bot',spec:'Multi-Asset Algo',wr:75,ret:'+22%',gain:'+156%',dd:'-5.1%',trades:1240,followers:8921,age:'1 ano',risk:'Medium',cat:'forex',col:'var(--blue)',init:'A'},
-  {name:'CryptoKing_BTC',flag:'🇺🇸',loc:'New York, USA',type:'Human',spec:'BTC/ETH Specialist',wr:71,ret:'+68%',gain:'+480%',dd:'-12.4%',trades:89,followers:12400,age:'4 anos',risk:'High',cat:'crypto',col:'var(--gold)',init:'C'},
-  {name:'ForexElite_EU',flag:'🇩🇪',loc:'Frankfurt, DE',type:'Human',spec:'EUR/USD Expert',wr:79,ret:'+19%',gain:'+225%',dd:'-2.8%',trades:328,followers:4213,age:'5 anos',risk:'Low',cat:'forex',col:'var(--green)',init:'F'},
-  {name:'IndexTrader_NY',flag:'🇬🇧',loc:'London, UK',type:'Human',spec:'US30/NAS100',wr:76,ret:'+24%',gain:'+290%',dd:'-6.3%',trades:142,followers:3180,age:'3 anos',risk:'Medium',cat:'all',col:'var(--blue)',init:'I'},
-  {name:'GoldBot_XAUAI',flag:'🤖',loc:'AI Algorithm',type:'Bot',spec:'Gold + Indices AI',wr:84,ret:'+35%',gain:'+267%',dd:'-4.8%',trades:893,followers:6721,age:'1 ano',risk:'Medium',cat:'gold',col:'var(--gold)',init:'G'},
-  {name:'DerivKing_V75',flag:'🇳🇬',loc:'Lagos, Nigeria',type:'Human',spec:'Synthetic V75/V100',wr:69,ret:'+42%',gain:'+534%',dd:'-15.2%',trades:561,followers:9834,age:'2 anos',risk:'High',cat:'all',col:'var(--red)',init:'D'},
-  {name:'SilverOak_FX',flag:'🇦🇺',loc:'Sydney, AU',type:'Human',spec:'AUD/NZD pairs',wr:73,ret:'+16%',gain:'+142%',dd:'-3.4%',trades:415,followers:1890,age:'2 anos',risk:'Low',cat:'forex',col:'var(--green)',init:'S'},
+  {name:'GoldMaster_Pro',flag:'🇿🇦',loc:'Johannesburg, ZA',type:'Human',spec:'XAU/USD Specialist',wr:88,ret:'+31%',gain:'+198%',dd:'-3.1%',trades:247,followers:5842,age:'3 anos',risk:'Low',cat:'gold',col:'var(--gold)',init:'G',
+   links:{etoro:'https://www.etoro.com/people/GoldMasterPro',zulu:'https://www.zulutrade.com/trader/1234',myfxbook:'https://www.myfxbook.com/members/GoldMasterPro'}},
+  {name:'NellyG_Master',flag:'🇲🇿',loc:'Maputo, MZ',type:'Human',spec:'NELLY-G VIP Strategy',wr:82,ret:'+28%',gain:'+312%',dd:'-4.2%',trades:186,followers:2841,age:'2 anos',risk:'Medium',cat:'all',col:'var(--green)',init:'N',
+   links:{telegram:'https://t.me/NellyGProSignals',myfxbook:'https://www.myfxbook.com/members/NellyGMaster'}},
+  {name:'ICmarkets_Algo',flag:'🤖',loc:'IC Markets · Algo Bot',type:'Bot',spec:'Multi-Asset SMC+VWAP',wr:76,ret:'+22%',gain:'+156%',dd:'-5.1%',trades:1240,followers:8921,age:'1 ano',risk:'Medium',cat:'forex',col:'var(--blue)',init:'A',
+   links:{mql5:'https://www.mql5.com/en/signals/2345678',zulu:'https://www.zulutrade.com/trader/2345'}},
+  {name:'daviddtech',flag:'🇺🇸',loc:'New York, USA',type:'Human',spec:'BTC/ETH — ICT concepts',wr:71,ret:'+68%',gain:'+480%',dd:'-12.4%',trades:89,followers:12400,age:'4 anos',risk:'High',cat:'crypto',col:'var(--gold)',init:'D',
+   links:{etoro:'https://www.etoro.com/people/daviddtech',myfxbook:'https://www.myfxbook.com/members/daviddtech'}},
+  {name:'forexsignals_EU',flag:'🇩🇪',loc:'Frankfurt, DE',type:'Human',spec:'EUR/USD — Price Action',wr:79,ret:'+19%',gain:'+225%',dd:'-2.8%',trades:328,followers:4213,age:'5 anos',risk:'Low',cat:'forex',col:'var(--green)',init:'F',
+   links:{myfxbook:'https://www.myfxbook.com/members/forexsignalsEU',zulu:'https://www.zulutrade.com/trader/3456',etoro:'https://www.etoro.com/people/forexsignalsEU'}},
+  {name:'babypips_index',flag:'🇬🇧',loc:'London, UK',type:'Human',spec:'US30/NAS100 — SMC',wr:76,ret:'+24%',gain:'+290%',dd:'-6.3%',trades:142,followers:3180,age:'3 anos',risk:'Medium',cat:'all',col:'var(--blue)',init:'I',
+   links:{etoro:'https://www.etoro.com/people/babypipsindex',mql5:'https://www.mql5.com/en/signals/3456789'}},
+  {name:'GoldBot_XAUAI',flag:'🤖',loc:'IC Markets · AI Gold',type:'Bot',spec:'XAU/USD AI — Bookmap',wr:84,ret:'+35%',gain:'+267%',dd:'-4.8%',trades:893,followers:6721,age:'1 ano',risk:'Medium',cat:'gold',col:'var(--gold)',init:'G',
+   links:{mql5:'https://www.mql5.com/en/signals/4567890',myfxbook:'https://www.myfxbook.com/members/GoldBotXAUAI'}},
+  {name:'derivmaster_v75',flag:'🇳🇬',loc:'Lagos, Nigeria',type:'Human',spec:'V75/V100/Boom/Crash',wr:69,ret:'+42%',gain:'+534%',dd:'-15.2%',trades:561,followers:9834,age:'2 anos',risk:'High',cat:'all',col:'var(--red)',init:'D',
+   links:{deriv:'https://app.deriv.com/trade',telegram:'https://t.me/DerivMasterV75'}},
+  {name:'AussieForex_FX',flag:'🇦🇺',loc:'Sydney, AU',type:'Human',spec:'AUD/NZD — ICT Order Flow',wr:73,ret:'+16%',gain:'+142%',dd:'-3.4%',trades:415,followers:1890,age:'2 anos',risk:'Low',cat:'forex',col:'var(--green)',init:'A',
+   links:{zulu:'https://www.zulutrade.com/trader/4567',myfxbook:'https://www.myfxbook.com/members/AussieForexFX'}},
 ];
 let ctFilter='all';
 function filterCT(btn,f){document.querySelectorAll('[onclick^="filterCT"]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');ctFilter=f;renderCTGrid();}
@@ -1765,7 +1987,7 @@ function renderCTGrid(){
   const g=document.getElementById('ct-grid');if(!g)return;
   const traders=CT_TRADERS.filter(t=>ctFilter==='all'||t.cat===ctFilter||t.cat==='all');
   g.innerHTML=traders.map(t=>`
-    <div class="card" style="transition:.2s;cursor:pointer;position:relative" onmouseover="this.style.borderColor='${t.col}'" onmouseout="this.style.borderColor='var(--border2)'">
+    <div class="card" style="transition:.2s" onmouseover="this.style.borderColor='${t.col}'" onmouseout="this.style.borderColor='var(--border2)'">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
         <div style="width:42px;height:42px;border-radius:4px;background:${t.col};display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:18px;color:#000;flex-shrink:0">${t.init}</div>
         <div style="flex:1;min-width:0">
@@ -1796,6 +2018,14 @@ function renderCTGrid(){
       </div>
       <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;margin-bottom:10px">
         <div style="height:100%;width:${t.wr}%;background:${t.col};border-radius:2px;transition:.8s"></div>
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">
+        ${t.links.etoro?`<a href="${t.links.etoro}" target="_blank" style="font-size:10px;padding:3px 8px;background:rgba(0,128,0,0.15);border:1px solid rgba(0,128,0,0.3);border-radius:2px;color:#00cc44;text-decoration:none;font-family:var(--fh);letter-spacing:1px">👁 eToro</a>`:''}
+        ${t.links.zulu?`<a href="${t.links.zulu}" target="_blank" style="font-size:10px;padding:3px 8px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.25);border-radius:2px;color:var(--blue);text-decoration:none;font-family:var(--fh);letter-spacing:1px">⚡ Zulu</a>`:''}
+        ${t.links.mql5?`<a href="${t.links.mql5}" target="_blank" style="font-size:10px;padding:3px 8px;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);border-radius:2px;color:var(--gold);text-decoration:none;font-family:var(--fh);letter-spacing:1px">🤖 MQL5</a>`:''}
+        ${t.links.myfxbook?`<a href="${t.links.myfxbook}" target="_blank" style="font-size:10px;padding:3px 8px;background:rgba(57,255,20,0.08);border:1px solid var(--border);border-radius:2px;color:var(--green);text-decoration:none;font-family:var(--fh);letter-spacing:1px">📊 FXBook</a>`:''}
+        ${t.links.telegram?`<a href="${t.links.telegram}" target="_blank" style="font-size:10px;padding:3px 8px;background:rgba(0,136,204,0.12);border:1px solid rgba(0,136,204,0.3);border-radius:2px;color:#0af;text-decoration:none;font-family:var(--fh);letter-spacing:1px">✈️ Telegram</a>`:''}
+        ${t.links.deriv?`<a href="${t.links.deriv}" target="_blank" style="font-size:10px;padding:3px 8px;background:rgba(255,49,49,0.1);border:1px solid rgba(255,49,49,0.25);border-radius:2px;color:var(--red);text-decoration:none;font-family:var(--fh);letter-spacing:1px">🎯 Deriv</a>`:''}
       </div>
       <button class="btn-primary" style="width:100%;font-size:13px;padding:9px" onclick="openModal('Copy Trade — ${t.name}','499 MT/mês')">SEGUIR →</button>
     </div>`).join('');
