@@ -2203,4 +2203,9 @@ setInterval(checkMT5Server, 30000); // verifica a cada 30s
 
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('pay-modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('pay-modal'))closeModal();});
-  document.getElementById('apikey-modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('apikey-modal'))document.getEl
+  document.getElementById('apikey-modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('apikey-modal'))document.getElementById('apikey-modal').classList.remove('open');});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();document.getElementById('apikey-modal')?.classList.remove('open');}});
+});
+</script>
+</body>
+</html>
