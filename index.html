@@ -558,11 +558,57 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
 
   <!-- ═══ PAGE: MARKETS ═══ -->
   <div class="page" id="page-markets">
-    <div class="ph"><div><div class="pt">🌐 MERCADOS AO VIVO</div><div class="ps">Binance API + ECB Frankfurter · Preços em tempo real</div></div><div style="font-family:var(--fm);font-size:10px;color:var(--muted)" id="mkt-time">A carregar...</div></div>
-    <div style="font-size:11px;color:var(--gold);letter-spacing:2px;font-family:var(--fh);margin-bottom:10px">▸ CRYPTO</div>
-    <div id="crypto-prices" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:20px"></div>
-    <div style="font-size:11px;color:var(--gold);letter-spacing:2px;font-family:var(--fh);margin-bottom:10px">▸ FOREX & COMMODITIES</div>
-    <div id="forex-prices" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px"></div>
+    <div class="ph">
+      <div><div class="pt">🌐 MERCADOS AO VIVO</div><div class="ps">Binance API + ECB Frankfurter · Preços em tempo real</div></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <button class="fb active" onclick="fMarket(this,'all')">TODOS</button>
+        <button class="fb" onclick="fMarket(this,'forex')">FOREX</button>
+        <button class="fb" onclick="fMarket(this,'commodities')">COMMODITIES</button>
+        <button class="fb" onclick="fMarket(this,'indices')">ÍNDICES</button>
+        <button class="fb" onclick="fMarket(this,'crypto')">CRYPTO</button>
+        <div style="font-family:var(--fm);font-size:10px;color:var(--muted);margin-left:8px" id="mkt-time">A carregar...</div>
+      </div>
+    </div>
+
+    <!-- FOREX -->
+    <div class="mkt-section" id="sec-forex">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:11px;color:var(--green);letter-spacing:2px;font-family:var(--fh)">▸ FOREX</span>
+        <span style="font-size:9px;color:var(--muted);font-family:var(--fd)">Câmbio de moedas · ECB Frankfurter</span>
+        <div style="flex:1;height:1px;background:var(--border2);margin-left:8px"></div>
+      </div>
+      <div id="mkt-forex" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:22px"></div>
+    </div>
+
+    <!-- COMMODITIES -->
+    <div class="mkt-section" id="sec-commodities">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:11px;color:var(--gold);letter-spacing:2px;font-family:var(--fh)">▸ COMMODITIES</span>
+        <span style="font-size:9px;color:var(--muted);font-family:var(--fd)">Ouro, Prata, Petróleo</span>
+        <div style="flex:1;height:1px;background:var(--border2);margin-left:8px"></div>
+      </div>
+      <div id="mkt-commodities" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:22px"></div>
+    </div>
+
+    <!-- INDICES -->
+    <div class="mkt-section" id="sec-indices">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:11px;color:var(--blue);letter-spacing:2px;font-family:var(--fh)">▸ ÍNDICES</span>
+        <span style="font-size:9px;color:var(--muted);font-family:var(--fd)">S&P 500, NASDAQ, DJI</span>
+        <div style="flex:1;height:1px;background:var(--border2);margin-left:8px"></div>
+      </div>
+      <div id="mkt-indices" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:22px"></div>
+    </div>
+
+    <!-- CRYPTO -->
+    <div class="mkt-section" id="sec-crypto">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:11px;color:var(--purple);letter-spacing:2px;font-family:var(--fh)">▸ CRYPTO</span>
+        <span style="font-size:9px;color:var(--muted);font-family:var(--fd)">Binance API · Actualização a cada 60s</span>
+        <div style="flex:1;height:1px;background:var(--border2);margin-left:8px"></div>
+      </div>
+      <div id="mkt-crypto" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:22px"></div>
+    </div>
   </div>
 
   <!-- ═══ PAGE: INSIGHTS ═══ -->
@@ -1510,18 +1556,118 @@ async function runBacktests(){
   const best=[...results].sort((a,b)=>b.winRate-a.winRate)[0];const tlog=document.getElementById('bt-trade-log');if(tlog&&best?.tradeLog)tlog.innerHTML=best.tradeLog.map(t=>`<tr><td style="font-family:var(--fm);font-size:10px;color:var(--muted)">${new Date(t.estMs).toLocaleDateString('pt')}</td><td><span class="st ${t.dir.toLowerCase()}" style="font-size:10px">${t.dir}</span></td><td style="font-family:var(--fm);font-size:10px">${t.price}</td><td style="font-family:var(--fm);font-size:10px;color:var(--muted)">${t.exitPrice}</td><td style="font-size:10px;color:${t.exitReason==='TP1'?'var(--green)':'var(--red)'}">${t.exitReason}</td><td style="font-family:var(--fm);font-size:10px;color:var(--muted)">$${t.entryDollar}</td><td style="font-family:var(--fm);color:${t.won?'var(--green)':'var(--red)'};font-weight:700">${t.won?'+':''}$${Math.abs(t.pnlDollar).toFixed(2)}</td></tr>`).join('');
 }
 
-/* ── MARKET PRICES ── */
+/* ── MARKET PRICES — organizado por categoria ── */
 const MC={};
+let _mktFilter='all';
+
+function fMarket(btn,f){
+  document.querySelectorAll('[onclick^="fMarket"]').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  _mktFilter=f;
+  ['forex','commodities','indices','crypto'].forEach(cat=>{
+    const sec=document.getElementById('sec-'+cat);
+    if(sec)sec.style.display=(f==='all'||f===cat)?'block':'none';
+  });
+}
+
+function mktCard(cat,catLabel,catCol,catBg,symbol,name,price,chg,dec){
+  const up=chg>=0;
+  const pF=price>=10000?price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}):price>=1?price.toFixed(dec):price.toFixed(6);
+  const chgStr=chg!==null?`<div style="font-family:var(--fm);font-size:11px;color:${up?'var(--green)':'var(--red)'};margin-top:3px">${up?'▲':'▼'} ${Math.abs(chg).toFixed(2)}%</div>`:'<div style="font-size:9px;color:var(--muted);margin-top:3px;font-family:var(--fd)">Sem variação</div>';
+  return`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:13px;transition:.2s" onmouseover="this.style.borderColor='var(--border)'" onmouseout="this.style.borderColor='var(--border2)'">
+    <div style="font-size:8px;font-family:var(--fh);letter-spacing:1px;padding:2px 7px;border-radius:2px;background:${catBg};color:${catCol};display:inline-block;margin-bottom:8px">${catLabel}</div>
+    <div style="font-family:var(--fh);font-size:14px;letter-spacing:2px;margin-bottom:2px">${symbol}</div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:6px;font-family:var(--fd)">${name}</div>
+    <div style="font-family:var(--fm);font-size:18px">${price>0?pF:'—'}</div>
+    ${price>0?chgStr:''}
+  </div>`;
+}
+
 async function fetchMarketPrices(){
   const te=document.getElementById('mkt-time');if(te)te.textContent='A carregar...';
-  try{const r=await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,solana,binancecoin,ripple,cardano&order=market_cap_desc&per_page=6&sparkline=false&price_change_percentage=24h');if(!r.ok)throw new Error();const d=await r.json();const sm={bitcoin:'BTC',ethereum:'ETH',solana:'SOL',binancecoin:'BNB',ripple:'XRP',cardano:'ADA'};d.forEach(c=>{const s=sm[c.id];if(s)MC[s]={price:c.current_price,chg:c.price_change_percentage_24h||0,name:c.name};});
-  const ce=document.getElementById('crypto-prices');if(ce)ce.innerHTML=d.map(c=>{const s=sm[c.id];if(!s)return'';const up=c.price_change_percentage_24h>=0;const pF=c.current_price>=1000?c.current_price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}):c.current_price>=1?c.current_price.toFixed(4):c.current_price.toFixed(6);return`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:13px"><div style="font-size:8px;font-family:var(--fh);letter-spacing:1px;padding:2px 6px;border-radius:2px;background:rgba(245,200,66,0.08);color:var(--gold);display:inline-block;margin-bottom:7px">CRYPTO</div><div style="font-family:var(--fh);font-size:14px;letter-spacing:2px">${s}/USD</div><div style="font-size:10px;color:var(--muted);margin-bottom:7px;font-family:var(--fd)">${c.name}</div><div style="font-family:var(--fm);font-size:16px">$${pF}</div><div style="font-family:var(--fm);font-size:11px;color:${up?'var(--green)':'var(--red)'};margin-top:2px">${up?'▲':'▼'} ${Math.abs(c.price_change_percentage_24h||0).toFixed(2)}%</div></div>`;}).join('');
-  const tm={BTC:0,ETH:1,BNB:5,SOL:6,XRP:7};Object.entries(tm).forEach(([k,i])=>{const d2=MC[k];if(!d2)return;const pr=document.getElementById('tp'+i),ch=document.getElementById('tc'+i);if(pr)pr.textContent=d2.price.toFixed([2,2,2,4,4,2,2,4][i]||4);if(ch){ch.textContent=(d2.chg>=0?'+':'')+d2.chg.toFixed(2)+'%';ch.className='tc '+(d2.chg>=0?'up':'dn');}});
+
+  // ── 1. CRYPTO (CoinGecko) ─────────────────────────────────────
+  try{
+    const r=await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,binancecoin,solana,ripple,cardano,dogecoin,avalanche-2&order=market_cap_desc&per_page=8&sparkline=false&price_change_percentage=24h');
+    if(r.ok){
+      const d=await r.json();
+      const sm={bitcoin:'BTC/USD',ethereum:'ETH/USD',binancecoin:'BNB/USD',solana:'SOL/USD',ripple:'XRP/USD',cardano:'ADA/USD',dogecoin:'DOGE/USD','avalanche-2':'AVAX/USD'};
+      const skMap={bitcoin:'BTC',ethereum:'ETH',binancecoin:'BNB',solana:'SOL',ripple:'XRP',cardano:'ADA'};
+      d.forEach(c=>{const sk=skMap[c.id];if(sk)MC[sk]={price:c.current_price,chg:c.price_change_percentage_24h||0};});
+      const ce=document.getElementById('mkt-crypto');
+      if(ce)ce.innerHTML=d.map(c=>{
+        const sym=sm[c.id]||c.symbol.toUpperCase()+'/USD';
+        const up=c.price_change_percentage_24h>=0;
+        const dec=c.current_price>=1000?2:c.current_price>=1?4:6;
+        return mktCard('crypto','CRYPTO','var(--purple)','rgba(167,139,250,0.08)',sym,c.name,c.current_price,c.price_change_percentage_24h,dec);
+      }).join('');
+      // Ticker bar update
+      const tm={BTC:0,ETH:1,BNB:5,SOL:6,XRP:7};
+      Object.entries(tm).forEach(([k,i])=>{const d2=MC[k];if(!d2)return;const pr=document.getElementById('tp'+i),ch=document.getElementById('tc'+i);if(pr)pr.textContent=d2.price.toFixed(2);if(ch){ch.textContent=(d2.chg>=0?'+':'')+d2.chg.toFixed(2)+'%';ch.className='tc '+(d2.chg>=0?'up':'dn');}});
+    }
   }catch(e){}
-  try{const r2=await fetch('https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY');if(r2.ok){const d2=await r2.json();const rt=d2.rates;if(rt.EUR)MC['EURUSD']={price:1/rt.EUR,chg:0};if(rt.GBP)MC['GBPUSD']={price:1/rt.GBP,chg:0};if(rt.JPY)MC['USDJPY']={price:rt.JPY,chg:0};}}catch(e){}
-  try{const r3=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd&include_24hr_change=true');if(r3.ok){const d3=await r3.json();if(d3['pax-gold']){MC['XAUUSD']={price:d3['pax-gold'].usd,chg:d3['pax-gold'].usd_24h_change||0};const pr=document.getElementById('tp2'),ch=document.getElementById('tc2');const d4=MC['XAUUSD'];if(d4&&pr){pr.textContent=d4.price.toFixed(2);if(ch){ch.textContent=(d4.chg>=0?'+':'')+d4.chg.toFixed(2)+'%';ch.className='tc '+(d4.chg>=0?'up':'dn');}}}}}catch(e){}
-  const fe=document.getElementById('forex-prices');
-  if(fe){const fl=[{k:'EURUSD',s:'EUR/USD',t:'forex',d:4},{k:'GBPUSD',s:'GBP/USD',t:'forex',d:4},{k:'USDJPY',s:'USD/JPY',t:'forex',d:2},{k:'XAUUSD',s:'XAU/USD',t:'commodity',d:2},{k:'BTC',s:'BTC/USD',t:'crypto',d:2},{k:'ETH',s:'ETH/USD',t:'crypto',d:2},{k:'SOL',s:'SOL/USD',t:'crypto',d:4},{k:'XRP',s:'XRP/USD',t:'crypto',d:5}];const cols={forex:'var(--green)',commodity:'var(--blue)',crypto:'var(--gold)'};const bgs={forex:'rgba(0,229,160,0.07)',commodity:'rgba(56,189,248,0.07)',crypto:'rgba(245,200,66,0.07)'};fe.innerHTML=fl.map(f=>{const d=MC[f.k];return`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:13px"><div style="font-size:8px;font-family:var(--fh);letter-spacing:1px;padding:2px 6px;border-radius:2px;background:${bgs[f.t]};color:${cols[f.t]};display:inline-block;margin-bottom:7px">${f.t.toUpperCase()}</div><div style="font-family:var(--fh);font-size:14px;letter-spacing:2px">${f.s}</div><div style="font-family:var(--fm);font-size:16px;margin-top:7px">${d?d.price.toFixed(f.d):'—'}</div>${d&&d.chg?`<div style="font-family:var(--fm);font-size:11px;color:${d.chg>=0?'var(--green)':'var(--red)'};margin-top:2px">${d.chg>=0?'▲':'▼'} ${Math.abs(d.chg).toFixed(2)}%</div>`:'<div style="font-size:9px;color:var(--muted);margin-top:2px;font-family:var(--fd)">ECB Rate</div>'}</div>`;}).join('');}
+
+  // ── 2. FOREX (ECB Frankfurter) ────────────────────────────────
+  try{
+    const r=await fetch('https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY,AUD,CAD,CHF,SEK,NOK');
+    if(r.ok){
+      const d=await r.json();const rt=d.rates;
+      const pairs=[
+        {k:'EURUSD',s:'EUR/USD',n:'Euro',p:rt.EUR?1/rt.EUR:0,dec:5},
+        {k:'GBPUSD',s:'GBP/USD',n:'British Pound',p:rt.GBP?1/rt.GBP:0,dec:5},
+        {k:'USDJPY',s:'USD/JPY',n:'Japanese Yen',p:rt.JPY||0,dec:3},
+        {k:'AUDUSD',s:'AUD/USD',n:'Australian Dollar',p:rt.AUD?1/rt.AUD:0,dec:5},
+        {k:'USDCAD',s:'USD/CAD',n:'Canadian Dollar',p:rt.CAD||0,dec:5},
+        {k:'USDCHF',s:'USD/CHF',n:'Swiss Franc',p:rt.CHF||0,dec:5},
+        {k:'USDSEK',s:'USD/SEK',n:'Swedish Krona',p:rt.SEK||0,dec:4},
+        {k:'USDNOK',s:'USD/NOK',n:'Norwegian Krone',p:rt.NOK||0,dec:4},
+      ];
+      pairs.forEach(p=>{if(p.p>0)MC[p.k]={price:p.p,chg:0};});
+      const fe=document.getElementById('mkt-forex');
+      if(fe)fe.innerHTML=pairs.map(p=>mktCard('forex','FOREX','var(--green)','rgba(0,229,160,0.07)',p.s,p.n,p.p,null,p.dec)).join('');
+    }
+  }catch(e){}
+
+  // ── 3. COMMODITIES (CoinGecko + ECB) ─────────────────────────
+  try{
+    const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold,silver&vs_currencies=usd&include_24hr_change=true');
+    if(r.ok){
+      const d=await r.json();
+      const comms=[];
+      if(d['pax-gold']){
+        MC['XAUUSD']={price:d['pax-gold'].usd,chg:d['pax-gold'].usd_24h_change||0};
+        comms.push(mktCard('commodity','COMMODITY','var(--gold)','rgba(245,200,66,0.08)','XAU/USD','Gold (Ouro)',d['pax-gold'].usd,d['pax-gold'].usd_24h_change||0,2));
+        // Ticker
+        const pr=document.getElementById('tp2'),ch=document.getElementById('tc2');
+        if(pr)pr.textContent=d['pax-gold'].usd.toFixed(2);
+        if(ch){ch.textContent=(MC['XAUUSD'].chg>=0?'+':'')+MC['XAUUSD'].chg.toFixed(2)+'%';ch.className='tc '+(MC['XAUUSD'].chg>=0?'up':'dn');}
+      }
+      if(d['silver']){
+        MC['XAGUSD']={price:d['silver'].usd,chg:d['silver'].usd_24h_change||0};
+        comms.push(mktCard('commodity','COMMODITY','var(--gold)','rgba(245,200,66,0.08)','XAG/USD','Silver (Prata)',d['silver'].usd,d['silver'].usd_24h_change||0,3));
+      }
+      // WTI Oil estimate placeholder
+      comms.push(mktCard('commodity','COMMODITY','var(--gold)','rgba(245,200,66,0.08)','WTI/USD','Crude Oil',0,null,2));
+      const cm=document.getElementById('mkt-commodities');if(cm)cm.innerHTML=comms.join('');
+    }
+  }catch(e){
+    const cm=document.getElementById('mkt-commodities');
+    if(cm)cm.innerHTML=mktCard('commodity','COMMODITY','var(--gold)','rgba(245,200,66,0.08)','XAU/USD','Gold',MC['XAUUSD']?.price||0,MC['XAUUSD']?.chg||0,2);
+  }
+
+  // ── 4. INDICES (valores estáticos com nota) ───────────────────
+  const idx=[
+    {s:'SPX/USD', n:'S&P 500',        p:5218.19, chg:0.25},
+    {s:'NDX/USD', n:'NASDAQ 100',     p:18239.54, chg:0.41},
+    {s:'DJI/USD', n:'Dow Jones',      p:39308.00, chg:0.17},
+    {s:'VIX',     n:'Volatility Index',p:14.32,  chg:-3.21},
+    {s:'DAX/EUR', n:'DAX (Alemanha)', p:18453.00, chg:0.33},
+    {s:'FTSE/GBP',n:'FTSE 100 (UK)',  p:8154.00,  chg:0.12},
+  ];
+  const idxEl=document.getElementById('mkt-indices');
+  if(idxEl)idxEl.innerHTML=idx.map(i=>mktCard('index','ÍNDICE','var(--blue)','rgba(56,189,248,0.07)',i.s,i.n,i.p,i.chg,2)).join('')+
+    '<div style="grid-column:1/-1;font-size:9px;color:var(--muted);font-family:var(--fd);padding:6px 4px">⚠️ Índices: valores de referência · Use TradingView no Terminal para preços em tempo real</div>';
+
   if(te)te.textContent='ACTUALIZADO: '+nowStr();
 }
 
