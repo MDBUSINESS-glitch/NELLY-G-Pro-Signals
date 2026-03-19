@@ -539,12 +539,62 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
 
   <!-- ═══ PAGE: NEWS ═══ -->
   <div class="page" id="page-news">
-    <div class="ph"><div><div class="pt">📰 NOTÍCIAS & EVENTOS</div><div class="ps">Calendário económico de alto impacto</div></div></div>
-    <div class="card"><div class="ct">⚡ EVENTOS DE ALTO IMPACTO</div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="display:grid;grid-template-columns:100px 70px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border2)"><span style="font-family:var(--fm);font-size:10px;color:var(--muted)">Próxima 6ª</span><span style="font-size:10px;padding:2px 7px;border-radius:3px;background:rgba(255,77,109,0.1);color:var(--red);font-family:var(--fh)">MUITO ALTO</span><span style="font-size:12px">NFP — Non-Farm Payrolls <span style="color:var(--muted);font-size:10px">(14:30 UTC)</span></span><span style="font-family:var(--fm);font-size:10px;color:var(--muted)">Ant: 170K</span></div>
-        <div style="display:grid;grid-template-columns:100px 70px 1fr auto;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border2)"><span style="font-family:var(--fm);font-size:10px;color:var(--muted)">3ª-feira</span><span style="font-size:10px;padding:2px 7px;border-radius:3px;background:rgba(245,200,66,0.1);color:var(--gold);font-family:var(--fh)">ALTO</span><span style="font-size:12px">US CPI MoM <span style="color:var(--muted);font-size:10px">(14:30 UTC)</span></span><span style="font-family:var(--fm);font-size:10px;color:var(--muted)">Ant: 0.3%</span></div>
-        <div style="display:grid;grid-template-columns:100px 70px 1fr auto;gap:12px;align-items:center;padding:10px 0"><span style="font-family:var(--fm);font-size:10px;color:var(--muted)">4ª-feira</span><span style="font-size:10px;padding:2px 7px;border-radius:3px;background:rgba(245,200,66,0.1);color:var(--gold);font-family:var(--fh)">ALTO</span><span style="font-size:12px">FOMC Minutes <span style="color:var(--muted);font-size:10px">(20:00 UTC)</span></span><span style="font-family:var(--fm);font-size:10px;color:var(--muted)">—</span></div>
+    <div class="ph"><div><div class="pt">📰 NOTÍCIAS & EVENTOS</div><div class="ps">Calendário económico de alto impacto · Narrativa e impacto nos activos</div></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="fb active" onclick="fNews(this,'all')">TODOS</button>
+      <button class="fb" onclick="fNews(this,'forex')">FOREX</button>
+      <button class="fb" onclick="fNews(this,'gold')">OURO</button>
+      <button class="fb" onclick="fNews(this,'crypto')">CRYPTO</button>
+    </div>
+    </div>
+
+    <!-- BANNER ALERTA -->
+    <div style="background:rgba(255,77,109,.07);border:1px solid rgba(255,77,109,.2);border-radius:var(--r);padding:11px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:18px">⚡</span>
+      <div>
+        <div style="font-family:var(--fh);font-size:12px;letter-spacing:1px;color:var(--red)">PRÓXIMO EVENTO DE ALTO IMPACTO</div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--fd);margin-top:2px">NFP (Non-Farm Payrolls) — Próxima 6ª feira 14:30 UTC · Evite entrar em trades 30 min antes</div>
+      </div>
+    </div>
+
+    <!-- EVENTOS PRINCIPAIS -->
+    <div class="card" id="news-container">
+      <div class="ct">📅 CALENDÁRIO ECONÓMICO — SEMANA ACTUAL</div>
+      <div id="news-list"></div>
+    </div>
+
+    <!-- IMPACTO POR ACTIVO -->
+    <div class="card" style="margin-top:14px">
+      <div class="ct">🎯 IMPACTO ESPERADO POR ACTIVO</div>
+      <div id="news-asset-impact" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:4px"></div>
+    </div>
+
+    <!-- ANÁLISE DE SENTIMENTO -->
+    <div class="card" style="margin-top:14px">
+      <div class="ct">🧠 ANÁLISE DE SENTIMENTO — FED & BCE</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="background:rgba(0,0,0,.2);border-radius:var(--r);padding:14px">
+          <div style="font-family:var(--fh);font-size:13px;letter-spacing:2px;margin-bottom:8px;color:var(--blue)">🏛 FEDERAL RESERVE (FED)</div>
+          <div style="font-size:11px;line-height:1.9;color:var(--muted);font-family:var(--fd)">
+            <strong style="color:var(--text)">Postura actual:</strong> Hawkish moderado<br>
+            <strong style="color:var(--text)">Taxa de juro:</strong> 5.25–5.50% (mantida)<br>
+            <strong style="color:var(--text)">Próxima decisão:</strong> FOMC — dependente de dados<br>
+            <strong style="color:var(--text)">Impacto no USD:</strong> <span style="color:var(--green)">POSITIVO — USD mais forte</span><br>
+            <strong style="color:var(--text)">Impacto no XAU:</strong> <span style="color:var(--red)">NEGATIVO — Ouro sob pressão</span><br>
+            <strong style="color:var(--text)">Impacto no BTC:</strong> <span style="color:var(--red)">NEGATIVO — Risk-off</span>
+          </div>
+        </div>
+        <div style="background:rgba(0,0,0,.2);border-radius:var(--r);padding:14px">
+          <div style="font-family:var(--fh);font-size:13px;letter-spacing:2px;margin-bottom:8px;color:var(--gold)">🏦 BANCO CENTRAL EUROPEU (BCE)</div>
+          <div style="font-size:11px;line-height:1.9;color:var(--muted);font-family:var(--fd)">
+            <strong style="color:var(--text)">Postura actual:</strong> Dovish — cortes em curso<br>
+            <strong style="color:var(--text)">Taxa de juro:</strong> 3.65% (em descida)<br>
+            <strong style="color:var(--text)">Próxima decisão:</strong> Possível corte adicional<br>
+            <strong style="color:var(--text)">Impacto no EUR:</strong> <span style="color:var(--red)">NEGATIVO — EUR mais fraco</span><br>
+            <strong style="color:var(--text)">Impacto no EUR/USD:</strong> <span style="color:var(--red)">VENDA favorecida</span><br>
+            <strong style="color:var(--text)">Divergência Fed/BCE:</strong> <span style="color:var(--gold)">USD > EUR estrutural</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -665,7 +715,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
       <div style="display:flex;flex-direction:column;gap:10px">
         <div class="cinfo" onclick="window.open('https://wa.me/258840330540','_blank')"><div class="cic" style="background:rgba(0,229,160,.08)">📱</div><div><div class="cil">WHATSAPP (SUPORTE)</div><div class="civ">+258 840 330 540</div></div></div>
         <div class="cinfo" onclick="window.open('https://t.me/NellyGVIP','_blank')"><div class="cic" style="background:rgba(56,189,248,.08)">✈️</div><div><div class="cil">TELEGRAM VIP</div><div class="civ">@NellyGVIP</div></div></div>
-        <div class="cinfo"><div class="cic" style="background:rgba(245,200,66,.08)">📧</div><div><div class="cil">EMAIL</div><div class="civ">dancamanuel@gmail.com</div></div></div>
+        <div class="cinfo"><div class="cic" style="background:rgba(245,200,66,.08)">📧</div><div><div class="cil">EMAIL</div><div class="civ"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ceaaafa0adafa3afa0bbaba28ea9a3afa7a2e0ada1a3">[email&#160;protected]</a></div></div></div>
         <div class="card" style="background:rgba(0,229,160,.03)"><div class="ct" style="font-size:11px">💳 PAGAMENTOS</div>
           <div style="display:flex;flex-direction:column;gap:8px">
             <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border2)"><div style="width:32px;height:32px;border-radius:4px;background:rgba(0,229,160,.12);display:flex;align-items:center;justify-content:center;font-size:16px">📱</div><div><div style="font-size:8px;color:var(--muted);font-family:var(--fh);letter-spacing:1px">M-PESA</div><div style="font-family:var(--fm);font-size:13px;color:var(--green)">840 330 540</div></div></div>
@@ -715,7 +765,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
 </div>
 
 <div id="toast"></div>
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 'use strict';
 /* ═══════════════════════════════════════════════════
    NELLY-G PRO — JavaScript v3.1
@@ -1218,16 +1268,85 @@ async function runAllSignals(){
 }
 
 /* ── INSIGHTS ── */
-const FOREX_PAIRS=[{sym:'EURUSD',label:'EUR/USD'},{sym:'GBPUSD',label:'GBP/USD'},{sym:'USDJPY',label:'USD/JPY'},{sym:'AUDUSD',label:'AUD/USD'},{sym:'USDCAD',label:'USD/CAD'},{sym:'USDCHF',label:'USD/CHF'}];
-const CRYPTO_PAIRS=[{sym:'BTCUSDT',label:'BTC/USD'},{sym:'ETHUSDT',label:'ETH/USD'},{sym:'BNBUSDT',label:'BNB/USD'},{sym:'SOLUSDT',label:'SOL/USD'},{sym:'XRPUSDT',label:'XRP/USD'},{sym:'ADAUSDT',label:'ADA/USD'}];
-const COMM_PAIRS=[{sym:'PAXGUSDT',label:'XAU/USD'},{sym:'SILVER',label:'XAG/USD'}];
-let _insTab='general';
-function swIns(tab,btn){_insTab=tab;document.querySelectorAll('[onclick^="swIns"]').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');buildInsightsFromCache();}
+const FOREX_PAIRS=[{sym:'EURUSD',label:'EUR/USD',icon:'€'},{sym:'GBPUSD',label:'GBP/USD',icon:'£'},{sym:'USDJPY',label:'USD/JPY',icon:'¥'},{sym:'AUDUSD',label:'AUD/USD',icon:'🦘'},{sym:'USDCAD',label:'USD/CAD',icon:'🍁'},{sym:'USDCHF',label:'USD/CHF',icon:'🇨🇭'}];
+const CRYPTO_PAIRS=[{sym:'BTCUSDT',label:'BTC/USD',icon:'₿'},{sym:'ETHUSDT',label:'ETH/USD',icon:'⟠'},{sym:'BNBUSDT',label:'BNB/USD',icon:'🟡'},{sym:'SOLUSDT',label:'SOL/USD',icon:'◎'},{sym:'XRPUSDT',label:'XRP/USD',icon:'✦'},{sym:'ADAUSDT',label:'ADA/USD',icon:'🔵'}];
+const COMM_PAIRS=[{sym:'PAXGUSDT',label:'XAU/USD',icon:'🥇'},{sym:'BTCUSDT',label:'BTC/USD',icon:'₿'}];
+let _insTab='general',_insLoading=false;
+
+function swIns(tab,btn){
+  _insTab=tab;
+  document.querySelectorAll('[onclick^="swIns"]').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const pairs=_insTab==='crypto'?CRYPTO_PAIRS:_insTab==='commodities'?COMM_PAIRS:FOREX_PAIRS;
+  const anyLoaded=pairs.some(p=>insightCache[p.sym]&&insightCache[p.sym].dir!=='HOLD'||insightCache[p.sym]);
+  if(!anyLoaded)loadInsightPairs(pairs);
+  else buildInsightsFromCache();
+}
 function setTF(btn){document.querySelectorAll('.tfb').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');buildInsightsFromCache();}
+
+async function loadInsightPairs(pairs){
+  if(_insLoading)return;_insLoading=true;
+  const g=document.getElementById('insights-grid');if(!g){_insLoading=false;return;}
+  g.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted);font-family:var(--fh);letter-spacing:2px"><div class="typing" style="justify-content:center"><span></span><span></span><span></span></div><div style="margin-top:8px;font-size:12px">A ANALISAR PARES...</div></div>`;
+  for(const p of pairs){
+    try{
+      let s;
+      if(p.sym.endsWith('USDT')){const cn=await fetchBin(p.sym,'4h',150);s=score(cn);}
+      else{const fxM={EURUSD:{fxBase:'EUR',fxQuote:'USD'},GBPUSD:{fxBase:'GBP',fxQuote:'USD'},USDJPY:{fxBase:'USD',fxQuote:'JPY'},AUDUSD:{fxBase:'AUD',fxQuote:'USD'},USDCAD:{fxBase:'USD',fxQuote:'CAD'},USDCHF:{fxBase:'USD',fxQuote:'CHF'}};const a=fxM[p.sym]||{fxBase:'EUR',fxQuote:'USD'};const cn=await fetchFrankfurter({...a,sym:p.sym,label:p.label});s=score(cn);}
+      insightCache[p.sym]={label:p.label,cat:_insTab,dir:s.dir,conf:(s.sc/10*100).toFixed(0),mst:s.mst,adx:s.adx,rsi:s.rsi,hatrend:s.hatrend,tech:s.tech,price:s.price,e9:s.e9,e21:s.e21};
+    }catch(e){insightCache[p.sym]={label:p.label,cat:_insTab,dir:'HOLD',conf:'—',mst:'RANGING',adx:0,rsi:50,hatrend:'NEUTRAL',price:0};}
+    buildInsightsFromCache();
+    await delay(400);
+  }
+  _insLoading=false;
+}
+
 function buildInsightsFromCache(){
   const g=document.getElementById('insights-grid');if(!g)return;
   const pairs=_insTab==='crypto'?CRYPTO_PAIRS:_insTab==='commodities'?COMM_PAIRS:FOREX_PAIRS;
-  g.innerHTML=pairs.map(p=>{const c=insightCache[p.sym];const dir=c?.dir||'HOLD',conf=c?.conf||'—',mst=c?.mst||'—',adxN=c?.adx||0;const isBuy=dir==='BUY',isSell=dir==='SELL';const abbr=p.label.replace('/','').slice(0,4);return`<div style="background:var(--bg2);border:1px solid ${isBuy?'rgba(0,229,160,0.2)':isSell?'rgba(255,77,109,0.2)':'var(--border2)'};border-radius:var(--r);padding:12px 14px;display:flex;align-items:center;gap:9px;transition:.2s"><div style="width:36px;height:36px;border-radius:50%;background:rgba(0,229,160,0.06);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:10px;color:var(--green);flex-shrink:0">${abbr}</div><div style="flex:1;min-width:0"><div style="font-family:var(--fh);font-size:12px;letter-spacing:1px">${p.label}</div><div style="font-size:9px;color:var(--muted);font-family:var(--fd)">${mst!=='—'?mst+' · ':''}${adxN>0?'ADX '+adxN.toFixed(0):'Aguardando...'}</div>${conf!=='—'?`<div style="font-size:9px;color:var(--muted)">Conf: ${conf}%</div>`:''}</div><span style="padding:3px 10px;border-radius:20px;font-family:var(--fh);font-size:10px;letter-spacing:1px;background:${isBuy?'rgba(0,229,160,0.15)':isSell?'rgba(255,77,109,0.15)':'rgba(245,200,66,0.1)'};color:${isBuy?'var(--green)':isSell?'var(--red)':'var(--gold)'};border:1px solid ${isBuy?'rgba(0,229,160,0.3)':isSell?'rgba(255,77,109,0.3)':'rgba(245,200,66,0.25)'}">${isBuy?'BULLISH':isSell?'BEARISH':'NEUTRAL'}</span></div>`;}).join('');
+  g.innerHTML=pairs.map(p=>{
+    const c=insightCache[p.sym];
+    const dir=c?.dir||'HOLD',conf=c?.conf||'—',mst=c?.mst||'—',adxN=c?.adx||0;
+    const rsi=c?.rsi||50,ha=c?.hatrend||'—',price=c?.price||0;
+    const isBuy=dir==='BUY',isSell=dir==='SELL';
+    const dc=isBuy?'var(--green)':isSell?'var(--red)':'var(--gold)';
+    const adxCol=adxN>=30?'var(--green)':adxN>=22?'var(--gold)':'var(--red)';
+    const rsiLbl=rsi<30?'OVERSOLD':rsi<45?'suporte':rsi>70?'OVERBOUGHT':rsi>55?'resistência':'neutro';
+    const mstIcon=mst==='BULLISH'?'↑':mst==='BEARISH'?'↓':'↔';
+    return`<div style="background:var(--bg2);border:1px solid ${isBuy?'rgba(0,229,160,0.25)':isSell?'rgba(255,77,109,0.25)':'var(--border2)'};border-radius:var(--r);padding:14px;transition:.2s;${isBuy?'box-shadow:0 0 10px rgba(0,229,160,0.06)':isSell?'box-shadow:0 0 10px rgba(255,77,109,0.06)':''}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:7px">
+          <div style="width:32px;height:32px;border-radius:50%;background:${isBuy?'rgba(0,229,160,0.1)':isSell?'rgba(255,77,109,0.1)':'rgba(255,255,255,0.04)'};border:1px solid ${isBuy?'rgba(0,229,160,0.3)':isSell?'rgba(255,77,109,0.3)':'var(--border2)'};display:flex;align-items:center;justify-content:center;font-size:14px">${p.icon||'📊'}</div>
+          <div>
+            <div style="font-family:var(--fh);font-size:13px;letter-spacing:1px">${p.label}</div>
+            ${price>0?`<div style="font-family:var(--fm);font-size:10px;color:var(--muted)">${price>=1?price.toFixed(4):price.toFixed(6)}</div>`:''}
+          </div>
+        </div>
+        <span style="padding:4px 12px;border-radius:20px;font-family:var(--fh);font-size:11px;letter-spacing:1px;background:${isBuy?'rgba(0,229,160,0.15)':isSell?'rgba(255,77,109,0.15)':'rgba(245,200,66,0.1)'};color:${dc};border:1px solid ${isBuy?'rgba(0,229,160,0.3)':isSell?'rgba(255,77,109,0.3)':'rgba(245,200,66,0.25)'}">
+          ${isBuy?'▲ BULLISH':isSell?'▼ BEARISH':'◆ NEUTRAL'}
+        </span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:7px">
+        <div style="background:rgba(0,0,0,0.25);border-radius:3px;padding:5px 7px;text-align:center">
+          <div style="font-size:7px;color:var(--muted);font-family:var(--fh);letter-spacing:1px">ADX</div>
+          <div style="font-family:var(--fm);font-size:11px;color:${adxCol}">${adxN>0?adxN.toFixed(0):'—'}</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.25);border-radius:3px;padding:5px 7px;text-align:center">
+          <div style="font-size:7px;color:var(--muted);font-family:var(--fh);letter-spacing:1px">RSI</div>
+          <div style="font-family:var(--fm);font-size:11px;color:${rsi<35?'var(--green)':rsi>65?'var(--red)':'var(--muted)'}">${rsi?rsi.toFixed(0):'—'}</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.25);border-radius:3px;padding:5px 7px;text-align:center">
+          <div style="font-size:7px;color:var(--muted);font-family:var(--fh);letter-spacing:1px">SMC</div>
+          <div style="font-family:var(--fm);font-size:11px;color:${mst==='BULLISH'?'var(--green)':mst==='BEARISH'?'var(--red)':'var(--gold)'}">${mstIcon} ${mst!=='—'?mst.slice(0,4):'—'}</div>
+        </div>
+      </div>
+      <div style="font-size:9px;color:var(--muted);font-family:var(--fd);line-height:1.5">
+        HA: <span style="color:${ha==='BULLISH'?'var(--green)':ha==='BEARISH'?'var(--red)':'var(--muted)'}">${ha}</span>
+        ${conf!=='—'?` · Conf: <span style="color:${dc}">${conf}%</span>`:''}
+        ${adxN>0?` · RSI: <span style="color:var(--muted)">${rsiLbl}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 /* ── TERMINAL ── */
@@ -1365,10 +1484,517 @@ function renderCTGrid(){
   g.innerHTML=traders.map(t=>`<div class="card" style="transition:.2s" onmouseover="this.style.borderColor='${t.col}'" onmouseout="this.style.borderColor='var(--border2)'"><div style="display:flex;align-items:center;gap:9px;margin-bottom:10px"><div style="width:40px;height:40px;border-radius:6px;background:${t.col};display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:18px;color:#000;flex-shrink:0">${t.init}</div><div><div style="font-family:var(--fh);font-size:13px;letter-spacing:1px">${t.flag} ${t.name}</div><div style="font-size:9px;color:var(--muted);font-family:var(--fd)">${t.loc} · ${t.type}</div></div><div style="margin-left:auto;font-size:8px;padding:2px 6px;border-radius:2px;background:rgba(255,255,255,0.05);color:${rc[t.risk]};font-family:var(--fh)">${t.risk}</div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:8px"><div style="background:rgba(0,0,0,.2);border-radius:3px;padding:8px;text-align:center"><div style="font-size:8px;color:var(--muted)">WIN RATE</div><div style="font-family:var(--fm);font-size:18px;color:${t.wr>=80?'var(--green)':t.wr>=70?'var(--gold)':'var(--red)'}">${t.wr}%</div></div><div style="background:rgba(0,0,0,.2);border-radius:3px;padding:8px;text-align:center"><div style="font-size:8px;color:var(--muted)">MÊS</div><div style="font-family:var(--fm);font-size:18px;color:var(--green)">${t.ret}</div></div><div style="background:rgba(0,0,0,.2);border-radius:3px;padding:8px;text-align:center"><div style="font-size:8px;color:var(--muted)">TOTAL</div><div style="font-family:var(--fm);font-size:16px;color:var(--blue)">${t.gain}</div></div></div><div style="height:4px;background:rgba(255,255,255,.05);border-radius:2px;margin-bottom:8px"><div style="height:100%;width:${t.wr}%;background:${t.col};border-radius:2px"></div></div><div style="font-size:10px;color:var(--muted);margin-bottom:8px;font-family:var(--fd)">DD: ${t.dd} · ${t.trades} trades</div><button class="btn-p" style="width:100%;font-size:12px;padding:8px" onclick="openModal('Copy ${t.name}','499 MT/mês')">SEGUIR →</button></div>`).join('');
 }
 
-/* ── CURRICULUM ── */
-const CURRICULUM=[{lv:0,title:'Fundamentos do Trading & Mercados',free:true},{lv:1,title:'Forex Market Basics',free:false},{lv:2,title:'Technical Analysis — Beginner',free:false},{lv:3,title:'Technical Analysis — Intermediate',free:false},{lv:4,title:'Fundamental Analysis',free:false},{lv:5,title:'Risk & Money Management + Kelly Criterion',free:false},{lv:6,title:'SMC — Smart Money Concepts',free:false},{lv:7,title:'ICT — Inner Circle Trader Concepts',free:false},{lv:8,title:'ADX & Advanced Trend Analysis',free:false},{lv:9,title:'Heikin Ashi & Candle Patterns',free:false},{lv:10,title:'Automated Trading & Algo Systems',free:false},{lv:11,title:'AI in Trading — Machine Learning',free:false}];
-function renderCurriculum(){const c=document.getElementById('curriculum');if(!c)return;c.innerHTML=CURRICULUM.map((l,i)=>`<div class="lc-item ${l.free?'active':''}" onclick="openLesson(${i})"><div class="lc-lv"><span>Level ${l.lv}</span>${!l.free?'<span style="color:var(--red);font-size:10px">🔒</span><span class="pro-badge">PRO</span>':'<span style="color:var(--green);font-size:10px">✓</span>'}</div><div class="lc-title">${l.title}</div></div>`).join('');}
-function openLesson(i){const l=CURRICULUM[i];document.querySelectorAll('.lc-item').forEach((el,j)=>el.classList.toggle('active',j===i));document.getElementById('lesson-title').textContent='LEVEL '+l.lv+' — '+l.title.toUpperCase();document.getElementById('learn-q').value='Explica Level '+l.lv+': "'+l.title+'". Inclui conceitos-chave, exemplos com EUR/USD ou BTC, e como aplicar no NELLY-G PRO.';learnQ();}
+/* ── NEWS & ECONOMIC CALENDAR ── */
+const NEWS_EVENTS=[
+  {day:'Seg',date:'Hoje',time:'—',impact:'BAIXO',cat:'all',name:'Abertura Mercados Europeus',prev:'—',fore:'—',
+   narrative:'Início da sessão de Londres. Spreads normalizam após o fim de semana. Atenção aos gaps de abertura no EUR/USD e GBP/USD.',
+   assets:[{s:'EUR/USD',i:'Neutro',col:'var(--muted)'},{s:'GBP/USD',i:'Neutro',col:'var(--muted)'}]},
+  {day:'3ª',date:'Esta semana',time:'14:30 UTC',impact:'ALTO',cat:'forex',name:'US CPI MoM (Inflação)',prev:'0.3%',fore:'0.2%',
+   narrative:'O CPI abaixo do esperado (0.2% vs 0.3%) pode indicar que a inflação está a arrefecer mais rápido que o previsto, dando ao Fed mais espaço para cortar taxas. USD poderia enfraquecer, favorecendo EUR/USD BUY e XAU/USD BUY.',
+   assets:[{s:'EUR/USD',i:'BULLISH se < prev',col:'var(--green)'},{s:'USD/JPY',i:'BEARISH se < prev',col:'var(--red)'},{s:'XAU/USD',i:'BULLISH se < prev',col:'var(--green)'},{s:'BTC/USD',i:'BULLISH',col:'var(--green)'}]},
+  {day:'4ª',date:'Esta semana',time:'20:00 UTC',impact:'ALTO',cat:'forex',name:'FOMC Minutes',prev:'—',fore:'—',
+   narrative:'Actas da última reunião do Fed. Mercados analisam o tom (hawkish/dovish) e pistas sobre futuros cortes. Tom dovish → USD fraco, Ouro forte. Tom hawkish → USD forte, Ouro fraco. Volatilidade elevada nas 2h seguintes.',
+   assets:[{s:'EUR/USD',i:'Alta volatilidade',col:'var(--gold)'},{s:'XAU/USD',i:'Alta volatilidade',col:'var(--gold)'},{s:'BTC/USD',i:'Moderado',col:'var(--muted)'}]},
+  {day:'5ª',date:'Esta semana',time:'14:30 UTC',impact:'MÉDIO',cat:'forex',name:'US Jobless Claims',prev:'210K',fore:'215K',
+   narrative:'Pedidos de subsídio de desemprego. Um número acima do esperado (mais desempregados) enfraquece o USD. Importante como leading indicator para o NFP de sexta-feira.',
+   assets:[{s:'USD/JPY',i:'BEARISH se > prev',col:'var(--red)'},{s:'EUR/USD',i:'BULLISH se > prev',col:'var(--green)'}]},
+  {day:'6ª',date:'Esta semana',time:'14:30 UTC',impact:'MUITO ALTO',cat:'forex',name:'NFP — Non-Farm Payrolls',prev:'175K',fore:'180K',
+   narrative:'⚡ O evento mais importante do calendário económico mensal. Mede criação de empregos nos EUA (excluindo agricultura). NFP forte (> previsão) → USD SOBE → EUR/USD cai, XAU cai. NFP fraco → USD CAI → EUR/USD sobe, XAU sobe. EVITE abrir trades 30 min antes e durante o evento.',
+   assets:[{s:'EUR/USD',i:'MOVE ±80 pips',col:'var(--gold)'},{s:'GBP/USD',i:'MOVE ±60 pips',col:'var(--gold)'},{s:'XAU/USD',i:'MOVE ±30 USD',col:'var(--gold)'},{s:'USD/JPY',i:'MOVE ±80 pips',col:'var(--gold)'},{s:'BTC/USD',i:'MOVE moderado',col:'var(--muted)'}]},
+  {day:'Sem. que vem',date:'Próxima semana',time:'13:00 UTC',impact:'ALTO',cat:'forex',name:'BCE — Decisão de taxa de juro',prev:'3.65%',fore:'3.40%',
+   narrative:'O BCE está num ciclo de cortes. Se cortarem 25bp para 3.40%, o EUR pode cair inicialmente mas depois recuperar se a comunicação for "hawkish". Lagarde (presidente BCE) normalmente envia sinais nas semanas anteriores.',
+   assets:[{s:'EUR/USD',i:'BEARISH se cortar',col:'var(--red)'},{s:'EUR/GBP',i:'BEARISH',col:'var(--red)'},{s:'XAU/EUR',i:'BULLISH',col:'var(--green)'}]},
+  {day:'Sem. que vem',date:'Próxima semana',time:'07:00 UTC',impact:'MÉDIO',cat:'forex',name:'UK CPI (Inflação UK)',prev:'2.2%',fore:'2.1%',
+   narrative:'Inflação do Reino Unido. Dados abaixo do esperado aumentam a probabilidade de cortes do Banco de Inglaterra (BoE), o que enfraquece a GBP.',
+   assets:[{s:'GBP/USD',i:'BEARISH se < prev',col:'var(--red)'},{s:'EUR/GBP',i:'BULLISH se < prev',col:'var(--green)'}]},
+  {day:'Mensal',date:'1ª 6ª feira',time:'14:30 UTC',impact:'MUITO ALTO',cat:'crypto',name:'BTC ETF Flows',prev:'$480M',fore:'—',
+   narrative:'Os fluxos nos ETFs de Bitcoin (BlackRock IBIT, Fidelity FBTC) são um indicador chave de sentimento institucional. Fluxos positivos elevados → BTC SOBE. Semanas de saídas → BTC pode cair.',
+   assets:[{s:'BTC/USD',i:'BULLISH se entradas > $200M',col:'var(--green)'},{s:'ETH/USD',i:'Correlacionado',col:'var(--green)'}]},
+];
+
+let _newsFilter='all';
+function fNews(btn,f){document.querySelectorAll('[onclick^="fNews"]').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');_newsFilter=f;renderNews();}
+function renderNews(){
+  const list=document.getElementById('news-list');if(!list)return;
+  const data=NEWS_EVENTS.filter(e=>_newsFilter==='all'||e.cat===_newsFilter);
+  const ic={'MUITO ALTO':'var(--red)','ALTO':'var(--gold)','MÉDIO':'var(--blue)','BAIXO':'var(--muted)'};
+  const bg={'MUITO ALTO':'rgba(255,77,109,0.08)','ALTO':'rgba(245,200,66,0.06)','MÉDIO':'rgba(56,189,248,0.05)','BAIXO':'rgba(255,255,255,0.02)'};
+  list.innerHTML=data.map((e,i)=>`
+    <div style="border-bottom:1px solid var(--border2);padding:14px 0" id="news-${i}">
+      <div style="display:grid;grid-template-columns:90px 90px 1fr auto;gap:12px;align-items:center;cursor:pointer" onclick="toggleNews(${i})">
+        <div>
+          <div style="font-family:var(--fm);font-size:10px;color:var(--muted)">${e.day}</div>
+          <div style="font-size:9px;color:var(--muted);font-family:var(--fd)">${e.time}</div>
+        </div>
+        <span style="font-size:10px;padding:3px 8px;border-radius:3px;background:${bg[e.impact]};color:${ic[e.impact]};font-family:var(--fh);letter-spacing:.5px;text-align:center">${e.impact}</span>
+        <div>
+          <div style="font-size:12px;font-weight:600;font-family:var(--fd)">${e.name} <span style="color:var(--muted);font-size:10px">(${e.time})</span></div>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--fm);margin-top:2px">Ant: ${e.prev} · Prev: ${e.fore}</div>
+        </div>
+        <span style="font-size:12px;color:var(--muted);transition:.2s" id="news-arrow-${i}">▼</span>
+      </div>
+      <div id="news-detail-${i}" style="display:none;margin-top:10px;padding:12px;background:rgba(0,0,0,.2);border-radius:var(--r);border-left:3px solid ${ic[e.impact]}">
+        <div style="font-size:11px;line-height:1.9;color:var(--text);font-family:var(--fd);margin-bottom:10px">${e.narrative}</div>
+        <div style="font-size:9px;color:var(--muted);font-family:var(--fh);letter-spacing:1px;margin-bottom:6px">IMPACTO ESPERADO POR ACTIVO:</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${e.assets.map(a=>`<span style="font-size:10px;padding:2px 8px;border-radius:3px;background:rgba(255,255,255,0.04);color:${a.col};font-family:var(--fd);border:1px solid rgba(255,255,255,0.06)">${a.s}: ${a.i}</span>`).join('')}
+        </div>
+      </div>
+    </div>`).join('');
+
+  // Asset impact summary
+  const ai=document.getElementById('news-asset-impact');if(!ai)return;
+  const assetMap={};data.forEach(e=>e.assets.forEach(a=>{if(!assetMap[a.s])assetMap[a.s]={s:a.s,events:[],bullish:0,bearish:0};assetMap[a.s].events.push({ev:e.name,i:a.i,col:a.col});if(a.col==='var(--green)')assetMap[a.s].bullish++;if(a.col==='var(--red)')assetMap[a.s].bearish++;}));
+  ai.innerHTML=Object.values(assetMap).map(a=>{const bias=a.bullish>a.bearish?'BULLISH':a.bearish>a.bullish?'BEARISH':'MISTO';const bc=bias==='BULLISH'?'var(--green)':bias==='BEARISH'?'var(--red)':'var(--gold)';return`<div style="background:rgba(0,0,0,.2);border:1px solid var(--border2);border-radius:3px;padding:10px"><div style="font-family:var(--fh);font-size:12px;letter-spacing:1px;margin-bottom:4px">${a.s}</div><div style="font-size:10px;padding:2px 7px;border-radius:2px;display:inline-block;margin-bottom:6px;background:rgba(255,255,255,0.04);color:${bc};font-family:var(--fh)">${bias}</div><div style="font-size:9px;color:var(--muted);font-family:var(--fd);line-height:1.6">${a.events.slice(0,2).map(e=>`<span style="color:${e.col}">▸ ${e.ev.slice(0,18)}…</span>`).join('<br>')}</div></div>`;}).join('');
+}
+function toggleNews(i){const d=document.getElementById('news-detail-'+i),a=document.getElementById('news-arrow-'+i);if(!d)return;const open=d.style.display==='block';d.style.display=open?'none':'block';if(a)a.textContent=open?'▼':'▲';}
+
+const CURRICULUM=[
+  {lv:0,title:'Fundamentos do Trading & Mercados',free:true,emoji:'📊',content:`
+**O que é Trading?**
+Trading é a compra e venda de activos financeiros (forex, acções, crypto, commodities) com o objectivo de obter lucro com as variações de preço.
+
+**Mercados principais:**
+• 🌐 **Forex** — O maior mercado do mundo ($7.5 TRILHÕES/dia). Pares como EUR/USD, GBP/USD, USD/JPY.
+• 📈 **Acções** — Participação em empresas (Apple, Tesla, NVIDIA)
+• 🪙 **Crypto** — Bitcoin, Ethereum, Solana — mercado 24/7
+• 🥇 **Commodities** — Ouro (XAU/USD), Petróleo (WTI)
+
+**Como funciona o NELLY-G PRO:**
+O motor analisa 17 componentes técnicos (EMA, RSI, MACD, ADX, Heikin Ashi, SMC, ICT, VWAP, etc.) e gera um score de confiança. Quando o score supera o threshold mínimo E o ADX confirma tendência, é gerado um sinal BUY ou SELL com TP1, TP2, TP3 e SL definidos.
+
+**Conceitos essenciais:**
+• **Bull market** — Tendência de alta (preço sobe)
+• **Bear market** — Tendência de queda (preço desce)  
+• **Liquidez** — Facilidade de comprar/vender sem mover o preço
+• **Spread** — Diferença entre preço de compra e venda (custo oculto)
+• **Pip** — Menor movimento de preço (0.0001 no EUR/USD)
+• **Lote** — Tamanho da posição (0.01 lote = micro lote)
+
+**Sessões de trading:**
+• 🇬🇧 **LONDON** 07:00–16:00 UTC — Maior volatilidade no Forex
+• 🗽 **NEW YORK** 12:00–21:00 UTC — NFP, CPI, dados macro
+• 🇯🇵 **ASIA** 22:00–07:00 UTC — JPY, XAU mais activos
+• **Overlap London+NY** 12:00–16:00 UTC — ⭐ MELHOR hora para operar`},
+  {lv:1,title:'Forex Market Basics',free:false,emoji:'🌐',content:`
+**O que é Forex?**
+Foreign Exchange — mercado global de câmbio de moedas. Opera 24h/5 dias por semana (fecha fim de semana).
+
+**Pares de moedas:**
+• **Majors** (mais líquidos): EUR/USD, GBP/USD, USD/JPY, USD/CHF, AUD/USD, USD/CAD
+• **Minors**: EUR/GBP, EUR/JPY, GBP/JPY
+• **Exóticos**: USD/ZAR, USD/MXN (alto spread, evite para começar)
+
+**Como ler um par:**
+EUR/USD = 1.0850
+• EUR = moeda BASE (a que você compra/vende)
+• USD = moeda COTAÇÃO (em que o preço é expresso)
+• Se você acredita que EUR vai subir vs USD → **BUY EUR/USD**
+
+**Factores que movem o Forex:**
+1. 🏛 Taxas de juro (Fed, BCE, BoE, BoJ) — O MAIS IMPORTANTE
+2. 📊 Inflação (CPI, PCE) — Afecta política monetária
+3. 💼 Emprego (NFP, Jobless Claims) — Saúde económica
+4. 📈 PIB / Crescimento — Força da economia
+5. 🌍 Sentimento de risco (risk-on/risk-off)
+
+**Risk-on vs Risk-off:**
+• **Risk-ON** → investidores confiantes → compram EUR, AUD, NZD, crypto → vendem USD, JPY, CHF
+• **Risk-OFF** → medo no mercado → compram USD, JPY, CHF, OURO → vendem EUR, AUD, crypto
+
+**Como o NELLY-G usa isso:**
+O motor usa ECB Frankfurter API para dados diários de forex e aplica o Score Engine v3 com 17 indicadores. Para forex, o ADX threshold é ligeiramente mais alto (22 mínimo) porque forex tem menos volatilidade que crypto.`},
+  {lv:2,title:'Technical Analysis — Beginner',free:false,emoji:'📐',content:`
+**O que é Análise Técnica?**
+Estudo de gráficos de preços para prever movimentos futuros com base em padrões históricos. Baseia-se na ideia de que "o preço desconta tudo".
+
+**Tipos de gráficos:**
+• **Linha** — Simples, mostra apenas o preço de fecho
+• **Barras (OHLC)** — Open, High, Low, Close
+• **Candlestick** ← NELLY-G usa este — Mais informação visual
+
+**Leitura de candlestick:**
+\`\`\`
+     │ ← sombra superior (high)
+  ┌──┤
+  │  │ ← CORPO
+  └──┤
+     │ ← sombra inferior (low)
+\`\`\`
+• Vela VERDE (bullish): Fecho > Abertura → compradores ganharam
+• Vela VERMELHA (bearish): Fecho < Abertura → vendedores ganharam
+
+**Padrões básicos no NELLY-G:**
+• **Heikin Ashi** (3 velas consecutivas da mesma cor) → confirmação de tendência
+• **Engolfo bullish** → vela verde grande engole vela vermelha → reversão para cima
+• **Doji** → indecisão → aguardar confirmação
+
+**Suporte & Resistência:**
+• **Suporte** — Nível onde o preço tende a parar de cair (compradores entram)
+• **Resistência** — Nível onde o preço tende a parar de subir (vendedores entram)
+
+**Como usar no NELLY-G:**
+O NELLY-G identifica automaticamente Order Blocks (zonas de suporte/resistência institucionais) e marca-os nos sinais. Quando o preço está num Order Block BULL + sinal BUY → entrada de alta qualidade.`},
+  {lv:3,title:'Technical Analysis — Intermediate',free:false,emoji:'📈',content:`
+**Indicadores no NELLY-G PRO (17 componentes):**
+
+**1. EMA (Exponential Moving Average)**
+Médias móveis exponenciais — dão mais peso aos preços recentes.
+• EMA 9 > EMA 21 > EMA 50 → TENDÊNCIA BULLISH FORTE (3 pontos no score)
+• EMA 9 < EMA 21 < EMA 50 → TENDÊNCIA BEARISH FORTE
+• Golden Cross (EMA9 cruza EMA21 de baixo para cima) → sinal de compra
+
+**2. RSI (Relative Strength Index)**
+Oscilador de 0 a 100 que mede velocidade/magnitude das variações:
+• RSI < 30 → SOBREVENDA → potencial compra (+1.5 no score)
+• RSI > 70 → SOBRECOMPRA → potencial venda
+• RSI 45–55 → zona neutra
+
+**3. MACD (Moving Average Convergence Divergence)**
+• Histograma positivo e crescente → bullish momentum
+• Histograma negativo e crescente → bearish momentum a enfraquecer
+
+**4. Bollinger Bands**
+• Preço toca banda inferior → possível compra
+• Preço toca banda superior → possível venda
+• Bandas largas → alta volatilidade
+• Bandas estreitas → compressão → explosão iminente
+
+**5. Stochastic %K**
+• %K < 20 → sobrevenda
+• %K > 80 → sobrecompra
+
+**6. VWAP (Volume Weighted Average Price)**
+• Preço acima do VWAP → viés comprador (institucional)
+• Preço abaixo do VWAP → viés vendedor
+
+**Multi-Timeframe no NELLY-G:**
+O motor analisa 3 timeframes (15m + 1h + 4h para intraday). Só gera sinal quando PELO MENOS 2 dos 3 TFs concordam na mesma direcção. Isto reduz drasticamente os false signals.`},
+  {lv:4,title:'Fundamental Analysis',free:false,emoji:'🌍',content:`
+**O que é Análise Fundamental?**
+Avaliação do valor real de um activo com base em dados económicos, políticas monetárias e eventos geopolíticos.
+
+**Os 3 dados macro mais importantes para Forex:**
+
+**1. NFP (Non-Farm Payrolls)** — ⭐⭐⭐ MAIS IMPORTANTE
+• Publicado toda 1ª 6ª feira do mês, 14:30 UTC
+• Mede criação de emprego nos EUA (excl. agricultura)
+• NFP > esperado → USD SOBE → EUR/USD, GBP/USD CAEM
+• NFP < esperado → USD CAI → EUR/USD, GBP/USD SOBEM
+• ⚠️ NELLY-G bloqueia sinais automáticos 15 min antes do NFP
+
+**2. CPI (Consumer Price Index) — Inflação**
+• Publicado mensalmente, 14:30 UTC
+• CPI > esperado → inflação alta → Fed pode subir taxas → USD FORTE
+• CPI < esperado → desinflação → Fed pode cortar → USD FRACO
+
+**3. FOMC (Federal Open Market Committee)**
+• Reuniões a cada 6 semanas
+• Decisão de taxa de juro → move TODOS os mercados
+• Aumento de taxas → USD FORTE, Ouro FRACO, Crypto FRACO
+• Redução de taxas → USD FRACO, Ouro FORTE, Crypto FORTE
+
+**Impacto no XAU/USD (Ouro):**
+• Ouro é inversamente correlacionado com USD e taxas reais
+• Taxas reais negativas → Ouro SOBE
+• USD Index (DXY) SOBE → Ouro DESCE
+
+**Como o NELLY-G integra fundamental:**
+A página "Análise Macro IA" usa Claude AI com web_search para analisar os dados mais recentes do Fed/BCE/NFP/CPI em tempo real e gerar um bias direcional baseado no contexto macro actual.`},
+  {lv:5,title:'Risk & Money Management + Kelly Criterion',free:false,emoji:'🛡️',content:`
+**A REGRA MAIS IMPORTANTE DO TRADING:**
+> "Não é sobre quanto você ganha — é sobre quanto você NÃO PERDE"
+
+**Regras de gestão de risco no NELLY-G PRO:**
+
+**1. Risco por trade: máximo 1-2% do capital**
+Se tem $1000, arrisque no máximo $10-20 por trade.
+Mesmo com 10 perdas consecutivas, ainda tem $800-900.
+
+**2. Kelly Criterion (implementado no NELLY-G)**
+Fórmula: Kelly% = W - (1-W)/R
+Onde W = win rate estimado, R = odds (R:R ratio = 3.5)
+• Kelly real = Kelly * 0.5 (half-Kelly — mais conservador)
+• Limitado a 2% máximo no NELLY-G
+
+**3. Stop Loss obrigatório**
+O NELLY-G gera SL automático baseado no ATR (Average True Range).
+SL = distância mínima necessária para dar "espaço" ao trade.
+NUNCA mova o SL para aumentar a perda — isso destrói contas.
+
+**4. Breakeven (implementado no EA v3)**
+Quando o preço atinge 50% do TP1, o EA move o SL para o preço de entrada.
+Resultado: trade sem risco mesmo que o mercado reverta.
+
+**5. R:R Ratio (Risk:Reward)**
+NELLY-G usa R:R 1:3.5 — por cada $1 arriscado, objetivo de $3.50 de lucro.
+Com apenas 30% de win rate, ainda é lucrativo!
+• 30% win rate × 3.5R = break-even
+• 60% win rate × 3.5R = very profitable
+
+**6. Maximum Drawdown**
+Estabeleça um limite (ex: -15% do capital total).
+Se atingir, PARE de operar por 1 semana.
+
+**Calculadora rápida:**
+Capital: $1000 | Risco: 1% = $10
+SL: 50 pips → Lote: $10 ÷ (50 × $1/pip) = 0.20 lotes
+TP1: 50 pips → Lucro: $20 (R:R 1:2)
+TP3: 175 pips → Lucro: $70 (R:R 1:7)`},
+  {lv:6,title:'SMC — Smart Money Concepts',free:false,emoji:'🏦',content:`
+**O que é SMC?**
+Smart Money Concepts (SMC) é uma metodologia que analisa como o "dinheiro inteligente" (bancos, fundos, instituições) move o mercado para coletar liquidez antes de mover na direcção real.
+
+**Conceitos chave implementados no NELLY-G:**
+
+**1. Market Structure (Estrutura de Mercado)**
+• **HH/HL (Higher High / Higher Low)** → BULLISH — mercado fazendo máximos e mínimos progressivamente mais altos
+• **LH/LL (Lower High / Lower Low)** → BEARISH
+• **ChoCH (Change of Character)** → A estrutura muda — sinal de possível reversão
+• **BOS (Break of Structure)** → Confirmação de continuação
+
+**2. Order Blocks (OB)**
+Zonas onde instituições colocaram grandes ordens. O preço tende a voltar a elas.
+• **Bullish OB** → Última vela bearish ANTES de um impulso bullish forte
+• **Bearish OB** → Última vela bullish ANTES de um impulso bearish forte
+• NELLY-G identifica OBs e adiciona +0.8 ao score quando o preço está na zona
+
+**3. Liquidity Sweep**
+Instituições "varrem" os stops dos traders de varejo antes de mover na direcção real.
+• Sweep de lows → coleta stops de comprados → depois SOBE (sinal bullish)
+• Sweep de highs → coleta stops de vendidos → depois DESCE (sinal bearish)
+• NELLY-G detecta sweeps e adiciona +1.0 ao score
+
+**4. Fair Value Gap (FVG) / Imbalance**
+Zonas onde o preço se moveu tão rápido que criou um "vazio" — o preço tende a preencher.
+• FVG bullish → zona de suporte potencial
+• FVG bearish → zona de resistência potencial
+
+**5. Displacement**
+Impulso forte (engolfo de 3+ velas) com alto volume → movimento institucional real.
+NELLY-G detecta displacement e adiciona +0.8 ao score.
+
+**6. POC (Point of Control)**
+Volume Profile — nível onde mais volume foi negociado. Actua como ímã de preços.
+• Preço acima do POC → suporte abaixo
+• Preço abaixo do POC → resistência acima`},
+  {lv:7,title:'ICT — Inner Circle Trader Concepts',free:false,emoji:'🔷',content:`
+**O que é ICT?**
+Inner Circle Trader é uma metodologia avançada de Michael J. Huddleston que explica como o mercado é manipulado institucionalmente.
+
+**3 conceitos ICT no NELLY-G:**
+
+**1. Displacement (já em SMC)**
+Movimento brusco e impulsivo que mostra intenção institucional real.
+
+**2. Fair Value Gap (FVG)**
+Quando uma vela 3 não preenche o gap entre a vela 1 e 3:
+\`\`\`
+Vela 1: Low = 1.0800
+Vela 2: Grande (engolfo)
+Vela 3: High = 1.0810
+FVG = zona de 1.0800 a 1.0810 (imbalance)
+\`\`\`
+O preço TENDE a voltar a preencher o FVG antes de continuar.
+
+**3. Liquidity Sweep**
+"Stop Hunt" institucional. Os grandes players sabem onde estão os stops:
+• Acima de máximos anteriores (stops de vendedores)
+• Abaixo de mínimos anteriores (stops de compradores)
+Eles empurram o preço para esses níveis → colectam stops → invertem.
+
+**Modelo de entrada ICT no NELLY-G:**
+1. Identificar tendência principal (4H ou 1D)
+2. Aguardar liquidity sweep (varrer stops)
+3. Verificar FVG + displacement no TF inferior
+4. Entrar com confirmação multi-timeframe
+5. SL abaixo do swing low (BUY) ou acima do swing high (SELL)
+
+**Sessões ICT (Kill Zones):**
+• **London Kill Zone** 07:00–09:00 UTC → melhor para EUR/GBP
+• **NY Kill Zone** 13:00–15:00 UTC → melhor para USD/Gold
+• **Asian Range** → define o range que será varrido em London
+
+**NELLY-G integração:**
+Todos estes 3 conceitos ICT estão implementados no Score Engine v3. Quando displacement + FVG + liquidity sweep concordam na mesma direcção, adiciona até +2.3 pontos ao score, elevando confiança para 65–85%.`},
+  {lv:8,title:'ADX & Advanced Trend Analysis',free:false,emoji:'📐',content:`
+**ADX (Average Directional Index)**
+Desenvolvido por J. Welles Wilder. Mede a FORÇA da tendência (não a direcção).
+
+**Interpretação:**
+• ADX < 15 → Sem tendência (evite trades direccionais)
+• ADX 15–22 → Tendência fraca (NELLY-G usa multiplicador 0.65×)
+• ADX 22–30 → Tendência moderada (multiplicador 1.0×)
+• ADX > 30 → Tendência FORTE (multiplicador 1.25×) ← MELHOR para entrar
+• ADX > 50 → Tendência muito forte (exaustão possível)
+
+**DI+ e DI- (Directional Indicators):**
+• DI+ > DI- → Pressão compradora → contexto BULLISH
+• DI- > DI+ → Pressão vendedora → contexto BEARISH
+• Cruzamento DI+/DI- → Possível mudança de tendência
+
+**Como o NELLY-G usa ADX:**
+1. ADX < 22 → Threshold sobe para 7.5 (mais difícil gerar sinal)
+2. ADX ≥ 22 → Threshold normal (4.5–6.5 dependendo das EMAs)
+3. ADX ≥ 30 → Todos os scores multiplicados por 1.25
+4. DI+ > DI- e BUY → adiciona +0.5 ao score bull
+5. ADX < 18 → BACKTEST ignora completamente o trade
+
+**Heikin Ashi combinado com ADX:**
+A combinação mais poderosa do NELLY-G:
+• ADX > 30 + 3 velas HA consecutivas + DI+ > DI- → ⭐ SINAL PREMIUM
+• Conf típica: 65–80%
+• Win rate histórico: 78–88%
+
+**Tendências vs Ranges:**
+• Quando ADX < 20 → mercado em RANGE → use osciladores (RSI, Stoch)
+• Quando ADX > 25 → mercado em TENDÊNCIA → use EMAs, MACD, VWAP
+• NELLY-G adapta automaticamente o peso de cada indicador`},
+  {lv:9,title:'Heikin Ashi & Candle Patterns',free:false,emoji:'🕯️',content:`
+**Heikin Ashi — Velas Modificadas**
+"Heikin Ashi" = "média barra" em japonês. Suaviza o ruído do mercado.
+
+**Cálculo:**
+• HA-Close = (Open + High + Low + Close) / 4
+• HA-Open = (HA-Open anterior + HA-Close anterior) / 2
+• HA-High = máximo entre High, HA-Open, HA-Close
+• HA-Low = mínimo entre Low, HA-Open, HA-Close
+
+**Interpretação:**
+• 🟢 Vela HA VERDE sem sombra inferior = tendência bullish FORTE
+• 🔴 Vela HA VERMELHA sem sombra superior = tendência bearish FORTE
+• Vela com sombras dos dois lados = indecisão, possível reversão
+
+**Regra das 3 velas (implementada no NELLY-G):**
+3 velas HA consecutivas da mesma cor = confirmação de tendência.
+Adiciona +0.7 × strength ao score direcional.
+
+**Padrões de candlestick clássicos:**
+
+**Reversão BULLISH:**
+• **Hammer** (martelo) — sombra inferior longa, corpo pequeno no topo
+• **Bullish Engulfing** — vela verde grande engole completamente a vela vermelha
+• **Morning Star** — 3 velas: vermelha grande, doji/pequena, verde grande
+
+**Reversão BEARISH:**
+• **Shooting Star** — sombra superior longa, corpo pequeno em baixo
+• **Bearish Engulfing** — vela vermelha grande engole completamente a vela verde
+• **Evening Star** — oposto do Morning Star
+
+**Continuação:**
+• **Three White Soldiers** — 3 velas verdes consecutivas com closes progressivos
+• **Three Black Crows** — 3 velas vermelhas consecutivas
+• **Marubozu** — vela sem sombras (compradores/vendedores totalmente no controlo)
+
+**Tip NELLY-G:**
+Combine sempre HA com ADX > 22 e SMC direction. Uma vela HA isolada não é suficiente — precisa de contexto.`},
+  {lv:10,title:'Automated Trading & Algo Systems',free:false,emoji:'🤖',content:`
+**Trading Automatizado com NELLY-G PRO**
+
+**O ecossistema completo:**
+\`\`\`
+NELLY-G PRO (browser)
+      ↓ Sinal gerado
+auto_bridge.py (Python)
+      ↓ Escreve ficheiro
+nellygpro_signal.txt (MT5/Files)
+      ↓ EA lê a cada tick
+SniperSMC_EA.mq5 (MT5)
+      ↓ Executa ordem
+Broker (Exness, ICMarkets...)
+\`\`\`
+
+**SniperSMC_EA v3.0 — Funcionalidades:**
+• Auto-detecção de filling mode (FOK/IOC/RETURN)
+• Breakeven automático quando preço atinge 50% do TP1
+• Trailing Stop quando preço atinge 80% do TP1
+• Limite máximo de 3 trades abertos simultâneos
+• Anti-duplicado — não abre 2 trades no mesmo símbolo
+• Cálculo de lote baseado em % do saldo (Kelly Criterion)
+
+**auto_bridge.py — Funcionalidades:**
+• Modo AUTO: monitoriza clipboard — copie o sinal no NELLY-G e é enviado automaticamente
+• Modo MANUAL: escreva/cole o sinal directamente
+• Validação de R:R mínimo (1:1), SL máximo (5%)
+• Sufixo automático do broker (EURUSD → EURUSDm para Exness)
+• Log de todos os sinais enviados
+
+**Formato do sinal MT5:**
+\`\`\`
+SELL XAUUSDm 4630.15 4680.58 4579.72 4519.21 4568.83
+  ↑      ↑       ↑       ↑       ↑       ↑       ↑
+DIR   SYMBOL  ENTRY    SL      TP1     TP2     TP3
+\`\`\`
+
+**Gestão de risco no EA:**
+• RiskPercent = 1.0% (padrão — recomendado)
+• MaxLot = 2.0 (protecção contra lotes excessivos)
+• MaxOpenTrades = 3 (nunca mais de 3 posições abertas)
+
+**Instalação rápida:**
+1. MetaEditor → F4 → paste SniperSMC_EA.mq5 → F7 (compilar)
+2. Arrastar EA para gráfico XAUUSDm ou EURUSDm
+3. Activar "Allow algo trading" (botão verde no MT5)
+4. pip install colorama pyperclip → python auto_bridge.py`},
+  {lv:11,title:'AI in Trading — Machine Learning',free:false,emoji:'🧠',content:`
+**Inteligência Artificial no NELLY-G PRO**
+
+**Claude AI (Anthropic) — 3 casos de uso:**
+
+**1. Narrativas de sinais em tempo real**
+Cada sinal BUY/SELL recebe uma narrativa de 130 palavras explicando:
+• Por que este sinal agora (contexto de mercado)
+• A vantagem técnica principal (edge)
+• Gestão de risco específica para este trade
+
+**2. Análise Macro IA com web_search**
+Claude pesquisa na web em tempo real:
+• Últimas decisões do Fed/BCE
+• CPI/PCE mais recente
+• NFP e tendência do emprego
+• Sentimento de risco global
+Gera uma análise estruturada com impacto directo no activo seleccionado.
+
+**3. Professor IA — Academia interactiva**
+Responde a qualquer pergunta sobre trading, SMC, ICT, ADX, etc.
+Adapta a resposta ao nível do utilizador.
+
+**Machine Learning no Trading (avançado):**
+• **Random Forest** — classifica padrões de mercado
+• **LSTM (Long Short-Term Memory)** — séries temporais de preços
+• **Reinforcement Learning** — o agente aprende a operar por tentativa/erro
+• **Sentiment Analysis** — análise de notícias e tweets
+
+**Limitações do ML no trading:**
+• Overfitting — o modelo memoriza o passado mas falha no futuro
+• Non-stationarity — os mercados mudam de regime constantemente
+• Look-ahead bias — usar dados futuros acidentalmente no treino
+
+**Implementação prática com NELLY-G:**
+O Score Engine v3 é essencialmente um ensemble de regras heurísticas optimizadas — similar a um Random Forest manual. Os pesos de cada indicador foram calibrados empiricamente para maximizar o Sharpe Ratio nos backtests.
+
+**Próximos passos:**
+• Integração de sentiment analysis de notícias (RSS feeds)
+• Score adaptativo baseado no regime de mercado (trending vs ranging)
+• Optimização de parâmetros com algoritmos genéticos`}
+];
+
+function renderCurriculum(){
+  const c=document.getElementById('curriculum');if(!c)return;
+  c.innerHTML=CURRICULUM.map((l,i)=>`<div class="lc-item ${l.free?'active':''}" onclick="openLesson(${i})"><div class="lc-lv"><span>${l.emoji} Level ${l.lv}</span>${!l.free?'<span style="color:var(--red);font-size:10px">🔒</span><span class="pro-badge">PRO</span>':'<span style="color:var(--green);font-size:10px">✓</span>'}</div><div class="lc-title">${l.title}</div></div>`).join('');
+}
+function openLesson(i){
+  const l=CURRICULUM[i];
+  document.querySelectorAll('.lc-item').forEach((el,j)=>el.classList.toggle('active',j===i));
+  document.getElementById('lesson-title').textContent=l.emoji+' LEVEL '+l.lv+' — '+l.title.toUpperCase();
+  const wrap=document.getElementById('learn-ans'),ans=document.getElementById('learn-ans-text');
+  if(!wrap||!ans)return;wrap.style.display='block';
+  // Format the built-in content
+  const html=l.content.trim().replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>').replace(/```([^`]+)```/g,'<div style="background:rgba(0,0,0,.4);border:1px solid var(--border2);border-radius:3px;padding:10px;font-family:var(--fm);font-size:10px;margin:6px 0;white-space:pre">$1</div>');
+  ans.innerHTML=`<div style="font-size:10px;color:var(--purple);font-family:var(--fh);letter-spacing:1px;margin-bottom:8px">📚 CONTEÚDO LEVEL ${l.lv} — ${!l.free?'<span style="color:var(--gold)">PRO DESBLOQUEADO</span>':'<span style="color:var(--green)">GRATUITO</span>'}</div>${html}${apiKey&&!l.free?`<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border2)"><button onclick="learnQ()" style="background:var(--green);border:none;border-radius:4px;color:#000;padding:7px 14px;font-family:var(--fh);font-size:11px;cursor:pointer;letter-spacing:1px">✦ PERGUNTAR AO PROFESSOR IA →</button><div style="font-size:9px;color:var(--muted);margin-top:5px;font-family:var(--fd)">Faça perguntas específicas sobre este nível</div></div>`:''}`;
+  // Pre-fill question
+  document.getElementById('learn-q').value='Aprofunda o Level '+l.lv+' "'+l.title+'". Dá exemplos práticos com EUR/USD ou XAU/USD usando o NELLY-G PRO.';
+}
 
 /* ── MODALS ── */
 function openModal(plan,price){document.getElementById('modal-plan').textContent=plan.toUpperCase()+' — '+price.toUpperCase();document.getElementById('pay-amt').textContent=price;document.getElementById('pay-modal').classList.add('open');}
@@ -1379,7 +2005,19 @@ function openWhatsApp(){const plan=document.getElementById('modal-plan')?.textCo
 function connectMT5(){const login=document.getElementById('mt5-login')?.value,accept=document.getElementById('mt5-risk-accept')?.checked;if(!login){alert('Insira o Login ID MT5.');return;}if(!accept){alert('Aceite os riscos.');return;}showToast('✅ MT5 guardado!');}
 function connectBinance(){const k=document.getElementById('bin-apikey')?.value?.trim(),s=document.getElementById('bin-secret')?.value?.trim();if(!k||!s){alert('Insira API Key e Secret Key.');return;}showToast('✅ Binance API guardada!');}
 function sendContact(){const email=document.getElementById('cf-email')?.value?.trim(),msg=document.getElementById('cf-msg')?.value?.trim();if(!email||!msg){alert('Preencha todos os campos.');return;}const sub=document.getElementById('cf-sub')?.value||'Mensagem';window.location.href=`mailto:dancamanuel@gmail.com?subject=NELLY-G: ${encodeURIComponent(sub)}&body=${encodeURIComponent('Email: '+email+'\n\n'+msg)}`;}
-function sPeriod(btn){document.querySelectorAll('[onclick^="sPeriod"]').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');}
+function sPeriod(btn){
+  document.querySelectorAll('[onclick^="sPeriod"]').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const isAnnual=btn?.textContent?.includes('ANUAL');
+  const prices={FREE:{m:'0 MT',a:'0 MT'},PRO:{m:'499 MT',a:'399 MT'},ELITE:{m:'999 MT',a:'799 MT'}};
+  document.querySelectorAll('.pc').forEach(card=>{
+    const nameEl=card.querySelector('.pc-name');const priceEl=card.querySelector('.pc-price');
+    if(!nameEl||!priceEl)return;
+    const plan=nameEl.textContent.trim();const p=prices[plan];if(!p)return;
+    const val=isAnnual?p.a:p.m;
+    priceEl.innerHTML=`${val}<span>/mês</span>${isAnnual?'<div style="font-size:10px;color:var(--green);font-family:var(--fd);margin-top:2px">💰 Poupas 20% vs mensal</div>':''}`;
+  });
+}
 
 /* ── TICKER BAR ── */
 const TICK=[{p:'BTC/USD',d:2},{p:'ETH/USD',d:2},{p:'XAU/USD',d:2},{p:'EUR/USD',d:4},{p:'GBP/USD',d:4},{p:'BNB/USD',d:2},{p:'SOL/USD',d:2},{p:'XRP/USD',d:4}];
@@ -1392,11 +2030,22 @@ function doLogin(){loadSignals();document.getElementById('landing').style.displa
 function doLogout(){document.getElementById('app').classList.remove('visible');document.getElementById('landing').style.display='flex';}
 function openApiKey(){document.getElementById('apikey-modal').classList.add('open');document.getElementById('apikey-inp').value=apiKey;}
 function saveApiKey(){const k=document.getElementById('apikey-inp').value.trim();if(!k){alert('Insira uma chave válida');return;}apiKey=k;localStorage.setItem('ng_pro_key',k);document.getElementById('apikey-modal').classList.remove('open');const bar=document.getElementById('ai-status-bar');if(bar)bar.style.display='inline-flex';showToast('✅ IA Claude Activada!');}
-function navTo(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const pg=document.getElementById('page-'+id);if(pg)pg.classList.add('active');if(btn)btn.classList.add('active');}
+function navTo(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pg=document.getElementById('page-'+id);if(pg)pg.classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(id==='insights'){
+    const pairs=_insTab==='crypto'?CRYPTO_PAIRS:_insTab==='commodities'?COMM_PAIRS:FOREX_PAIRS;
+    const anyLoaded=pairs.some(p=>insightCache[p.sym]);
+    if(!anyLoaded)loadInsightPairs(pairs);
+    else buildInsightsFromCache();
+  }
+}
 
 /* ── INIT ── */
 function initApp(){
-  buildTicker();updateAssetList();renderCurriculum();renderCTGrid();
+  buildTicker();updateAssetList();renderCurriculum();renderCTGrid();renderNews();
   fetchMarketPrices();refreshSigHistTable();renderHistPage();buildInsightsFromCache();updateSessionChips();
   if(apiKey){const bar=document.getElementById('ai-status-bar');if(bar)bar.style.display='inline-flex';}
   setInterval(monitorSignals,90000);setInterval(fetchMarketPrices,60000);setInterval(updateSessionChips,60000);
@@ -1405,9 +2054,4 @@ function initApp(){
 
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('pay-modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('pay-modal'))closeModal();});
-  document.getElementById('apikey-modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('apikey-modal'))document.getElementById('apikey-modal').classList.remove('open');});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();document.getElementById('apikey-modal')?.classList.remove('open');}});
-});
-</script>
-</body>
-</html>
+  document.getElementById('apikey-modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('apikey-modal'))document.getEl
