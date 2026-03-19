@@ -269,6 +269,41 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
 .ar-sel{background:rgba(0,0,0,.4);border:1px solid var(--border2);border-radius:3px;color:var(--text);font-family:var(--fm);font-size:10px;padding:3px 7px;outline:none;cursor:pointer}
 .ar-status{font-size:9px;font-family:var(--fm);color:var(--muted);margin-left:auto}
 
+/* MT5 SERVER STATUS BAR */
+.mt5-bar{display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:var(--r);border:1px solid;margin-bottom:12px;flex-wrap:wrap;transition:.3s}
+.mt5-bar.connected{background:rgba(0,229,160,.05);border-color:rgba(0,229,160,.2)}
+.mt5-bar.disconnected{background:rgba(255,77,109,.05);border-color:rgba(255,77,109,.2)}
+.mt5-bar.checking{background:rgba(245,200,66,.05);border-color:rgba(245,200,66,.2)}
+.mt5-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.mt5-dot.on{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 1.5s infinite}
+.mt5-dot.off{background:var(--red)}
+.mt5-dot.wait{background:var(--gold);animation:pulse 1s infinite}
+.mt5-txt{font-family:var(--fh);font-size:10px;letter-spacing:1px}
+.mt5-sub{font-size:9px;color:var(--muted);font-family:var(--fd)}
+
+/* SEND TO MT5 BUTTON — on signal card */
+.btn-send-mt5{
+  width:100%;margin-top:6px;padding:8px;
+  background:linear-gradient(90deg,rgba(0,229,160,.15),rgba(56,189,248,.1));
+  border:1px solid rgba(0,229,160,.35);
+  border-radius:4px;color:var(--green);
+  font-family:var(--fh);font-size:11px;letter-spacing:1px;
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn-send-mt5:hover{background:rgba(0,229,160,.25);box-shadow:0 0 12px rgba(0,229,160,.2)}
+.btn-send-mt5.sending{opacity:.6;pointer-events:none}
+.btn-send-mt5.sent{background:rgba(0,229,160,.2);border-color:var(--green);color:var(--green)}
+.btn-send-mt5.error{background:rgba(255,77,109,.15);border-color:var(--red);color:var(--red)}
+
+/* AUTO SEND TOGGLE */
+.auto-send-wrap{display:flex;align-items:center;gap:7px;padding:6px 10px;background:rgba(0,0,0,.2);border-radius:3px;margin-top:6px;cursor:pointer}
+.toggle-sw{position:relative;width:32px;height:18px;flex-shrink:0}
+.toggle-sw input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:9px;transition:.2s;border:1px solid var(--border2)}
+.toggle-slider::before{content:'';position:absolute;width:12px;height:12px;left:2px;top:2px;background:var(--muted);border-radius:50%;transition:.2s}
+.toggle-sw input:checked+.toggle-slider{background:rgba(0,229,160,.3);border-color:var(--green)}
+.toggle-sw input:checked+.toggle-slider::before{transform:translateX(14px);background:var(--green)}
+
 #toast{position:fixed;bottom:22px;right:22px;background:var(--green);color:#000;padding:11px 18px;border-radius:6px;font-weight:700;font-size:12px;font-family:var(--fh);letter-spacing:1px;display:none;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.4)}
 #toast.err{background:var(--red);color:#fff}
 
@@ -385,7 +420,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
       </div>
     </div>
 
-    <!-- AUTO-REFRESH BAR (NOVO) -->
+    <!-- AUTO-REFRESH + MT5 BAR -->
     <div class="ar-bar">
       <span class="ar-lbl">🔄 AUTO-REFRESH:</span>
       <select class="ar-sel" id="ar-interval" onchange="setAutoRefresh()">
@@ -395,8 +430,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
         <option value="30">30 minutos</option>
         <option value="60">1 hora</option>
       </select>
-      <span style="font-size:9px;color:var(--muted);font-family:var(--fd)">· Actualiza automaticamente todos os sinais</span>
+      <label class="auto-send-wrap" title="Envia automaticamente cada sinal ao MT5 via servidor local">
+        <span class="toggle-sw"><input type="checkbox" id="auto-send-toggle" onchange="toggleAutoSend(this.checked)"><span class="toggle-slider"></span></span>
+        <span style="font-size:9px;color:var(--muted);font-family:var(--fh);letter-spacing:1px">AUTO-SEND MT5</span>
+      </label>
       <span class="ar-status" id="ar-status">—</span>
+    </div>
+
+    <!-- MT5 SERVER STATUS BAR -->
+    <div class="mt5-bar checking" id="mt5-status-bar">
+      <div class="mt5-dot wait" id="mt5-dot"></div>
+      <div style="flex:1">
+        <div class="mt5-txt" id="mt5-txt" style="color:var(--gold)">🔌 A verificar servidor MT5...</div>
+        <div class="mt5-sub" id="mt5-sub">Execute: <code style="font-family:var(--fm);font-size:9px;color:var(--green)">python mt5_server.py</code> no seu computador</div>
+      </div>
+      <button class="fb" onclick="checkMT5Server()" style="font-size:9px;padding:3px 10px">↺</button>
     </div>
 
     <div id="risk-guard" style="display:none;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.2);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;font-size:11px;color:var(--gold);font-family:var(--fh);letter-spacing:1px">
@@ -1014,6 +1062,9 @@ function addToSignalLog({asset,dir,priceRaw,conf,levels,icon,cat,src,adx,session
   sigLog=sigLog.slice(0,100);saveSignals();
   refreshSigHistTable();renderHistPage();
   const sc=document.getElementById('sig-count');if(sc)sc.textContent=sigLog.filter(s=>!s.finalOutcome).length;
+  // Auto-send ao MT5 se activado
+  if(dir!=='HOLD'&&levels)
+    autoSendIfEnabled(asset,dir,levels.entry,levels.sl,levels.tp1,levels.tp2||0,levels.tp3||0,conf,adx||0);
 }
 
 /* ── OUTCOME MONITOR ── */
@@ -1181,7 +1232,8 @@ function renderSignalCard(asset,dir,sc,price,levels,mtf,tech,fund,sent,holdMsg,a
         <div class="lv-cell" style="background:rgba(245,200,66,.04)"><div class="lv-lbl">⚖ BREAKEVEN</div><div class="lv-val" style="color:var(--gold)">${fmtP(be)}</div></div>
       </div>
       <div style="font-size:8px;color:var(--muted);margin-top:4px;font-family:var(--fm)">R:R ${levels.rr} · Kelly ${(kelly*100).toFixed(1)}% do capital</div>
-      <button class="btn-mt5" onclick="copySignalMT5(this,'${sym}','${dir}',${levels.entry},${levels.sl},${levels.tp1},${levels.tp2},${levels.tp3})">📋 COPIAR PARA MT5</button>`;
+      <button class="btn-mt5" onclick="copySignalMT5(this,'${sym}','${dir}',${levels.entry},${levels.sl},${levels.tp1},${levels.tp2},${levels.tp3})">📋 COPIAR PARA MT5</button>
+      <button class="btn-send-mt5" onclick="sendSignalToMT5(this,'${asset.label}','${dir}',${levels.entry},${levels.sl},${levels.tp1},${levels.tp2||0},${levels.tp3||0},'${conf}','${adxN.toFixed(0)}')">🚀 ENVIAR AO MT5</button>`;
   }
 
   el.innerHTML=`
@@ -2051,6 +2103,103 @@ function initApp(){
   setInterval(monitorSignals,90000);setInterval(fetchMarketPrices,60000);setInterval(updateSessionChips,60000);
   setAutoRefresh();
 }
+
+/* ══════════════════════════════════════════════════════════════
+   MT5 SERVER INTEGRATION
+   Comunica com mt5_server.py em localhost:5555
+══════════════════════════════════════════════════════════════ */
+
+const MT5_SERVER = 'http://localhost:5555';
+let _mt5Online = false;
+let _autoSend  = false;
+let _lastSentKey = '';
+
+/* Verificar se o servidor está activo */
+async function checkMT5Server(){
+  const bar=document.getElementById('mt5-status-bar');
+  const dot=document.getElementById('mt5-dot');
+  const txt=document.getElementById('mt5-txt');
+  const sub=document.getElementById('mt5-sub');
+  if(bar){bar.className='mt5-bar checking';dot.className='mt5-dot wait';txt.textContent='A verificar...';txt.style.color='var(--gold)';}
+  try{
+    const r=await fetch(MT5_SERVER+'/health',{signal:AbortSignal.timeout(2000)});
+    const d=await r.json();
+    _mt5Online=true;
+    if(bar) bar.className='mt5-bar connected';
+    if(dot) dot.className='mt5-dot on';
+    if(txt){txt.textContent='✅ Servidor MT5 activo — pronto para receber sinais';txt.style.color='var(--green)';}
+    if(sub) sub.textContent=d.mt5_ok?`MT5: ${(d.mt5_path||'').split('\\').slice(-3).join('\\')}`:'⚠️ MT5 não detectado — abra o MT5';
+    // Actualizar barra AI status
+    const aiBar=document.getElementById('ai-status-bar');
+    if(aiBar&&d.mt5_ok) aiBar.style.display='inline-flex';
+  }catch(e){
+    _mt5Online=false;
+    if(bar) bar.className='mt5-bar disconnected';
+    if(dot) dot.className='mt5-dot off';
+    if(txt){txt.textContent='🔴 Servidor MT5 offline — execute mt5_server.py';txt.style.color='var(--red)';}
+    if(sub) sub.innerHTML='Comando: <code style="font-family:var(--fm);font-size:9px;color:var(--green)">python mt5_server.py</code>';
+  }
+}
+
+/* Toggle AUTO-SEND */
+function toggleAutoSend(on){
+  _autoSend=on;
+  if(on&&!_mt5Online){
+    showToast('⚠️ Servidor MT5 offline! Execute mt5_server.py',true);
+    document.getElementById('auto-send-toggle').checked=false;
+    _autoSend=false;
+    return;
+  }
+  showToast(on?'✅ AUTO-SEND activado — sinais enviados automaticamente!':'AUTO-SEND desactivado');
+}
+
+/* Enviar sinal ao MT5 via servidor */
+async function sendSignalToMT5(btn, asset, dir, entry, sl, tp1, tp2, tp3, conf, adx){
+  if(!_mt5Online){
+    showToast('Servidor MT5 offline. Execute mt5_server.py',true);
+    return;
+  }
+  if(btn){btn.className='btn-send-mt5 sending';btn.textContent='⏳ A enviar...';}
+  try{
+    const r=await fetch(MT5_SERVER+'/send',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        direction:dir, symbol:asset.replace('/','').replace(' ',''),
+        entry:entry, sl:sl, tp1:tp1, tp2:tp2||0, tp3:tp3||0,
+        asset:asset, conf:conf, adx:adx,
+      }),
+      signal:AbortSignal.timeout(3000),
+    });
+    const d=await r.json();
+    if(d.ok){
+      if(btn){btn.className='btn-send-mt5 sent';btn.textContent='✅ ENVIADO AO MT5!';}
+      showToast('✅ Sinal enviado ao MT5: '+d.line);
+      setTimeout(()=>{if(btn){btn.className='btn-send-mt5';btn.innerHTML='🚀 ENVIAR AO MT5';}},4000);
+    }else{
+      if(btn){btn.className='btn-send-mt5 error';btn.textContent='❌ '+d.error;}
+      showToast('❌ '+d.error,true);
+      setTimeout(()=>{if(btn){btn.className='btn-send-mt5';btn.innerHTML='🚀 ENVIAR AO MT5';}},4000);
+    }
+  }catch(e){
+    if(btn){btn.className='btn-send-mt5 error';btn.textContent='❌ Servidor offline';}
+    showToast('Servidor offline. Verifique mt5_server.py',true);
+    _mt5Online=false;
+    checkMT5Server();
+  }
+}
+
+/* Auto-send: chamado após cada sinal novo */
+async function autoSendIfEnabled(asset, dir, entry, sl, tp1, tp2, tp3, conf, adx){
+  if(!_autoSend||!_mt5Online) return;
+  const key=`${dir}${asset}${entry}`;
+  if(key===_lastSentKey) return;
+  _lastSentKey=key;
+  await sendSignalToMT5(null, asset, dir, entry, sl, tp1, tp2, tp3, conf, adx);
+}
+
+document.addEventListener('DOMContentLoaded',()=>{ setTimeout(checkMT5Server, 1500); });
+setInterval(checkMT5Server, 30000); // verifica a cada 30s
 
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('pay-modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('pay-modal'))closeModal();});
