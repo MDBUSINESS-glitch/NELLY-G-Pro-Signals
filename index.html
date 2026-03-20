@@ -413,9 +413,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
           <div class="sess-chip asia" id="sess-asia">ASIA</div>
         </div>
         <button class="fb active" onclick="fSigAsset(this,'all')">TODOS</button>
-        <button class="fb" onclick="fSigAsset(this,'crypto')">CRYPTO</button>
-        <button class="fb" onclick="fSigAsset(this,'forex')">FOREX</button>
-        <button class="fb" onclick="fSigAsset(this,'commodity')">OURO</button>
+        <button class="fb" onclick="fSigAsset(this,'forex')">€ FOREX</button>
+        <button class="fb" onclick="fSigAsset(this,'commodity')">🥇 OURO</button>
+        <button class="fb" onclick="fSigAsset(this,'crypto')">₿ CRYPTO</button>
         <button class="btn-p" style="padding:8px 18px;font-size:13px" onclick="runAllSignals()">⚡ ANALISAR TUDO</button>
       </div>
     </div>
@@ -1331,9 +1331,57 @@ function setAutoRefresh(){
 }
 
 /* ── RUN ALL SIGNALS ── */
-const ASSETS=[{sym:'BTCUSDT',label:'BTC/USD',cat:'crypto',icon:'₿',src:'binance'},{sym:'ETHUSDT',label:'ETH/USD',cat:'crypto',icon:'⟠',src:'binance'},{sym:'BNBUSDT',label:'BNB/USD',cat:'crypto',icon:'🟡',src:'binance'},{sym:'SOLUSDT',label:'SOL/USD',cat:'crypto',icon:'◎',src:'binance'},{sym:'XRPUSDT',label:'XRP/USD',cat:'crypto',icon:'✦',src:'binance'},{sym:'ADAUSDT',label:'ADA/USD',cat:'crypto',icon:'🔵',src:'binance'},{sym:'PAXGUSDT',label:'XAU/USD',cat:'commodity',icon:'🥇',src:'binance'},{sym:'EURUSD',label:'EUR/USD',cat:'forex',icon:'€',src:'forex',fxBase:'EUR',fxQuote:'USD'},{sym:'GBPUSD',label:'GBP/USD',cat:'forex',icon:'£',src:'forex',fxBase:'GBP',fxQuote:'USD'},{sym:'USDJPY',label:'USD/JPY',cat:'forex',icon:'¥',src:'forex',fxBase:'USD',fxQuote:'JPY'},{sym:'AUDUSD',label:'AUD/USD',cat:'forex',icon:'🦘',src:'forex',fxBase:'AUD',fxQuote:'USD'},{sym:'USDCHF',label:'USD/CHF',cat:'forex',icon:'🇨🇭',src:'forex',fxBase:'USD',fxQuote:'CHF'}];
+const ASSETS=[
+  // FOREX
+  {sym:'EURUSD', label:'EUR/USD',cat:'forex',    icon:'€', src:'forex',fxBase:'EUR',fxQuote:'USD'},
+  {sym:'GBPUSD', label:'GBP/USD',cat:'forex',    icon:'£', src:'forex',fxBase:'GBP',fxQuote:'USD'},
+  {sym:'USDJPY', label:'USD/JPY',cat:'forex',    icon:'¥', src:'forex',fxBase:'USD',fxQuote:'JPY'},
+  {sym:'AUDUSD', label:'AUD/USD',cat:'forex',    icon:'🦘',src:'forex',fxBase:'AUD',fxQuote:'USD'},
+  {sym:'USDCHF', label:'USD/CHF',cat:'forex',    icon:'🇨🇭',src:'forex',fxBase:'USD',fxQuote:'CHF'},
+  // COMMODITIES
+  {sym:'PAXGUSDT',label:'XAU/USD',cat:'commodity',icon:'🥇',src:'binance'},
+  // CRYPTO
+  {sym:'BTCUSDT', label:'BTC/USD',cat:'crypto',  icon:'₿', src:'binance'},
+  {sym:'ETHUSDT', label:'ETH/USD',cat:'crypto',  icon:'⟠', src:'binance'},
+  {sym:'BNBUSDT', label:'BNB/USD',cat:'crypto',  icon:'🟡',src:'binance'},
+  {sym:'SOLUSDT', label:'SOL/USD',cat:'crypto',  icon:'◎', src:'binance'},
+  {sym:'XRPUSDT', label:'XRP/USD',cat:'crypto',  icon:'✦', src:'binance'},
+  {sym:'ADAUSDT', label:'ADA/USD',cat:'crypto',  icon:'🔵',src:'binance'},
+];
 let sigFilter='all';
-function fSigAsset(btn,f){document.querySelectorAll('[onclick^="fSigAsset"]').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');sigFilter=f;runAllSignals();}
+function fSigAsset(btn,f){
+  document.querySelectorAll('[onclick^="fSigAsset"]').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  sigFilter=f;
+  runAllSignals();
+}
+
+function buildSigGrid(assets){
+  const grid=document.getElementById('sig-grid');if(!grid)return;
+  // Group by category maintaining FOREX → OURO → CRYPTO order
+  const groups=[
+    {cat:'forex',    label:'▸ FOREX',      color:'var(--green)'},
+    {cat:'commodity',label:'▸ COMMODITIES',color:'var(--gold)'},
+    {cat:'crypto',   label:'▸ CRYPTO',     color:'var(--purple)'},
+  ];
+  let html='';
+  for(const g of groups){
+    const group=assets.filter(a=>a.cat===g.cat);
+    if(!group.length) continue;
+    html+=`<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin-top:4px;margin-bottom:2px">
+      <span style="font-size:10px;color:${g.color};font-family:var(--fh);letter-spacing:2px">${g.label}</span>
+      <div style="flex:1;height:1px;background:var(--border2)"></div>
+    </div>`;
+    html+=group.map(a=>`<div id="sc-${a.sym}" class="sig-card">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+        <span>${a.icon}</span>
+        <span style="font-family:var(--fh);font-size:13px;letter-spacing:2px">${a.label}</span>
+      </div>
+      <div class="typing"><span></span><span></span><span></span></div>
+    </div>`).join('');
+  }
+  grid.innerHTML=html;
+}
 
 async function runAllSignals(){
   await checkEcon();
@@ -1344,7 +1392,7 @@ async function runAllSignals(){
   const grid=document.getElementById('sig-grid');if(!grid)return;
   const assets=ASSETS.filter(a=>sigFilter==='all'||a.cat===sigFilter);
   document.getElementById('sig-status').textContent=`A analisar ${assets.length} activos... Sessão: ${sess}`;
-  grid.innerHTML=assets.map(a=>`<div id="sc-${a.sym}" class="sig-card"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span>${a.icon}</span><span style="font-family:var(--fh);font-size:13px;letter-spacing:2px">${a.label}</span></div><div class="typing"><span></span><span></span><span></span></div></div>`).join('');
+  buildSigGrid(assets);
   for(const a of assets){
     try{
       let dir,fs,price,atrV,prim,mtfResults;
