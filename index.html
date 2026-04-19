@@ -828,7 +828,12 @@ async function runIES(){
     let candles;
     const binTfMap={'5m':'5m','15m':'15m','1h':'1h','4h':'4h','1d':'1d'};
     const binTf=binTfMap[tf]||'1h';
-    if(sym==='XAUUSD'||sym==='BTCUSD'){candles=await fetchBin(sym==='XAUUSD'?'PAXGUSDT':'BTCUSDT',binTf,200);}
+    if(sym==='XAUUSD'){
+      // XAU: candles do Binance PAXG para técnicos, mas preço actual de metals.live
+      candles=await fetchBin('PAXGUSDT',binTf,200);
+      const spotPrice=await fetchGoldSpot();
+      if(spotPrice&&candles.length){const ratio=spotPrice/candles[candles.length-1].c;candles=candles.map(c=>({...c,o:c.o*ratio,h:c.h*ratio,l:c.l*ratio,c:c.c*ratio}));}
+    }else if(sym==='BTCUSD'){candles=await fetchBin('BTCUSDT',binTf,200);}
     else if(['EURUSD','GBPUSD','USDJPY','AUDUSD','USDCAD'].includes(sym)){const fxMap={EURUSD:{fxBase:'EUR',fxQuote:'USD'},GBPUSD:{fxBase:'GBP',fxQuote:'USD'},USDJPY:{fxBase:'USD',fxQuote:'JPY'},AUDUSD:{fxBase:'AUD',fxQuote:'USD'},USDCAD:{fxBase:'USD',fxQuote:'CAD'}};candles=await fetchFrankfurter({...fxMap[sym],sym,label:sym});}
     else{candles=await fetchBin('BTCUSDT',binTf,200);}
     const s=score(candles);
@@ -887,7 +892,7 @@ async function runIES(){
     const instList=[['XAU/USD','🥇'],['EUR/USD','€'],['GBP/USD','£'],['USD/JPY','¥'],['AUD/USD','🦘'],['USD/CAD','🍁'],['NASDAQ','📈'],['DOW JONES','🏭']];
     const targetName=macroResult.target.sym;
     tbody.innerHTML=instList.map(([name,icon])=>{const sc2=macroResult.scores[name]||{bull:50,bear:50};const dir2=sc2.bull>sc2.bear?'▲ BUY':sc2.bear>sc2.bull?'▼ SELL':'─ NEUTRO';const conv=Math.max(sc2.bull,sc2.bear);const c=sc2.bull>sc2.bear?'var(--green)':sc2.bear>sc2.bull?'var(--red)':'var(--muted)';const barLen=Math.round(conv/100*10);const isT=name===targetName;return`<tr style="${isT?'background:rgba(0,229,160,.04)':''}"><td style="font-family:var(--fd);font-size:11px">${icon} ${name}${isT?' ◈':''}</td><td style="color:${c};font-family:var(--fh);font-size:11px">${dir2}</td><td style="color:${c};font-family:var(--fo);font-size:11px;text-align:center">${conv}%</td><td style="color:${c};font-family:var(--fm);font-size:9px">${'█'.repeat(barLen)+'░'.repeat(10-barLen)}</td><td style="font-family:var(--fm);font-size:9px;color:var(--muted)">${sc2.bull}/${sc2.bear}</td></tr>`;}).join('');
-    el('ies-mt5-detail').innerHTML=`${s.dir} · Lot: ${ps.lotSize} · Entry: ${fmtP(lv.entry)} · SL: ${fmtP(lv.sl)} · TP1: ${fmtP(lv.tp1)}`;
+    el('ies-mt5-detail').innerHTML=`${s.dir} · Lot: ${ps.lotSize} · Entry: ${fmtP(lv.entry)}<br>SL: ${fmtP(lv.sl)} · TP1: ${fmtP(lv.tp1)}<br>TP2: ${fmtP(lv.tp2)} · TP3: ${fmtP(lv.tp3)}`;
     // AI Recs
     const recs=el('ies-ai-recs');if(recs){
       recs.innerHTML=`<div class="ai-rec-card"><div class="ai-rec-type">TÉCNICO</div><div class="ai-rec-title">Níveis de Take Profit — ${s.dir==='BUY'||macroResult.target.dir===1?'Estrutura Bullish':'Estrutura Bearish'}</div><div class="ai-rec-body">TP1 (${fmtP(lv.tp1)}) = R:R 1:${ps.rrNet.toFixed(1)}. TP2 (${fmtP(lv.tp2)}) = R:R 1:3.5. Fibonacci 61.8% em ${fmtP(s.fibLevels?.f618||0)}. ADX ${s.adx.toFixed(0)} — ${s.adx>=30?'FORTE':s.adx>=22?'moderada':'fraca'}. HA: ${s.hapattern}. CVD Z-Score: ${s.cvd?.zscore?.toFixed(2)||0}σ ${s.cvd?.bearDiv?'⚠BEAR DIV':s.cvd?.bullDiv?'⚠BULL DIV':'✓ sem divergência'}.</div></div>
@@ -913,16 +918,86 @@ async function multiTF(sym,style='intraday'){
   if(bC>=2&&bW>=(bC===3?4.0:5.0)){fd='BUY';fs=bW;}else if(sC>=2&&sW>=(sC===3?4.0:5.0)){fd='SELL';fs=sW;}else{fd='HOLD';fs=Math.max(bW,sW);}
   return{fd,fs,results,prim,atr:prim?.atr||0,price:prim?.price||0};
 }
+async function fetchGoldSpot(){
+  // 1. metals.live — preço spot real XAU/USD
+  try{const r=await fetch('https://api.metals.live/v1/spot/gold',{signal:AbortSignal.timeout(3000)});if(r.ok){const d=await r.json();const p=Array.isArray(d)?d[0]?.price:d?.price;if(p&&p>1000)return parseFloat(p);}}catch(e){}
+  // 2. goldpricez via allorigins proxy
+  try{const r=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent('https://data-api.coindesk.com/spot-price/v2/tick/previous-close/full?market=cadli&instruments=XAU-USD&limit=1'),{signal:AbortSignal.timeout(4000)});if(r.ok){const d=await r.json();const body=JSON.parse(d.contents||'{}');const p=body?.Data?.XAU?.[0]?.CLOSE_VALUE;if(p&&p>1000)return parseFloat(p);}}catch(e){}
+  // 3. Fallback CoinGecko PAXG (pode variar ±1%)
+  try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd',{signal:AbortSignal.timeout(3000)});if(r.ok){const d=await r.json();const p=d['pax-gold']?.usd;if(p&&p>1000)return parseFloat(p);}}catch(e){}
+  return null;
+}
 async function fetchCurrentPrice(assetLabel,src){
   const base=(assetLabel||'').split('/')[0].trim().toUpperCase();
-  try{if(src==='binance'||['BTC','ETH','BNB','SOL','XRP','ADA','DOGE','PAXG'].includes(base)){const sym=base==='XAU'?'PAXGUSDT':base+'USDT';const r=await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${sym}`);if(!r.ok)return null;return parseFloat((await r.json()).price);}const quote=(assetLabel||'').split('/')[1]?.trim().toUpperCase()||'USD';const r=await fetch(`https://api.frankfurter.app/latest?from=${base}&to=${quote}`);if(!r.ok)return null;return(await r.json()).rates?.[quote]||null;}catch(e){return null;}
+  try{
+    // XAU — usar metals.live para preço spot real
+    if(base==='XAU')return await fetchGoldSpot();
+    if(src==='binance'||['BTC','ETH','BNB','SOL','XRP','ADA','DOGE','PAXG'].includes(base)){const sym=base+'USDT';const r=await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${sym}`,{signal:AbortSignal.timeout(3000)});if(!r.ok)return null;return parseFloat((await r.json()).price);}
+    const quote=(assetLabel||'').split('/')[1]?.trim().toUpperCase()||'USD';const r=await fetch(`https://api.frankfurter.app/latest?from=${base}&to=${quote}`,{signal:AbortSignal.timeout(3000)});if(!r.ok)return null;return(await r.json()).rates?.[quote]||null;
+  }catch(e){return null;}
 }
 
 /* ── SESSION ── */
 function getActiveSessions(){const h=new Date().getUTCHours();return{london:h>=7&&h<16,ny:h>=12&&h<21,asia:h>=22||h<7};}
 function getCurrentSession(){const s=getActiveSessions();if(s.london&&s.ny)return'LONDON+NY';if(s.london)return'LONDON';if(s.ny)return'NEW YORK';if(s.asia)return'ASIA';return'OFF-HOURS';}
 function updateSessionChips(){const s=getActiveSessions();['london','ny','asia'].forEach(k=>{const el=document.getElementById('sess-'+k);if(el)el.classList.toggle('active',s[k]);});}
-let econRisk=false;async function checkEcon(){const d=new Date(),dow=d.getUTCDay(),tm=d.getUTCHours()*60+d.getUTCMinutes();econRisk=dow===5&&d.getUTCDate()<=7&&tm>=805&&tm<=820;}
+/* ══════════════════════════════════════════════════════
+   NEWS GUARD — Bloqueio automático em eventos de alto impacto
+   Impede sinais 30min antes e 15min depois de cada evento
+   Por activo: XAU=USD events, EUR=EUR/USD events, etc.
+══════════════════════════════════════════════════════ */
+let econRisk=false,newsGuardActive=false,newsGuardMsg='',newsGuardAssets=[];
+const ECON_CALENDAR=[
+  // Formato: {h:hora UTC, m:minuto, label, assets:['XAU','USD','EUR','GBP','JPY','ALL'], dow:[1-5], impact:'high'}
+  // NFP — 1ª sexta-feira do mês 14:30 UTC
+  {h:14,m:30,label:'NFP (Non-Farm Payrolls)',assets:['ALL'],dow:[5],isFirstFriday:true,impact:'critical',blockBefore:30,blockAfter:15},
+  // CPI — normalmente 3ª semana do mês, terça/quarta 14:30
+  {h:14,m:30,label:'US CPI',assets:['USD','XAU','ALL'],dow:[2,3],impact:'high',blockBefore:20,blockAfter:10},
+  // FOMC Decision — cada 6 semanas, quarta 20:00 UTC
+  {h:20,m:0,label:'FOMC Decision',assets:['USD','XAU','ALL'],dow:[3],impact:'critical',blockBefore:30,blockAfter:20},
+  // Jobless Claims — toda quinta 14:30 UTC
+  {h:14,m:30,label:'US Jobless Claims',assets:['USD'],dow:[4],impact:'medium',blockBefore:10,blockAfter:5},
+  // BCE Decision — cada 6 semanas, quinta 13:15 UTC
+  {h:13,m:15,label:'BCE Rate Decision',assets:['EUR','XAU'],dow:[4],impact:'critical',blockBefore:30,blockAfter:20},
+  // US Market Open — cada dia
+  {h:13,m:30,label:'US Market Open',assets:['USD','XAU'],dow:[1,2,3,4,5],impact:'medium',blockBefore:5,blockAfter:5},
+  // London Open
+  {h:7,m:0,label:'London Open',assets:['EUR','GBP'],dow:[1,2,3,4,5],impact:'low',blockBefore:0,blockAfter:0},
+  // Tokyo Open
+  {h:0,m:0,label:'Tokyo Open',assets:['JPY'],dow:[1,2,3,4,5],impact:'low',blockBefore:0,blockAfter:0},
+];
+
+function checkNewsGuard(assetLabel){
+  const now=new Date(),dow=now.getUTCDay(),h=now.getUTCHours(),m=now.getUTCMinutes(),t=h*60+m;
+  const base=(assetLabel||'').split('/')[0].trim().toUpperCase();
+  const quote=(assetLabel||'').split('/')[1]?.trim().toUpperCase()||'';
+  const relevant=(ev)=>{
+    if(!ev.dow.includes(dow))return false;
+    if(ev.isFirstFriday&&now.getUTCDate()>7)return false;
+    return ev.assets.includes('ALL')||ev.assets.includes(base)||ev.assets.includes(quote)||ev.assets.includes('USD');
+  };
+  for(const ev of ECON_CALENDAR){
+    if(!relevant(ev))continue;
+    const evT=ev.h*60+ev.m;
+    const before=evT-ev.blockBefore,after=evT+ev.blockAfter;
+    if(t>=before&&t<=after){
+      return{blocked:ev.impact!=='low',msg:`⚡ ${ev.label} (${ev.h.toString().padStart(2,'0')}:${ev.m.toString().padStart(2,'0')} UTC) — Sinal bloqueado ${ev.blockBefore}min antes`,impact:ev.impact};
+    }
+  }
+  return{blocked:false,msg:'',impact:''};
+}
+
+async function checkEcon(){
+  const d=new Date(),dow=d.getUTCDay(),tm=d.getUTCHours()*60+d.getUTCMinutes();
+  // NFP é sempre 1ª sexta-feira do mês
+  econRisk=dow===5&&d.getUTCDate()<=7&&tm>=800&&tm<=825;
+  newsGuardActive=false;newsGuardMsg='';newsGuardAssets=[];
+}
+
+function isAssetBlocked(assetLabel){
+  const ng=checkNewsGuard(assetLabel);
+  return{blocked:ng.blocked||econRisk,msg:ng.msg||(econRisk?'⚡ NFP activo — sinal bloqueado':''),impact:ng.impact};
+}
 
 /* ── SIGNAL STORE ── */
 let sigLog=[];
@@ -965,7 +1040,7 @@ const ASSETS=[
   {sym:'XRPUSDT',label:'XRP/USD',cat:'crypto',icon:'✦',src:'binance'},
   {sym:'ADAUSDT',label:'ADA/USD',cat:'crypto',icon:'🔵',src:'binance'},
 ];
-let sigFilter='all';
+let sigFilter='all',_ngBlockMsg='';
 function fSigAsset(btn,f){document.querySelectorAll('[onclick^="fSigAsset"]').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');sigFilter=f;runAllSignals();}
 function filterSigGrid(q){document.querySelectorAll('[id^="sc-"]').forEach(c=>{const sym=c.id.replace('sc-','');const asset=ASSETS.find(a=>a.sym===sym);if(!asset)return;c.style.display=(!q||asset.label.toLowerCase().includes(q.toLowerCase())||asset.sym.toLowerCase().includes(q.toLowerCase()))?'block':'none';});}
 function updateRiskDisplay(){const bal=parseFloat(document.getElementById('acc-balance')?.value||10000);const rsk=parseFloat(document.getElementById('acc-risk')?.value||1);const el=document.getElementById('risk-display');if(el)el.textContent='$'+(bal*rsk/100).toFixed(0);}
@@ -981,11 +1056,13 @@ async function runAllSignals(){
   for(const a of assets){
     try{
       let dir,fs,price,atrV,prim,mtfResults;
-      if(a.src==='forex'){const cn=await fetchFrankfurter(a);const s=score(cn);dir=econRisk&&s.dir!=='HOLD'?'HOLD':s.dir;fs=s.sc;price=s.price;atrV=s.atr||s.price*0.006;prim=s;mtfResults=[{tf:'1D',dir:s.dir,rsi:s.rsi,e9:s.e9,e21:s.e21,mst:s.mst,adx:s.adx,hatrend:s.hatrend}];}
-      else{const res=await multiTF(a.sym,'intraday');dir=econRisk&&res.fd!=='HOLD'?'HOLD':res.fd;fs=res.fs;price=res.price;atrV=res.atr;prim=res.prim;mtfResults=res.results;}
+      const ngCheck=isAssetBlocked(a.label);
+      if(a.src==='forex'){const cn=await fetchFrankfurter(a);const s=score(cn);dir=ngCheck.blocked&&s.dir!=='HOLD'?'HOLD':s.dir;fs=s.sc;price=s.price;atrV=s.atr||s.price*0.006;prim=s;mtfResults=[{tf:'1D',dir:s.dir,rsi:s.rsi,e9:s.e9,e21:s.e21,mst:s.mst,adx:s.adx,hatrend:s.hatrend}];}
+      else{const res=await multiTF(a.sym,'intraday');dir=ngCheck.blocked&&res.fd!=='HOLD'?'HOLD':res.fd;fs=res.fs;price=res.price;atrV=res.atr;prim=res.prim;mtfResults=res.results;}
+      if(a.sym==='PAXGUSDT'){const spotP=await fetchGoldSpot();if(spotP&&price){const ratio=spotP/price;price=spotP;if(prim){prim={...prim,price:spotP};if(atrV)atrV=atrV*ratio;}}}_ngBlockMsg=ngCheck.blocked?ngCheck.msg:''
       const lv=dir!=='HOLD'?buildLevels(price,dir,atrV):null;const conf=(fs/10*100).toFixed(0);
       let lotSize=0.01;if(lv){const pv=a.sym.includes('JPY')?9:a.sym.includes('XAU')||a.sym.includes('BTC')||a.sym.includes('ETH')?1:10;lotSize=PSIZER.compute({account,riskPct,entry:lv.entry,sl:lv.sl,pipVal:pv}).lotSize;}
-      renderSigCard(a,dir,fs,price,lv,mtfResults,prim,conf,sessData,lotSize,account,riskPct);
+      renderSigCard(a,dir,fs,price,lv,mtfResults,prim,conf,sessData,lotSize,account,riskPct,_ngBlockMsg);
       if(dir!=='HOLD'&&lv)addToSignalLog({asset:a.label,dir,priceRaw:price,conf,levels:lv,icon:a.icon,cat:a.cat,src:a.src,adx:prim?.adx||0,session:sess,kelly:prim?.kelly||0.01,tech:prim?.tech||'',fund:prim?.fund||'',sent:prim?.sent||'',lotSize});
     }catch(e){const el=document.getElementById('sc-'+a.sym);if(el)el.innerHTML=`<div style="color:var(--muted);font-size:11px;padding:8px;font-family:var(--fd)">⚠️ ${a.label}: ${e.message||'Erro API'}</div>`;}
     await delay(380);
@@ -993,7 +1070,7 @@ async function runAllSignals(){
   document.getElementById('sig-status').textContent=`${assets.length} activos · ${nowStr()} · ${sess} · IES v5 ON`;
 }
 
-function renderSigCard(asset,dir,sc,price,lv,mtfResults,prim,conf,sess,lotSize,account,riskPct){
+function renderSigCard(asset,dir,sc,price,lv,mtfResults,prim,conf,sess,lotSize,account,riskPct,newsGuardMsg=''){
   const el=document.getElementById('sc-'+asset.sym);if(!el)return;
   const iB=dir==='BUY',iS=dir==='SELL';const dc=iB?'var(--green)':iS?'var(--red)':'var(--gold)';
   const adxN=parseFloat(prim?.adx||0);const pivot=prim?.pivots||{p:0,r1:0,r2:0,r3:0,s1:0,s2:0,s3:0};
@@ -1031,6 +1108,7 @@ function renderSigCard(asset,dir,sc,price,lv,mtfResults,prim,conf,sess,lotSize,a
       <button onclick="copySignalMT5(this,'${sym}','${dir}',${lv.entry},${lv.sl},${lv.tp1},${lv.tp2},${lv.tp3})" style="flex:1;padding:6px;background:rgba(0,229,160,.07);border:1px solid rgba(0,229,160,.2);border-radius:3px;color:var(--green);font-family:var(--fh);font-size:9px;letter-spacing:1px;cursor:pointer">📋 MT5</button>
       <button onclick="sendSignalToMT5(this,'${asset.label}','${dir}',${lv.entry},${lv.sl},${lv.tp1},${lv.tp2||0},${lv.tp3||0},'${conf}','${adxN.toFixed(0)}')" class="btn-send-mt5" style="flex:2;margin:0;padding:6px">🚀 ENVIAR MT5</button>
     </div>`:''}
+    ${newsGuardMsg?`<div style="padding:5px 12px;background:rgba(255,77,109,.08);border-top:1px solid rgba(255,77,109,.2);font-size:9px;color:var(--red);font-family:var(--fh);letter-spacing:.5px">${newsGuardMsg}</div>`:''}
     <div style="padding:6px 12px;display:flex;gap:4px;flex-wrap:wrap;border-top:1px solid var(--border2)">${mtfHtml}<span style="margin-left:auto;font-size:8px;color:var(--muted);font-family:var(--fm)">${nowStr()}</span></div>`;
 }
 
@@ -1078,7 +1156,13 @@ async function fetchMarketPrices(){
   const te=document.getElementById('mkt-time');if(te)te.textContent='A carregar...';
   try{const r=await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,binancecoin,solana,ripple,cardano,dogecoin&order=market_cap_desc&per_page=7&sparkline=false&price_change_percentage=24h');if(r.ok){const d=await r.json();const sm={bitcoin:'BTC/USD',ethereum:'ETH/USD',binancecoin:'BNB/USD',solana:'SOL/USD',ripple:'XRP/USD',cardano:'ADA/USD',dogecoin:'DOGE/USD'};const ce=document.getElementById('mkt-crypto');if(ce)ce.innerHTML=d.map(c=>{const sym=sm[c.id]||c.symbol.toUpperCase()+'/USD';const dec=c.current_price>=1000?2:c.current_price>=1?4:6;return mktCard('CRYPTO','var(--purple)','rgba(167,139,250,0.08)',sym,c.name,c.current_price,c.price_change_percentage_24h,dec);}).join('');}}catch(e){}
   try{const r=await fetch('https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY,AUD,CAD,CHF');if(r.ok){const d=await r.json();const rt=d.rates;const pairs=[{s:'EUR/USD',n:'Euro',p:rt.EUR?1/rt.EUR:0,dec:5},{s:'GBP/USD',n:'British Pound',p:rt.GBP?1/rt.GBP:0,dec:5},{s:'USD/JPY',n:'Yen',p:rt.JPY||0,dec:3},{s:'AUD/USD',n:'Aus Dollar',p:rt.AUD?1/rt.AUD:0,dec:5},{s:'USD/CAD',n:'CA Dollar',p:rt.CAD||0,dec:5},{s:'USD/CHF',n:'Swiss Franc',p:rt.CHF||0,dec:5}];const fe=document.getElementById('mkt-forex');if(fe)fe.innerHTML=pairs.map(p=>mktCard('FOREX','var(--green)','rgba(0,229,160,0.07)',p.s,p.n,p.p,null,p.dec)).join('');}}catch(e){}
-  try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd&include_24hr_change=true');if(r.ok){const d=await r.json();if(d['pax-gold']){const cm=document.getElementById('mkt-commodities');if(cm)cm.innerHTML=mktCard('COMMODITY','var(--gold)','rgba(245,200,66,0.08)','XAU/USD','Gold',d['pax-gold'].usd,d['pax-gold'].usd_24h_change||0,2);}}}catch(e){}
+  // XAU — metals.live (preço spot real) + fallback CoinGecko PAXG
+  try{
+    let xauPrice=null,xauChg=0;
+    try{const rx=await fetch('https://api.metals.live/v1/spot/gold',{signal:AbortSignal.timeout(3000)});if(rx.ok){const dx=await rx.json();const p=Array.isArray(dx)?dx[0]?.price:dx?.price;if(p&&p>1000)xauPrice=parseFloat(p);}}catch(e){}
+    if(!xauPrice){const rx=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd&include_24hr_change=true');if(rx.ok){const dx=await rx.json();xauPrice=dx['pax-gold']?.usd||0;xauChg=dx['pax-gold']?.usd_24h_change||0;}}
+    if(xauPrice){const cm=document.getElementById('mkt-commodities');if(cm){const silverR=await fetch('https://api.metals.live/v1/spot/silver',{signal:AbortSignal.timeout(2000)}).then(r=>r.ok?r.json():null).catch(()=>null);const silverP=Array.isArray(silverR)?silverR[0]?.price:silverR?.price;cm.innerHTML=mktCard('COMMODITY','var(--gold)','rgba(245,200,66,0.08)','XAU/USD','Gold (Spot)',xauPrice,xauChg,2)+(silverP?mktCard('COMMODITY','var(--gold)','rgba(245,200,66,0.05)','XAG/USD','Silver (Spot)',parseFloat(silverP),0,3):'');}}
+  }catch(e){}
   const idx=[{s:'SPX/USD',n:'S&P 500',p:5218,chg:0.25},{s:'NDX/USD',n:'NASDAQ 100',p:18239,chg:0.41},{s:'DJI/USD',n:'Dow Jones',p:39308,chg:0.17},{s:'VIX',n:'Volatility',p:14.32,chg:-3.21}];
   const idxEl=document.getElementById('mkt-indices');if(idxEl)idxEl.innerHTML=idx.map(i=>mktCard('ÍNDICE','var(--blue)','rgba(56,189,248,0.07)',i.s,i.n,i.p,i.chg,2)).join('');
   if(te)te.textContent='ACTUALIZADO: '+nowStr();
@@ -1094,12 +1178,76 @@ const NEWS_EVENTS=[
 ];
 let _newsFilter='all';
 function fNews(btn,f){document.querySelectorAll('[onclick^="fNews"]').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');_newsFilter=f;renderNews();}
-function renderNews(){
+async function fetchForexFactoryCalendar(){
+  // Tenta ForexFactory JSON feed via proxy (CORS-safe)
+  try{
+    const url='https://nfs.faireconomy.media/ff_calendar_thisweek.json';
+    const r=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent(url),{signal:AbortSignal.timeout(5000)});
+    if(r.ok){const d=await r.json();const ev=JSON.parse(d.contents||'[]');return Array.isArray(ev)?ev:[];}
+  }catch(e){}
+  return[];
+}
+
+async function renderNews(){
   const list=document.getElementById('news-list');if(!list)return;
-  const data=NEWS_EVENTS.filter(e=>_newsFilter==='all'||e.cat===_newsFilter);
   const ic={'MUITO ALTO':'var(--red)','ALTO':'var(--gold)','MÉDIO':'var(--blue)','BAIXO':'var(--muted)'};
-  list.innerHTML=data.map((e,i)=>`<div style="border-bottom:1px solid var(--border2);padding:12px 0"><div style="display:grid;grid-template-columns:80px 90px 1fr auto;gap:12px;align-items:center;cursor:pointer" onclick="toggleNews(${i})"><div><div style="font-family:var(--fm);font-size:10px;color:var(--muted)">${e.day}</div><div style="font-size:9px;color:var(--muted);font-family:var(--fd)">${e.time}</div></div><span style="font-size:10px;padding:3px 8px;border-radius:3px;background:rgba(255,255,255,.03);color:${ic[e.impact]};font-family:var(--fh);text-align:center">${e.impact}</span><div><div style="font-size:12px;font-weight:600;font-family:var(--fd)">${e.name}</div><div style="font-size:10px;color:var(--muted);font-family:var(--fm);margin-top:2px">Ant: ${e.prev} · Prev: ${e.fore}</div></div><span id="news-arrow-${i}" style="font-size:12px;color:var(--muted)">▼</span></div><div id="news-detail-${i}" style="display:none;margin-top:10px;padding:12px;background:rgba(0,0,0,.2);border-radius:4px;border-left:3px solid ${ic[e.impact]};font-size:11px;font-family:var(--fd);color:var(--muted);line-height:1.9">${e.narrative}</div></div>`).join('');
-  const ai=document.getElementById('news-asset-impact');if(ai)ai.innerHTML=[{s:'EUR/USD',b:3,e:2},{s:'GBP/USD',b:2,e:2},{s:'XAU/USD',b:4,e:2},{s:'BTC/USD',b:2,e:1},{s:'USD/JPY',b:1,e:3}].map(a=>{const bias=a.b>a.e?'BULLISH':a.e>a.b?'BEARISH':'MISTO';const bc=bias==='BULLISH'?'var(--green)':bias==='BEARISH'?'var(--red)':'var(--gold)';return`<div style="background:rgba(0,0,0,.2);border:1px solid var(--border2);border-radius:3px;padding:10px"><div style="font-family:var(--fh);font-size:12px;letter-spacing:1px;margin-bottom:4px">${a.s}</div><div style="font-size:10px;padding:2px 7px;border-radius:2px;display:inline-block;background:rgba(255,255,255,.04);color:${bc};font-family:var(--fh)">${bias}</div></div>`;}).join('');}
+  const now=new Date();
+  // Tenta buscar eventos ForexFactory
+  let ffEvents=[];
+  try{ffEvents=await fetchForexFactoryCalendar();}catch(e){}
+  // Converte FF events para formato local
+  const ffFormatted=ffEvents.filter(ev=>['High','Medium'].includes(ev.impact)).map((ev,i)=>{
+    const evDate=new Date(ev.date);const impactMap={High:'ALTO',Medium:'MÉDIO',Low:'BAIXO'};
+    const assetMap={USD:['USD','XAU','BTC'],EUR:['EUR'],GBP:['GBP'],JPY:['JPY','USD/JPY'],AUD:['AUD'],NZD:['NZD'],CAD:['USD/CAD']};
+    const cur=ev.currency||'USD';const assets=assetMap[cur]||[cur];
+    const ngStatus=checkNewsGuard(cur+'/USD');
+    const isBlocked=ngStatus.blocked;
+    const tStr=evDate.toLocaleTimeString('pt',{hour:'2-digit',minute:'2-digit'})+'h UTC';
+    const dStr=evDate.toLocaleDateString('pt',{weekday:'short',day:'2-digit',month:'2-digit'});
+    return{day:dStr,time:tStr,impact:impactMap[ev.impact]||'MÉDIO',cat:['USD','EUR'].includes(cur)?'forex':cur==='XAU'?'gold':'forex',name:`${cur} · ${ev.title||'Evento'}`,prev:ev.previous||'—',fore:ev.forecast||'—',narrative:`${ev.title} — Evento ${impactMap[ev.impact]} para ${cur}. Verifique o impacto esperado nos activos correlacionados.`,live:true,isBlocked,cur,evDate};
+  });
+  const allEvents=[...ffFormatted,...NEWS_EVENTS.filter(e=>!ffFormatted.length)];
+  const data=allEvents.filter(e=>_newsFilter==='all'||(e.cat||'').includes(_newsFilter)||e.cat===_newsFilter);
+  list.innerHTML='';
+  // Guard status panel
+  const guardPanel=document.createElement('div');
+  guardPanel.style.cssText='margin-bottom:12px;padding:10px 14px;border-radius:var(--r);border:1px solid;display:flex;align-items:center;gap:10px';
+  const anyBlocked=ASSETS.some(a=>isAssetBlocked(a.label).blocked);
+  guardPanel.style.background=anyBlocked?'rgba(255,77,109,.07)':'rgba(0,229,160,.04)';
+  guardPanel.style.borderColor=anyBlocked?'rgba(255,77,109,.3)':'rgba(0,229,160,.2)';
+  guardPanel.innerHTML=`<span style="font-size:16px">${anyBlocked?'🔴':'🟢'}</span><div><div style="font-family:var(--fh);font-size:11px;letter-spacing:1px;color:${anyBlocked?'var(--red)':'var(--green)'}">${anyBlocked?'NEWS GUARD ACTIVO — Sinais bloqueados':'NEWS GUARD LIVRE — Sinais permitidos'}</div><div style="font-size:10px;color:var(--muted);font-family:var(--fd);margin-top:2px">${anyBlocked?'Evento de alto impacto em curso ou iminente. Aguardar janela segura.':'Sem eventos de alto impacto agora. Janela de trading segura.'}</div></div><button onclick="renderNews()" style="margin-left:auto;padding:4px 10px;background:rgba(0,229,160,.1);border:1px solid var(--border);border-radius:3px;color:var(--green);font-family:var(--fh);font-size:9px;cursor:pointer">↺ ACTUALIZAR</button>`;
+  list.appendChild(guardPanel);
+  if(ffFormatted.length){const badge=document.createElement('div');badge.innerHTML='<div style="font-size:9px;color:var(--green);font-family:var(--fh);letter-spacing:1px;margin-bottom:8px;padding:4px 8px;background:rgba(0,229,160,.06);border-radius:3px;display:inline-flex;align-items:center;gap:5px"><span style='color:var(--green)'>●</span> CALENDÁRIO LIVE — ForexFactory (actualizado)</div>';list.appendChild(badge);}
+  const evContainer=document.createElement('div');
+  evContainer.innerHTML=data.map((e,i)=>{
+    const isNow=e.evDate&&Math.abs(new Date()-e.evDate)<30*60*1000;
+    const isPast=e.evDate&&new Date()>e.evDate;
+    const isFuture=e.evDate&&new Date()<e.evDate&&(e.evDate-new Date())<3600000;
+    const rowBorder=e.isBlocked?'rgba(255,77,109,.3)':isNow?'rgba(245,200,66,.3)':'var(--border2)';
+    return`<div style="border-bottom:1px solid var(--border2);padding:12px 0;border-left:3px solid ${rowBorder};padding-left:10px;${e.isBlocked?'background:rgba(255,77,109,.04)':isNow?'background:rgba(245,200,66,.04)':''}">
+      <div style="display:grid;grid-template-columns:90px 90px 1fr auto;gap:12px;align-items:center;cursor:pointer" onclick="toggleNews(${i})">
+        <div><div style="font-family:var(--fm);font-size:10px;color:var(--muted)">${e.day||'Esta semana'}</div><div style="font-size:9px;color:${isNow?'var(--gold)':isFuture?'var(--blue)':'var(--muted)'};font-family:var(--fd)">${e.time||'—'}${isNow?' ⚡ AGORA':isFuture?' ⏰ EM BREVE':isPast?' ✓':''}</div></div>
+        <span style="font-size:10px;padding:3px 8px;border-radius:3px;background:rgba(255,255,255,.03);color:${ic[e.impact]||'var(--muted)'};font-family:var(--fh);text-align:center">${e.impact||'—'}</span>
+        <div>
+          <div style="display:flex;align-items:center;gap:6px"><span style="font-size:12px;font-weight:600;font-family:var(--fd)">${e.name}</span>${e.isBlocked?'<span style="font-size:8px;padding:1px 5px;background:rgba(255,77,109,.15);color:var(--red);border-radius:2px;font-family:var(--fh);border:1px solid rgba(255,77,109,.3)">🔴 SINAL BLOQUEADO</span>':''}</div>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--fm);margin-top:2px">Ant: ${e.prev||'—'} · Prev: ${e.fore||'—'}</div>
+        </div>
+        <span id="news-arrow-${i}" style="font-size:12px;color:var(--muted)">▼</span>
+      </div>
+      <div id="news-detail-${i}" style="display:none;margin-top:10px;padding:12px;background:rgba(0,0,0,.2);border-radius:4px;border-left:3px solid ${ic[e.impact]||'var(--muted)'};font-size:11px;font-family:var(--fd);color:var(--muted);line-height:1.9">
+        ${e.narrative||'—'}
+        ${e.isBlocked?`<div style="margin-top:8px;padding:6px 10px;background:rgba(255,77,109,.08);border-radius:3px;color:var(--red);font-family:var(--fh);font-size:10px;letter-spacing:.5px">🔴 NEWS GUARD ACTIVO — Aguardar ${30}min após o evento para nova entrada</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  list.appendChild(evContainer);
+  const ai=document.getElementById('news-asset-impact');
+  if(ai){
+    // Mostrar status de bloqueio por activo
+    const assetsStatus=ASSETS.map(a=>{const ng=isAssetBlocked(a.label);return{s:a.label,icon:a.icon,blocked:ng.blocked,msg:ng.msg};});
+    ai.innerHTML=assetsStatus.map(a=>`<div style="background:${a.blocked?'rgba(255,77,109,.06)':'rgba(0,0,0,.2)'};border:1px solid ${a.blocked?'rgba(255,77,109,.25)':'var(--border2)'};border-radius:3px;padding:10px"><div style="font-family:var(--fo);font-size:11px;letter-spacing:1px;margin-bottom:4px">${a.icon} ${a.s}</div><div style="font-size:10px;padding:2px 7px;border-radius:2px;display:inline-block;background:rgba(255,255,255,.04);color:${a.blocked?'var(--red)':'var(--green)'};font-family:var(--fh)">${a.blocked?'🔴 BLOQUEADO':'🟢 LIVRE'}</div>${a.msg?`<div style="font-size:9px;color:var(--muted);font-family:var(--fd);margin-top:4px;line-height:1.5">${a.msg}</div>`:''}</div>`).join('');
+  }
+}
 function toggleNews(i){const d=document.getElementById('news-detail-'+i),ar=document.getElementById('news-arrow-'+i);if(!d)return;const open=d.style.display==='block';d.style.display=open?'none':'block';if(ar)ar.textContent=open?'▼':'▲';}
 
 /* ── COPY TRADE ── */
@@ -1168,7 +1316,7 @@ function navTo(id,btn){
   const pg=document.getElementById('page-'+id);if(pg)pg.classList.add('active');if(btn)btn.classList.add('active');
   if(id==='stats')renderStats();
   if(id==='markets')fetchMarketPrices();
-  if(id==='news')renderNews();
+  if(id==='news'){renderNews();}
   if(id==='copytrade')renderCTGrid();
 }
 
@@ -1184,7 +1332,7 @@ function sPeriod(btn){}
 
 /* ── INIT ── */
 function initApp(){
-  buildTicker();updateRiskDisplay();renderCTGrid();renderNews();
+  buildTicker();updateRiskDisplay();renderCTGrid();renderNews().catch(()=>{});
   fetchMarketPrices();refreshSigHistTable();renderHistPage();renderStats();updateSessionChips();
   if(apiKey){const bar=document.getElementById('ai-status-bar');if(bar){bar.style.display='flex';bar.innerHTML='<span class="ai-badge">Claude IA Activo</span><span style="font-size:10px;color:var(--muted);font-family:var(--fd)">IES v5 + Macro + Narrativas activadas</span>';}}
   setTimeout(checkMT5Server,1500);
