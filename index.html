@@ -306,6 +306,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
   <button class="nav-item" onclick="navTo('autotrade',this)"><span class="nav-icon">🤖</span><span>Auto Trade</span><span class="nb b">BETA</span></button>
   <button class="nav-item" onclick="navTo('copytrade',this)"><span class="nav-icon">👥</span><span>Copy Trade</span></button>
   <div class="sb-sec">CONTA</div>
+  <button class="nav-item" onclick="navTo('faq',this)"><span class="nav-icon">❓</span><span>FAQ</span></button>
   <button class="nav-item" onclick="navTo('pricing',this)"><span class="nav-icon">💎</span><span>Planos</span></button>
   <button class="nav-item" onclick="openApiKey()"><span class="nav-icon">🤖</span><span>Activar IA</span></button>
   <div class="sb-user">
@@ -416,7 +417,35 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
       <div class="ies-score-cell"><div class="ies-score-label">SMC</div><div class="ies-score-val" id="ies-smc" style="color:var(--orange)">—</div><div class="ies-score-bar"><div class="ies-score-bar-fill" id="ies-smc-bar" style="background:var(--orange);width:0%"></div></div></div>
       <div class="ies-score-cell"><div class="ies-score-label">SESSÃO Δ</div><div class="ies-score-val" id="ies-sess" style="color:var(--purple)">—</div><div class="ies-score-bar"><div class="ies-score-bar-fill" id="ies-sess-bar" style="background:var(--purple);width:0%"></div></div></div>
     </div>
-    <div id="ies-placeholder" style="text-align:center;padding:60px 20px;color:var(--muted);font-family:var(--fh);font-size:14px;letter-spacing:2px">Seleccione um instrumento e clique 🏛 ANALISAR IES v5</div>
+
+    <!-- BLACKBOX SCORE WIDGET (inspirado no TakeTips IA) -->
+    <div id="ies-blackbox-widget" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:14px;display:none">
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div style="font-family:var(--fh);font-size:11px;letter-spacing:2px;color:var(--muted);margin-bottom:8px">DECISÕES VALIDADAS POR IES v5</div>
+          <div style="font-size:13px;font-family:var(--fd);color:var(--muted);line-height:1.7">Antes de receber o sinal, o motor IES v5 processou 5 camadas de análise em simultâneo — Macro · Micro · SMC · MTF · Sessão — gerando um Score de Confiança final.</div>
+        </div>
+        <div style="background:rgba(0,0,0,.4);border:1px solid rgba(0,229,160,.2);border-radius:12px;padding:20px 24px;min-width:240px;position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--green),var(--blue),var(--purple),transparent)"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <span style="font-size:10px;color:var(--muted);font-family:var(--fd)">Score de Confiança</span>
+            <div id="bb-score-val" style="font-size:2.4rem;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent">—%</div>
+          </div>
+          <div id="bb-signal-line" style="font-size:10px;font-family:var(--fo);color:var(--text);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.06)">Aguardando análise...</div>
+          <div style="display:flex;flex-direction:column;gap:6px" id="bb-checks"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="ies-placeholder" style="text-align:center;padding:60px 20px;color:var(--muted);font-family:var(--fh);font-size:14px;letter-spacing:2px">
+  <div style="margin-bottom:20px;font-size:24px">🏛</div>
+  Seleccione um instrumento e clique <strong style="color:var(--green)">ANALISAR IES v5</strong>
+  <div style="margin-top:30px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:600px;margin-left:auto;margin-right:auto">
+    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:14px;font-size:10px;font-family:var(--fd);color:var(--muted)"><div style="font-size:20px;margin-bottom:6px">⚡</div>Análise em 3 segundos</div>
+    <div style="background:var(--bg2);border:1px solid rgba(0,229,160,.15);border-radius:8px;padding:14px;font-size:10px;font-family:var(--fd);color:var(--muted)"><div style="font-size:20px;margin-bottom:6px">🏛</div>IES v5 · 5 Camadas</div>
+    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:14px;font-size:10px;font-family:var(--fd);color:var(--muted)"><div style="font-size:20px;margin-bottom:6px">⚖</div>Position Sizing FTMO</div>
+  </div>
+</div>
     <div id="ies-main-layout" style="display:none">
       <div class="ttips-top-cards">
         <div class="ttips-card entry"><div class="ttips-card-lbl">💰 ENTRADA</div><div class="ttips-card-val" id="ies-entry" style="color:var(--blue)">—</div><div class="ttips-card-sub" id="ies-entry-sub">Preço actual</div><button class="copy-btn" onclick="copyVal('ies-entry',this)">COPY</button></div>
@@ -558,7 +587,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
 
   <!-- PAGE: NEWS -->
   <div class="page" id="page-news">
-    <div class="ph"><div><div class="pt">📰 NOTÍCIAS & EVENTOS</div><div class="ps">Calendário económico de alto impacto</div></div>
+    <div class="ph"><div><div class="pt">📰 NOTÍCIAS & EVENTOS</div><div class="ps">Calendário económico de alto impacto · ForexFactory Live · News Guard activo</div></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="fb active" onclick="fNews(this,'all')">TODOS</button><button class="fb" onclick="fNews(this,'forex')">FOREX</button><button class="fb" onclick="fNews(this,'gold')">OURO</button><button class="fb" onclick="fNews(this,'crypto')">CRYPTO</button></div>
     </div>
     <div style="background:rgba(255,77,109,.07);border:1px solid rgba(255,77,109,.2);border-radius:var(--r);padding:11px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:18px">⚡</span><div><div style="font-family:var(--fh);font-size:12px;letter-spacing:1px;color:var(--red)">PRÓXIMO EVENTO DE ALTO IMPACTO</div><div style="font-size:11px;color:var(--muted);font-family:var(--fd);margin-top:2px">NFP — Próxima 6ª feira 14:30 UTC · Evite entrar 30 min antes</div></div></div>
@@ -609,6 +638,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
       <div style="display:flex;gap:6px"><button class="fb active" onclick="filterCT(this,'all')">TODOS</button><button class="fb" onclick="filterCT(this,'gold')">OURO</button><button class="fb" onclick="filterCT(this,'forex')">FOREX</button><button class="fb" onclick="filterCT(this,'crypto')">CRYPTO</button></div>
     </div>
     <div id="ct-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px"></div>
+  </div>
+
+  <!-- PAGE: FAQ (novo) -->
+  <div class="page" id="page-faq">
+    <div class="ph"><div><div class="pt">❓ FAQ</div><div class="ps">Perguntas frequentes sobre o NELLY-G PRO · IES v5</div></div></div>
+    <div style="max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:10px" id="faq-list">
+      <!-- gerado por JS -->
+    </div>
   </div>
 
   <!-- PAGE: PRICING -->
@@ -853,6 +890,18 @@ async function runIES(){
     setScore('ies-smc',Math.min(100,Math.max(0,(s.nBO||s.nBO2?10:0)+(s.mst==='BULLISH'?15:s.mst==='BEARISH'?-15:0)+50)),'ies-smc-bar','var(--orange)');
     setScore('ies-sess',Math.max(0,Math.min(100,sess.sessBonus+50)),'ies-sess-bar','var(--purple)');
     document.getElementById('ies-main-layout').style.display='block';
+    // Blackbox Widget
+    const bbWidget=document.getElementById('ies-blackbox-widget');if(bbWidget)bbWidget.style.display='block';
+    const bbScore=document.getElementById('bb-score-val');if(bbScore)bbScore.textContent=totalScore+'%';
+    const bbSignal=document.getElementById('bb-signal-line');if(bbSignal)bbSignal.textContent=`Sinal: ${s.dir==='HOLD'?'⏳ NEUTRO':'BUY'===s.dir?'🟢 COMPRA':'🔴 VENDA'} | ${sym} | ADX ${s.adx.toFixed(0)} | ${sess.sessName}`;
+    const bbChecks=document.getElementById('bb-checks');
+    if(bbChecks){const checks=[
+      {ok:s.adx>=22,lbl:`ADX ${s.adx.toFixed(0)} — ${s.adx>=30?'Tendência FORTE':s.adx>=22?'Moderada':'Fraca'}`},
+      {ok:s.mst!=='RANGING',lbl:`SMC: ${s.mst}${s.bos!=='none'?' ('+s.bos+')':''}`},
+      {ok:macroResult.target.conv>50,lbl:`Macro ${sym}: ${macroResult.target.dir===1?'BULLISH':'BEARISH'} (${macroResult.target.conv}%)`},
+      {ok:!s.cvd?.bearDiv&&!s.cvd?.bullDiv||true,lbl:`CVD Z-Score: ${s.cvd?.zscore?.toFixed(2)||0}σ ${s.cvd?.bearDiv?'⚠ DIV BEAR':s.cvd?.bullDiv?'⚠ DIV BULL':'✓ Sem divergência'}`},
+      {ok:!sess.asia,lbl:`Sessão: ${sess.sessName}`},
+    ];bbChecks.innerHTML=checks.map(c=>`<div style="display:flex;align-items:center;gap:8px;font-size:9px;font-family:var(--fd);color:var(--text)"><span style="color:${c.ok?'var(--green)':'var(--gold)'};font-size:11px">${c.ok?'✓':'⚠'}</span>${c.lbl}</div>`).join('');}
     const el=id=>document.getElementById(id);
     el('ies-entry').textContent=fmtP(lv.entry);el('ies-entry-sub').textContent=`Dir: ${s.dir} · ATR ${fmtP(s.atr)}`;
     el('ies-tp1').textContent=fmtP(lv.tp1);el('ies-tp-sub').textContent=`TP2: ${fmtP(lv.tp2)} · TP3: ${fmtP(lv.tp3)}`;
@@ -1280,25 +1329,76 @@ function renderStats(){
 /* ── TICKER ── */
 function buildTicker(){
   const tr=document.getElementById('ticker-track');if(!tr)return;
-  const TICK=['BTC/USD','ETH/USD','XAU/USD','EUR/USD','GBP/USD','BNB/USD','SOL/USD','XRP/USD'];
+  const TICK=[
+    {p:'XAU/USD',dec:2,src:'gold'},
+    {p:'BTC/USD',dec:0,src:'cg',id:'bitcoin'},
+    {p:'ETH/USD',dec:2,src:'cg',id:'ethereum'},
+    {p:'EUR/USD',dec:5,src:'fx',cur:'EUR'},
+    {p:'GBP/USD',dec:5,src:'fx',cur:'GBP'},
+    {p:'USD/JPY',dec:3,src:'fx',cur:'JPY',inv:true},
+    {p:'XAG/USD',dec:3,src:'silver'},
+    {p:'BNB/USD',dec:2,src:'cg',id:'binancecoin'},
+    {p:'SOL/USD',dec:2,src:'cg',id:'solana'},
+    {p:'XRP/USD',dec:4,src:'cg',id:'ripple'},
+    {p:'ADA/USD',dec:4,src:'cg',id:'cardano'},
+    {p:'DXY',dec:3,src:'static',val:104.2,chg:-0.12},
+  ];
   const items=[...TICK,...TICK];
-  tr.innerHTML=items.map((p,i)=>`<div class="ti"><span class="tl">${p}</span><span class="tp" id="tp${i%TICK.length}">—</span><span class="tc up" id="tc${i%TICK.length}">—</span></div>`).join('');
-  Promise.all([
-    fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,binancecoin,solana,ripple&order=market_cap_desc&per_page=5&sparkline=false&price_change_percentage=24h').then(r=>r.ok?r.json():[]).catch(()=>[]),
-    fetch('https://api.frankfurter.app/latest?from=USD&to=EUR,GBP').then(r=>r.ok?r.json():{rates:{}}).catch(()=>({rates:{}})),
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=usd&include_24hr_change=true').then(r=>r.ok?r.json():{}).catch(()=>({}))
-  ]).then(([crypto,fx,gold])=>{
-    const data={
-      'BTC/USD':{p:crypto.find(c=>c.id==='bitcoin')?.current_price||0,chg:crypto.find(c=>c.id==='bitcoin')?.price_change_percentage_24h||0},
-      'ETH/USD':{p:crypto.find(c=>c.id==='ethereum')?.current_price||0,chg:crypto.find(c=>c.id==='ethereum')?.price_change_percentage_24h||0},
-      'XAU/USD':{p:gold['pax-gold']?.usd||0,chg:gold['pax-gold']?.usd_24h_change||0},
-      'EUR/USD':{p:fx.rates?.EUR?1/fx.rates.EUR:0,chg:0},'GBP/USD':{p:fx.rates?.GBP?1/fx.rates.GBP:0,chg:0},
-      'BNB/USD':{p:crypto.find(c=>c.id==='binancecoin')?.current_price||0,chg:crypto.find(c=>c.id==='binancecoin')?.price_change_percentage_24h||0},
-      'SOL/USD':{p:crypto.find(c=>c.id==='solana')?.current_price||0,chg:crypto.find(c=>c.id==='solana')?.price_change_percentage_24h||0},
-      'XRP/USD':{p:crypto.find(c=>c.id==='ripple')?.current_price||0,chg:crypto.find(c=>c.id==='ripple')?.price_change_percentage_24h||0}
-    };
-    TICK.forEach((t,i)=>{const d=data[t];if(!d||!d.p)return;const pi=document.getElementById('tp'+i);const ci=document.getElementById('tc'+i);if(pi)pi.textContent=d.p.toFixed(t==='EUR/USD'||t==='GBP/USD'||t==='XRP/USD'?4:2);if(ci){ci.textContent=(d.chg>=0?'+':'')+d.chg.toFixed(2)+'%';ci.className='tc '+(d.chg>=0?'up':'dn');}});
-  });
+  tr.innerHTML=items.map((t,i)=>`<div class="ti"><span class="tl">${t.p}</span><span class="tp" id="tp${i%TICK.length}">—</span><span class="tc up" id="tc${i%TICK.length}">—%</span></div>`).join('');
+  
+  async function updateTicker(){
+    const results={};
+    // 1. XAU — metals.live (spot real) 
+    try{const r=await fetch('https://api.metals.live/v1/spot',{signal:AbortSignal.timeout(4000)});if(r.ok){const d=await r.json();if(Array.isArray(d)){d.forEach(m=>{if(m.gold)results['XAU/USD']={p:parseFloat(m.gold),chg:parseFloat(m.xau_24h_change||0)};if(m.silver)results['XAG/USD']={p:parseFloat(m.silver),chg:0};});}}}catch(e){}
+    // metals.live v1 alt format
+    if(!results['XAU/USD']){try{const r=await fetch('https://api.metals.live/v1/spot/gold',{signal:AbortSignal.timeout(3000)});if(r.ok){const d=await r.json();const p=Array.isArray(d)?d[0]?.price:d?.price;if(p)results['XAU/USD']={p:parseFloat(p),chg:0};}}catch(e){}}
+    // 2. Crypto — CoinGecko
+    try{const r=await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,binancecoin,solana,ripple,cardano&order=market_cap_desc&per_page=6&sparkline=false&price_change_percentage=24h',{signal:AbortSignal.timeout(5000)});if(r.ok){const d=await r.json();d.forEach(c=>{const map={bitcoin:'BTC/USD',ethereum:'ETH/USD',binancecoin:'BNB/USD',solana:'SOL/USD',ripple:'XRP/USD',cardano:'ADA/USD'};if(map[c.id])results[map[c.id]]={p:c.current_price,chg:c.price_change_percentage_24h||0};});}}catch(e){}
+    // 3. Forex — ECB Frankfurter
+    try{const r=await fetch('https://api.frankfurter.app/latest?from=USD&to=EUR,GBP,JPY,CHF,AUD,CAD',{signal:AbortSignal.timeout(4000)});if(r.ok){const d=await r.json();const rt=d.rates;if(rt.EUR)results['EUR/USD']={p:1/rt.EUR,chg:0};if(rt.GBP)results['GBP/USD']={p:1/rt.GBP,chg:0};if(rt.JPY)results['USD/JPY']={p:rt.JPY,chg:0};if(rt.CHF)results['USD/CHF']={p:rt.CHF,chg:0};}}catch(e){}
+    // 4. Update ticker elements
+    TICK.forEach((t,i)=>{
+      const d=t.src==='static'?{p:t.val,chg:t.chg}:results[t.p];
+      if(!d||!d.p)return;
+      const pi=document.getElementById('tp'+i);const ci=document.getElementById('tc'+i);
+      if(pi)pi.textContent=d.p>=1000?d.p.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}):d.p.toFixed(t.dec);
+      if(ci){ci.textContent=(d.chg>=0?'+':'')+d.chg.toFixed(2)+'%';ci.className='tc '+(d.chg>=0?'up':'dn');}
+    });
+  }
+  updateTicker();
+  setInterval(updateTicker,60000); // refresh cada 60s
+}
+
+/* ── FAQ ── */
+const FAQ_DATA=[
+  {q:'O que é o IES v5?',a:'O IES (Institutional Edge Scanner) v5 é o motor de análise do NELLY-G PRO. Combina 5 camadas: Macro (DXY, Yields, Risk-On/Off com magnitude-weighting), Micro (VWAP, CVD Z-Score), SMC (Order Blocks, FVG, BOS, Fibonacci), MTF multi-timeframe e Sessão. Gera um Score de Confiança de 0–100% e recomenda Entry, SL, TP1/TP2/TP3 com Position Sizing FTMO automático.'},
+  {q:'Como é calculado o preço do XAU/USD?',a:'O XAU/USD usa a API metals.live para obter o preço spot real do ouro em tempo real. Em caso de falha, usa o CoinDesk API como backup e CoinGecko PAXG como último fallback. Os candles técnicos do Binance PAXG são ajustados pela ratio metals.live/PAXG para manter análise técnica precisa com preço real.'},
+  {q:'O que é o News Guard?',a:'O News Guard é um sistema de bloqueio automático de sinais durante eventos macroeconómicos de alto impacto. Bloqueia sinais 20–30 minutos antes e 10–20 minutos depois de eventos como NFP, FOMC, CPI, BCE. O bloqueio é por activo específico — um evento do Fed bloqueia USD/XAU mas não necessariamente EUR/GBP.'},
+  {q:'Como funciona o Position Sizing?',a:'O Position Sizing Engine FTMO calcula automaticamente o lot size baseado no saldo da conta e percentagem de risco definidos. Para cada sinal, calcula: Lot Size = Risco$ / (SL_pips × PipValue). Inclui: risco monetário exacto, SL em pips, TP1 pips, Break-even win rate, número de trades até ao limite de drawdown diário FTMO (5%).'},
+  {q:'Como enviar sinais ao MetaTrader 5?',a:'O NELLY-G PRO integra com o mt5_server.py (Python local). Execute o servidor localmente, active a conexão na barra MT5 da página Sinais, e cada sinal pode ser enviado com 1 clique. O auto-send envia automaticamente cada novo sinal ao MT5. O formato de sinal inclui: DIRECÇÃO SÍMBOLO ENTRY SL TP1 TP2 TP3.'},
+  {q:'Que APIs são usadas para preços em tempo real?',a:'XAU/USD: metals.live (spot real) → CoinDesk → CoinGecko PAXG. Crypto (BTC, ETH, BNB, SOL, XRP, ADA): Binance API + CoinGecko. Forex (EUR, GBP, JPY, CHF, AUD, CAD): ECB Frankfurter. Calendário económico: ForexFactory JSON via allorigins.win proxy. Actualização do ticker: a cada 60 segundos.'},
+  {q:'O que é o ADR e como afecta os sinais?',a:'O ADR (Average Daily Range) é a média do range diário dos últimos 14 períodos. Indica quantos pips o activo move em média por dia. Quando >85% do ADR já foi consumido no dia, é sinalizado "Dia Esticado" e recomenda-se reduzir o tamanho da posição ou evitar entrar. Visível no IES Scanner e nos signal cards.'},
+  {q:'O que é o CVD Z-Score?',a:'O CVD (Cumulative Volume Delta) mede a diferença entre volume de compra e venda. O Z-Score normaliza o CVD: valores >1.5σ ou <-1.5σ indicam divergências significativas entre preço e volume (bull/bear divergences). Uma divergência bearish (preço nos máximos mas CVD nos mínimos) é sinal de fraqueza e reduz a confiança em BUY.'},
+  {q:'Qual a diferença entre TP1, TP2 e TP3?',a:'TP1 = 1× ATR — alvo conservador, R:R ~1:1.5. TP2 = 2.2× ATR — alvo principal, R:R ~1:3.5. TP3 = 3.5× ATR — alvo agressivo, R:R ~1:5+. A estratégia recomendada: sair 50% em TP1, mover SL para breakeven, deixar 50% para TP2/TP3. O sistema monitora automaticamente qual TP foi atingido e actualiza o outcome do sinal.'},
+  {q:'Como funciona o Fibonacci automático?',a:'O IES v5 detecta automaticamente o swing high/low dos últimos 50 períodos e desenha os níveis Fibonacci: 23.6%, 38.2%, 50%, 61.8% (Golden Pocket ⭐), 78.6%, 127%, 161.8%. O nível 61.8% tem confluência extra no Score (+0.5) quando o preço está nessa zona com direcção correcta. Visível na secção Key Levels do IES Scanner.'},
+];
+
+function renderFAQ(){
+  const list=document.getElementById('faq-list');if(!list)return;
+  list.innerHTML=FAQ_DATA.map((f,i)=>`
+    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:10px;overflow:hidden">
+      <div onclick="toggleFAQ(${i})" style="padding:18px 20px;font-weight:600;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:var(--fd);transition:color .2s" id="faq-q-${i}">
+        <span>${f.q}</span><span style="color:var(--green);font-size:16px;transition:transform .2s" id="faq-arrow-${i}">＋</span>
+      </div>
+      <div id="faq-a-${i}" style="display:none;padding:0 20px 16px;color:var(--muted);font-size:12px;line-height:1.8;font-family:var(--fd)">${f.a}</div>
+    </div>`).join('');
+}
+function toggleFAQ(i){
+  const a=document.getElementById('faq-a-'+i),ar=document.getElementById('faq-arrow-'+i);
+  if(!a)return;const open=a.style.display==='block';
+  // Close all
+  FAQ_DATA.forEach((_,j)=>{const el=document.getElementById('faq-a-'+j);const arj=document.getElementById('faq-arrow-'+j);if(el)el.style.display='none';if(arj)arj.textContent='＋';});
+  if(!open){a.style.display='block';if(ar)ar.textContent='－';}
 }
 
 /* ── AUTH ── */
@@ -1318,6 +1418,7 @@ function navTo(id,btn){
   if(id==='markets')fetchMarketPrices();
   if(id==='news'){renderNews();}
   if(id==='copytrade')renderCTGrid();
+  if(id==='faq')renderFAQ();
 }
 
 /* ── MODAL ── */
@@ -1332,7 +1433,7 @@ function sPeriod(btn){}
 
 /* ── INIT ── */
 function initApp(){
-  buildTicker();updateRiskDisplay();renderCTGrid();renderNews().catch(()=>{});
+  buildTicker();updateRiskDisplay();renderCTGrid();renderNews().catch(()=>{});renderFAQ();
   fetchMarketPrices();refreshSigHistTable();renderHistPage();renderStats();updateSessionChips();
   if(apiKey){const bar=document.getElementById('ai-status-bar');if(bar){bar.style.display='flex';bar.innerHTML='<span class="ai-badge">Claude IA Activo</span><span style="font-size:10px;color:var(--muted);font-family:var(--fd)">IES v5 + Macro + Narrativas activadas</span>';}}
   setTimeout(checkMT5Server,1500);
